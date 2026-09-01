@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS hak_akses (
+    id_akses BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    nama_akses VARCHAR(100) NOT NULL,
+    deskripsi VARCHAR(150)
+);
