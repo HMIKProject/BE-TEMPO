@@ -1,4 +1,4 @@
 CREATE TABLE IF NOT EXISTS useTest (
     nama_lengkap VARCHAR(255) NOT NULL,
     username VARCHAR(255) NOT NULL
-)
+);

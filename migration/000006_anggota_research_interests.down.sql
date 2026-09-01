@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS anggota_research_interests;
