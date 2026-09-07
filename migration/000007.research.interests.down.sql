@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS reasearch_interests;
+DROP TABLE IF EXISTS minat_riset;

@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS anggota_research_interests (
+CREATE TABLE IF NOT EXISTS minat_riset_anggota (
     id_anggota BIGINT REFERENCES anggota(id_anggota) ON DELETE CASCADE,
-    id_interest BIGINT REFERENCES research_interests(id_interest) ON DELETE CASCADE,
-    PRIMARY KEY (id_anggota, id_interest)
+    id_minat BIGINT REFERENCES minat_riset(id_minat) ON DELETE CASCADE,
+    PRIMARY KEY (id_anggota, id_minat)
 );

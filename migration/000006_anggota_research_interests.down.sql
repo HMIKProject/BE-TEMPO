@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS anggota_research_interests;
+DROP TABLE IF EXISTS minat_riset_anggota;

@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS anggota_skills;
+DROP TABLE IF EXISTS keahlian_anggota;
