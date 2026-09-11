@@ -1,19 +1,27 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/HMIKProject/hmik-corex-backend/internal/entity"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
 
 func main() {
-	// 1. Koneksi ke Database menggunakan port 5433 (seperti instruksi ke user)
-	dsn := "host=localhost user=postgres password=rahasia_admin dbname=hmik_db port=5433 sslmode=disable"
+	// Memuat file .env jika ada
+	godotenv.Load()
+
+	// 1. Koneksi ke Database menggunakan port 5433 (seperti instruksi ke user) atau DATABASE_URL dari Cloud
+	dsn := os.Getenv("DATABASE_URL")
+	if dsn == "" {
+		dsn = "host=localhost user=postgres password=rahasia_admin dbname=hmik_db port=5433 sslmode=disable"
+	}
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true, // Wajib agar tidak error plural (e.g. anggotas)
@@ -35,6 +43,7 @@ func main() {
 		"migration/000008_anggota_skills.up.sql",
 		"migration/000007.research.interests.up.sql",
 		"migration/000006_anggota_research_interests.up.sql",
+		"migration/000023_add_jabatan_to_anggota.up.sql",
 	}
 
 	fmt.Println("🏗️ Menjalankan skrip SQL untuk membangun tabel...")
@@ -66,49 +75,54 @@ func main() {
 	db.Create(&risetAI)
 	db.Create(&risetWeb)
 
-	// --- Seeder Pengguna & Anggota ---
-	// Data 1
-	pengguna1 := entity.Pengguna{
-		NamaLengkap:  "Damos Santoso",
-		Email:        "damos@student.ac.id",
-		Sandi:        "hashed_password_123",
-		FotoPengguna: "https://api.dicebear.com/7.x/avataaars/svg?seed=Damos",
+	// --- Seeder Pengguna & Anggota dari JSON ---
+	type AnggotaData struct {
+		Nim          string `json:"nim"`
+		NamaLengkap  string `json:"nama_lengkap"`
+		Email        string `json:"email"`
+		ProgramStudi string `json:"program_studi"`
+		Angkatan     int    `json:"angkatan"`
+		Jabatan      string `json:"jabatan"`
+		Foto         string `json:"foto"`
 	}
-	db.Create(&pengguna1)
 
-	anggota1 := entity.Anggota{
-		IdUser:       pengguna1.IdPengguna,
-		Nim:          "1900018001",
-		ProgramStudi: "Informatika",
-		Angkatan:     2019,
+	jsonFile, err := os.ReadFile("cmd/seeder/data_anggota.json")
+	if err != nil {
+		log.Fatalf("Gagal membaca file JSON data anggota: %v", err)
 	}
-	db.Create(&anggota1)
 
-	// Insert Pivot Anggota 1
-	db.Create(&entity.KeahlianAnggota{IdAnggota: anggota1.IdAnggota, IdKeahlian: keahlianGolang.IdKeahlian, TingkatPenguasaan: 5})
-	db.Create(&entity.KeahlianAnggota{IdAnggota: anggota1.IdAnggota, IdKeahlian: keahlianReact.IdKeahlian, TingkatPenguasaan: 4})
-	db.Create(&entity.MinatRisetAnggota{IdAnggota: anggota1.IdAnggota, IdMinat: risetWeb.IdMinat})
-
-	// Data 2
-	pengguna2 := entity.Pengguna{
-		NamaLengkap:  "Siti Aminah",
-		Email:        "siti@student.ac.id",
-		Sandi:        "hashed_password_456",
-		FotoPengguna: "https://api.dicebear.com/7.x/avataaars/svg?seed=Siti",
+	var dataAnggota []AnggotaData
+	if err := json.Unmarshal(jsonFile, &dataAnggota); err != nil {
+		log.Fatalf("Gagal parse JSON data anggota: %v", err)
 	}
-	db.Create(&pengguna2)
 
-	anggota2 := entity.Anggota{
-		IdUser:       pengguna2.IdPengguna,
-		Nim:          "1900018002",
-		ProgramStudi: "Sistem Informasi",
-		Angkatan:     2019,
+	for _, data := range dataAnggota {
+		pengguna := entity.Pengguna{
+			NamaLengkap:  data.NamaLengkap,
+			Email:        data.Email,
+			Sandi:        "HMIK" + data.Nim,
+			FotoPengguna: data.Foto,
+		}
+		
+		if pengguna.FotoPengguna == "" {
+			pengguna.FotoPengguna = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + data.NamaLengkap
+		}
+		
+		db.Create(&pengguna)
+
+		anggota := entity.Anggota{
+			IdUser:       pengguna.IdPengguna,
+			Nim:          data.Nim,
+			ProgramStudi: data.ProgramStudi,
+			Angkatan:     data.Angkatan,
+			Jabatan:      data.Jabatan,
+		}
+		db.Create(&anggota)
+
+		// Dummy Keahlian dan Minat Riset agar profile tidak kosong
+		db.Create(&entity.KeahlianAnggota{IdAnggota: anggota.IdAnggota, IdKeahlian: keahlianGolang.IdKeahlian, TingkatPenguasaan: 3})
+		db.Create(&entity.MinatRisetAnggota{IdAnggota: anggota.IdAnggota, IdMinat: risetWeb.IdMinat})
 	}
-	db.Create(&anggota2)
-
-	// Insert Pivot Anggota 2
-	db.Create(&entity.KeahlianAnggota{IdAnggota: anggota2.IdAnggota, IdKeahlian: keahlianReact.IdKeahlian, TingkatPenguasaan: 3})
-	db.Create(&entity.MinatRisetAnggota{IdAnggota: anggota2.IdAnggota, IdMinat: risetAI.IdMinat})
 
 	fmt.Println("✅ Proses Seeding berhasil! Database siap digunakan.")
 }

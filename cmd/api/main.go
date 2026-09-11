@@ -2,19 +2,29 @@ package main
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"github.com/HMIKProject/hmik-corex-backend/internal/routes"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
 
 func main() {
-	// 1. Koneksi ke Database (Port 5433 sesuai setup seeder)
-	dsn := "host=localhost user=postgres password=rahasia_admin dbname=hmik_db port=5433 sslmode=disable"
+	// Memuat file .env jika ada (Berguna untuk lokal, akan diabaikan jika di Cloud tanpa .env)
+	godotenv.Load()
+
+	// 1. Koneksi ke Database
+	// Render akan menyediakan DATABASE_URL, jika kosong kita pakai fallback ke localhost
+	dsn := os.Getenv("DATABASE_URL")
+	if dsn == "" {
+		dsn = "host=localhost user=postgres password=rahasia_admin dbname=hmik_db port=5433 sslmode=disable"
+	}
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,

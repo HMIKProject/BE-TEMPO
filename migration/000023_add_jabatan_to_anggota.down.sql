@@ -1,0 +1,1 @@
+ALTER TABLE anggota DROP COLUMN IF EXISTS jabatan;

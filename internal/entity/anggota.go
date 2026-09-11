@@ -9,6 +9,7 @@ type Anggota struct {
 	Nim          string    `gorm:"column:nim;type:varchar(20);unique;not null"`
 	ProgramStudi string    `gorm:"column:program_studi;type:varchar(100);not null"`
 	Angkatan     int       `gorm:"column:angkatan;not null"`
+	Jabatan      string    `gorm:"column:jabatan;type:varchar(100)"`
 	Status       bool      `gorm:"column:status;not null;default:true"`
 	Tautan       string    `gorm:"column:tautan;type:varchar(255)"`
 	Files        string    `gorm:"column:files;type:varchar(255)"`
