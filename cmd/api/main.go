@@ -14,6 +14,11 @@ import (
 	"gorm.io/gorm/schema"
 )
 
+// @title HMIK CoreX API
+// @version 1.0
+// @description API Dokumentasi untuk Backend Sistem Himpunan Mahasiswa Ilmu Komputer
+// @host localhost:8080
+// @BasePath /api/v1
 func main() {
 	// Memuat file .env jika ada (Berguna untuk lokal, akan diabaikan jika di Cloud tanpa .env)
 	godotenv.Load()

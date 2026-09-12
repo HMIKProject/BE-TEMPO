@@ -6,6 +6,10 @@ import (
 	"github.com/HMIKProject/hmik-corex-backend/internal/usecase"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+
+	_ "github.com/HMIKProject/hmik-corex-backend/docs"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // SetupRoutes mengatur semua pendaftaran jalur API (endpoints)
@@ -21,6 +25,9 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	uploadHandler := handler.NewUploadHandler()
 
 	// --- Mendaftarkan Routes ---
+
+	// Endpoint khusus untuk memunculkan halaman website Swagger UI
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	
 	// Grup API Versi 1
 	v1 := router.Group("/api/v1")

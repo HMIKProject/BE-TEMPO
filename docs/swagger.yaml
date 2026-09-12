@@ -1,0 +1,89 @@
+basePath: /api/v1
+definitions:
+  github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse:
+    properties:
+      data: {}
+      errors:
+        items:
+          type: string
+        type: array
+      message:
+        type: string
+      meta:
+        $ref: '#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.Meta'
+      status:
+        type: string
+    type: object
+  github_com_HMIKProject_hmik-corex-backend_pkg_utils.Meta:
+    properties:
+      current_page:
+        type: integer
+      limit_per_page:
+        type: integer
+      total_data:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API Dokumentasi untuk Backend Sistem Himpunan Mahasiswa Ilmu Komputer
+  title: HMIK CoreX API
+  version: "1.0"
+paths:
+  /company-profile/team:
+    get:
+      consumes:
+      - application/json
+      description: Mengembalikan semua data pengurus HMIK beserta keahlian dan minat
+        risetnya
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil data
+          schema:
+            $ref: '#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse'
+        "500":
+          description: Gagal mengambil data dari server
+          schema:
+            $ref: '#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse'
+      summary: Ambil daftar anggota tim HMIK
+      tags:
+      - Anggota
+  /upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Menerima file form-data gambar dan mengunggahnya ke Cloudinary,
+        mengembalikan URL gambar
+      parameters:
+      - description: File gambar yang akan diunggah
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: Folder tujuan di Cloudinary (opsional)
+        in: query
+        name: folder
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Gambar berhasil diunggah
+          schema:
+            $ref: '#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse'
+        "400":
+          description: Input file tidak valid
+          schema:
+            $ref: '#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse'
+        "500":
+          description: Gagal mengunggah ke Cloudinary
+          schema:
+            $ref: '#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse'
+      summary: Unggah gambar ke Cloudinary
+      tags:
+      - Upload
+swagger: "2.0"

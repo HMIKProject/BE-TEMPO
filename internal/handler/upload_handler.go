@@ -15,7 +15,18 @@ func NewUploadHandler() *UploadHandler {
 	return &UploadHandler{}
 }
 
-// UploadImage melayani request POST untuk mengunggah satu buah file gambar
+// UploadImage godoc
+// @Summary      Unggah gambar ke Cloudinary
+// @Description  Menerima file form-data gambar dan mengunggahnya ke Cloudinary, mengembalikan URL gambar
+// @Tags         Upload
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        image   formData  file    true  "File gambar yang akan diunggah"
+// @Param        folder  query     string  false "Folder tujuan di Cloudinary (opsional)"
+// @Success      200  {object}  utils.JSendResponse  "Gambar berhasil diunggah"
+// @Failure      400  {object}  utils.JSendResponse  "Input file tidak valid"
+// @Failure      500  {object}  utils.JSendResponse  "Gagal mengunggah ke Cloudinary"
+// @Router       /upload [post]
 func (h *UploadHandler) UploadImage(c *gin.Context) {
 	// 1. Set maksimal ukuran memori untuk file (contoh: 5MB)
 	c.Request.ParseMultipartForm(5 << 20)

@@ -18,7 +18,15 @@ func NewAnggotaHandler(usecase usecase.AnggotaUsecase) *AnggotaHandler {
 	return &AnggotaHandler{usecase}
 }
 
-// GetAllAnggota adalah endpoint untuk mengambil seluruh daftar tim company profile
+// GetAllAnggota godoc
+// @Summary      Ambil daftar anggota tim HMIK
+// @Description  Mengembalikan semua data pengurus HMIK beserta keahlian dan minat risetnya
+// @Tags         Anggota
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  utils.JSendResponse  "Berhasil mengambil data"
+// @Failure      500  {object}  utils.JSendResponse  "Gagal mengambil data dari server"
+// @Router       /company-profile/team [get]
 func (h *AnggotaHandler) GetAllAnggota(c *gin.Context) {
 	// Meminta Koki (Usecase) untuk mengambilkan data
 	anggotas, err := h.usecase.GetAllAnggota()
