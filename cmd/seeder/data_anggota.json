@@ -6,7 +6,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Ketua Himpunan",
-    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147765/hmik/cp/profile/hn9tybsxngppzgidnv5x.png"
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147765/hmik/cp/profile/hn9tybsxngppzgidnv5x.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Artificial Intelligence / Machine Learning",
+      "Cloud Computing / DevOps"
+    ]
   },
   {
     "nim": "105223049",
@@ -15,7 +20,11 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Wakil Ketua Himpunan",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243617/hmik/cp/profile/osqfpmvq4nadosyilotw.png",
+    "keahlian": [
+      "Data Science / Data Analytics",
+      "Cybersecurity"
+    ]
   },
   {
     "nim": "105223056",
@@ -24,7 +33,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Sekretaris 1",
-    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147766/hmik/cp/profile/rx2vr7hwh2zj1y7ze69j.png"
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147766/hmik/cp/profile/rx2vr7hwh2zj1y7ze69j.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Data Science / Data Analytics",
+      "Artificial Intelligence / Machine Learning"
+    ]
   },
   {
     "nim": "105224019",
@@ -33,7 +47,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
     "jabatan": "Sekretaris 2",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243618/hmik/cp/profile/kcmdbl5cjhshd09kprbx.png",
+    "keahlian": [
+      "Web Development",
+      "UI/UX Design",
+      "Project Management"
+    ]
   },
   {
     "nim": "105223048",
@@ -42,7 +61,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Bendahara 1",
-    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147767/hmik/cp/profile/nx2nxn8n40cj4wizcvbj.png"
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147767/hmik/cp/profile/nx2nxn8n40cj4wizcvbj.png",
+    "keahlian": [
+      "Cybersecurity",
+      "Multimedia / Video Editing",
+      "Public Speaking"
+    ]
   },
   {
     "nim": "105224028",
@@ -51,7 +75,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
     "jabatan": "Bendahara 2",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243619/hmik/cp/profile/tdpwdkacya4wuhcakuqr.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Artificial Intelligence / Machine Learning",
+      "Database"
+    ]
   },
   {
     "nim": "105223021",
@@ -60,7 +89,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Kepala Departemen Hubungan External",
-    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147768/hmik/cp/profile/xnikbc5durr8vm4cw335.png"
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147768/hmik/cp/profile/xnikbc5durr8vm4cw335.png",
+    "keahlian": [
+      "Data Science / Data Analytics",
+      "Artificial Intelligence / Machine Learning",
+      "Leadership / Organizational Management"
+    ]
   },
   {
     "nim": "105223040",
@@ -69,7 +103,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Sekretaris Departemen Hubungan External",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243620/hmik/cp/profile/zdbcnm4wwpoxwcyhby8l.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Web Development",
+      "Artificial Intelligence / Machine Learning"
+    ]
   },
   {
     "nim": "105223041",
@@ -78,7 +117,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Kadiv Pengabdian Masyarakat",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243621/hmik/cp/profile/o8wzrfwx7lu5p3rrqzxs.png",
+    "keahlian": [
+      "UI/UX Design",
+      "Graphic Design",
+      "Project Management"
+    ]
   },
   {
     "nim": "105223036",
@@ -87,7 +131,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243622/hmik/cp/profile/u33ps6pifrw1nfnm3v9d.png",
+    "keahlian": [
+      "Data Science / Data Analytics",
+      "Technical Writing / Documentation",
+      "Digital Marketing / Social Media"
+    ]
   },
   {
     "nim": "105223027",
@@ -96,7 +145,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243623/hmik/cp/profile/dswi2vf1l56lvrt8irui.png",
+    "keahlian": [
+      "Public Speaking",
+      "Leadership / Organizational Management",
+      "Robotic"
+    ]
   },
   {
     "nim": "105223034",
@@ -105,7 +159,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243625/hmik/cp/profile/avkma5pzaf78dtv7ft9h.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Web Development",
+      "Artificial Intelligence / Machine Learning"
+    ]
   },
   {
     "nim": "105223016",
@@ -114,7 +173,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243626/hmik/cp/profile/fuzdnflnd7j8t2xuiqdm.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Cloud Computing / DevOps",
+      "Leadership / Organizational Management"
+    ]
   },
   {
     "nim": "105223015",
@@ -123,7 +187,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243627/hmik/cp/profile/cnvjv3rhwmcqkjzbcdde.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Database",
+      "Project Management"
+    ]
   },
   {
     "nim": "105225004",
@@ -132,7 +201,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2025,
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243628/hmik/cp/profile/lmayd9ler5fbyjguijnl.png",
+    "keahlian": [
+      "Mobile Development",
+      "Data Science / Data Analytics",
+      "Cybersecurity"
+    ]
   },
   {
     "nim": "105223018",
@@ -141,7 +215,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Kadiv Kemitraan Strategis",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243629/hmik/cp/profile/zwuofd72pmnb5bpkkwby.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Web Development",
+      "UI/UX Design"
+    ]
   },
   {
     "nim": "105223012",
@@ -150,7 +229,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Kemitraan Strategis",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243630/hmik/cp/profile/l8nsbg4aczdh2t4qxn2s.png",
+    "keahlian": [
+      "UI/UX Design",
+      "Multimedia / Video Editing",
+      "Public Speaking"
+    ]
   },
   {
     "nim": "105225029",
@@ -159,7 +243,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2025,
     "jabatan": "Anggota Divisi Kemitraan Strategis",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243632/hmik/cp/profile/jacb7untttevabgqi7p8.png",
+    "keahlian": [
+      "Data Science / Data Analytics",
+      "Artificial Intelligence / Machine Learning",
+      "Cybersecurity"
+    ]
   },
   {
     "nim": "105223046",
@@ -168,7 +257,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Kepala Departemen Riset dan Teknologi",
-    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147769/hmik/cp/profile/qgdj9i7crgrkiv5u2awp.png"
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147769/hmik/cp/profile/qgdj9i7crgrkiv5u2awp.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Artificial Intelligence / Machine Learning",
+      "Cloud Computing / DevOps"
+    ]
   },
   {
     "nim": "105224030",
@@ -176,8 +270,12 @@
     "email": "105224030@student.universitaspertamina.ac.id",
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
-    "jabatan": "Kadiv Riset \u0026 Inovasi",
-    "foto": ""
+    "jabatan": "Kadiv Riset & Inovasi",
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243633/hmik/cp/profile/yvntecprilz7v2t38zlp.png",
+    "keahlian": [
+      "Data Science / Data Analytics",
+      "Cybersecurity"
+    ]
   },
   {
     "nim": "105223002",
@@ -185,8 +283,13 @@
     "email": "105223002@student.universitaspertamina.ac.id",
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
-    "jabatan": "Anggota Divisi Riset \u0026 Inovasi",
-    "foto": ""
+    "jabatan": "Anggota Divisi Riset & Inovasi",
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243634/hmik/cp/profile/rd5aqto59twwtkjcnj4e.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Data Science / Data Analytics",
+      "Artificial Intelligence / Machine Learning"
+    ]
   },
   {
     "nim": "105224044",
@@ -194,8 +297,13 @@
     "email": "105224044@student.universitaspertamina.ac.id",
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
-    "jabatan": "Anggota Divisi Riset \u0026 Inovasi",
-    "foto": ""
+    "jabatan": "Anggota Divisi Riset & Inovasi",
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243635/hmik/cp/profile/gkcaxoepu9o1w1hcwqwy.png",
+    "keahlian": [
+      "Web Development",
+      "UI/UX Design",
+      "Project Management"
+    ]
   },
   {
     "nim": "105225026",
@@ -203,8 +311,13 @@
     "email": "105225026@student.universitaspertamina.ac.id",
     "program_studi": "Ilmu komputer",
     "angkatan": 2025,
-    "jabatan": "Anggota Divisi Riset \u0026 Inovasi",
-    "foto": ""
+    "jabatan": "Anggota Divisi Riset & Inovasi",
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243636/hmik/cp/profile/voh3ofjj52um6qlctsno.png",
+    "keahlian": [
+      "Cybersecurity",
+      "Multimedia / Video Editing",
+      "Public Speaking"
+    ]
   },
   {
     "nim": "105224031",
@@ -213,7 +326,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
     "jabatan": "Kadiv Pengembangan Produk",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243637/hmik/cp/profile/u93mwpze49vxwjwtkvsq.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Artificial Intelligence / Machine Learning",
+      "Database"
+    ]
   },
   {
     "nim": "105224003",
@@ -222,7 +340,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
     "jabatan": "Anggota Divisi Pengembangan Produk",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243638/hmik/cp/profile/dlzhi8z1wdu4lhdczw8y.png",
+    "keahlian": [
+      "Data Science / Data Analytics",
+      "Artificial Intelligence / Machine Learning",
+      "Leadership / Organizational Management"
+    ]
   },
   {
     "nim": "105223045",
@@ -231,7 +354,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Pengembangan Produk",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243639/hmik/cp/profile/jurgf5wznxieeor86sfi.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Web Development",
+      "Artificial Intelligence / Machine Learning"
+    ]
   },
   {
     "nim": "105223025",
@@ -240,7 +368,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Pengembangan Produk",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243640/hmik/cp/profile/jexvnmrrmru4sguchszh.png",
+    "keahlian": [
+      "UI/UX Design",
+      "Graphic Design",
+      "Project Management"
+    ]
   },
   {
     "nim": "105225021",
@@ -249,7 +382,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2025,
     "jabatan": "Anggota Divisi Pengembangan Produk",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243641/hmik/cp/profile/u77nmqvfyri3yfyxs00l.png",
+    "keahlian": [
+      "Data Science / Data Analytics",
+      "Technical Writing / Documentation",
+      "Digital Marketing / Social Media"
+    ]
   },
   {
     "nim": "105223004",
@@ -258,7 +396,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Kepala Departemen Manahemen Internal",
-    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147770/hmik/cp/profile/pejnovfdv43cvosv23cy.png"
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147770/hmik/cp/profile/pejnovfdv43cvosv23cy.png",
+    "keahlian": [
+      "Public Speaking",
+      "Leadership / Organizational Management",
+      "Robotic"
+    ]
   },
   {
     "nim": "105223026",
@@ -267,7 +410,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Sekretaris Departemen Manahemen Internal",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243642/hmik/cp/profile/ltn5cczskmwm8bx8dz7x.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Web Development",
+      "Artificial Intelligence / Machine Learning"
+    ]
   },
   {
     "nim": "105224037",
@@ -276,7 +424,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
     "jabatan": "Kadiv MSDA",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243643/hmik/cp/profile/dr6xhxb2dmrrvvu8iyhz.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Cloud Computing / DevOps",
+      "Leadership / Organizational Management"
+    ]
   },
   {
     "nim": "105223050",
@@ -285,7 +438,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Anggota Divisi MSDA",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243644/hmik/cp/profile/mfh2m35xrmmamnkqstkq.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Database",
+      "Project Management"
+    ]
   },
   {
     "nim": "105224052",
@@ -293,8 +451,13 @@
     "email": "105224052@student.universitaspertamina.ac.id",
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
-    "jabatan": "Kadiv Minat \u0026 Bakat",
-    "foto": ""
+    "jabatan": "Kadiv Minat & Bakat",
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243645/hmik/cp/profile/izzeevvbxi0ocvysutsv.png",
+    "keahlian": [
+      "Mobile Development",
+      "Data Science / Data Analytics",
+      "Cybersecurity"
+    ]
   },
   {
     "nim": "105225001",
@@ -302,8 +465,13 @@
     "email": "105225001@student.universitaspertamina.ac.id",
     "program_studi": "Ilmu komputer",
     "angkatan": 2025,
-    "jabatan": "Anggota Divisi Minat \u0026 Bakat",
-    "foto": ""
+    "jabatan": "Anggota Divisi Minat & Bakat",
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243646/hmik/cp/profile/im9jfaotu2nfvhpz2uto.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Web Development",
+      "UI/UX Design"
+    ]
   },
   {
     "nim": "105224034",
@@ -311,8 +479,13 @@
     "email": "105224034@student.universitaspertamina.ac.id",
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
-    "jabatan": "Kadiv Aset \u0026 Perlengkapan",
-    "foto": ""
+    "jabatan": "Kadiv Aset & Perlengkapan",
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243647/hmik/cp/profile/qk9qq9et4rr5hmpbnopn.png",
+    "keahlian": [
+      "UI/UX Design",
+      "Multimedia / Video Editing",
+      "Public Speaking"
+    ]
   },
   {
     "nim": "105224020",
@@ -320,8 +493,13 @@
     "email": "105224020@student.universitaspertamina.ac.id",
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
-    "jabatan": "Anggota Divisi Aset \u0026 Perlengkapan",
-    "foto": ""
+    "jabatan": "Anggota Divisi Aset & Perlengkapan",
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243648/hmik/cp/profile/qqoztmi9fff3gcq636hh.png",
+    "keahlian": [
+      "Data Science / Data Analytics",
+      "Artificial Intelligence / Machine Learning",
+      "Cybersecurity"
+    ]
   },
   {
     "nim": "105224026",
@@ -329,8 +507,13 @@
     "email": "105224026@student.universitaspertamina.ac.id",
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
-    "jabatan": "Anggota Divisi Aset \u0026 Perlengkapan",
-    "foto": ""
+    "jabatan": "Anggota Divisi Aset & Perlengkapan",
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243649/hmik/cp/profile/ntejava180i4it5tw5po.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Artificial Intelligence / Machine Learning",
+      "Cloud Computing / DevOps"
+    ]
   },
   {
     "nim": "105225016",
@@ -338,8 +521,12 @@
     "email": "105225016@student.universitaspertamina.ac.id",
     "program_studi": "Ilmu komputer",
     "angkatan": 2025,
-    "jabatan": "Anggota Divisi Aset \u0026 Perlengkapan",
-    "foto": ""
+    "jabatan": "Anggota Divisi Aset & Perlengkapan",
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243650/hmik/cp/profile/oecmjhmsf9mxglhvjbty.png",
+    "keahlian": [
+      "Data Science / Data Analytics",
+      "Cybersecurity"
+    ]
   },
   {
     "nim": "105223005",
@@ -348,7 +535,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Kepala Departemen Academy UP",
-    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147772/hmik/cp/profile/yrddxsal8poam6uq8cp1.png"
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147772/hmik/cp/profile/yrddxsal8poam6uq8cp1.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Data Science / Data Analytics",
+      "Artificial Intelligence / Machine Learning"
+    ]
   },
   {
     "nim": "105224017",
@@ -357,7 +549,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
     "jabatan": "Kadiv Akademik",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789247374/hmik/cp/profile/devc4rdcc6zlfxwkgzap.png",
+    "keahlian": [
+      "Web Development",
+      "UI/UX Design",
+      "Project Management"
+    ]
   },
   {
     "nim": "105224007",
@@ -366,7 +563,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
     "jabatan": "Anggota Divisi Akademik",
-    "foto": ""
+    "foto": "",
+    "keahlian": [
+      "Cybersecurity",
+      "Multimedia / Video Editing",
+      "Public Speaking"
+    ]
   },
   {
     "nim": "105224038",
@@ -375,7 +577,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
     "jabatan": "Kadiv Keprofesian",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789247375/hmik/cp/profile/wtw3n8uxcssmd8gumgkm.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Artificial Intelligence / Machine Learning",
+      "Database"
+    ]
   },
   {
     "nim": "105224015",
@@ -384,7 +591,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2024,
     "jabatan": "Anggota Divisi Keprofesian",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789247376/hmik/cp/profile/bktrbyhebo9xnkwtybqv.png",
+    "keahlian": [
+      "Data Science / Data Analytics",
+      "Artificial Intelligence / Machine Learning",
+      "Leadership / Organizational Management"
+    ]
   },
   {
     "nim": "105225023",
@@ -393,7 +605,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2025,
     "jabatan": "Anggota Divisi Keprofesian",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789247377/hmik/cp/profile/debpdp2ask5fnagcwcvt.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Web Development",
+      "Artificial Intelligence / Machine Learning"
+    ]
   },
   {
     "nim": "105223007",
@@ -402,7 +619,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Kepala Departemen Media Informasi",
-    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147773/hmik/cp/profile/rpmvpb4uje8ekb0us1ru.png"
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147773/hmik/cp/profile/rpmvpb4uje8ekb0us1ru.png",
+    "keahlian": [
+      "UI/UX Design",
+      "Graphic Design",
+      "Project Management"
+    ]
   },
   {
     "nim": "105223009",
@@ -411,7 +633,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Sekretaris Departemen Media Informasi",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243651/hmik/cp/profile/p7w0zua7dpr7yzo3b8e0.png",
+    "keahlian": [
+      "Data Science / Data Analytics",
+      "Technical Writing / Documentation",
+      "Digital Marketing / Social Media"
+    ]
   },
   {
     "nim": "105223010",
@@ -420,7 +647,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
     "jabatan": "Kadiv Media Kreatif",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243652/hmik/cp/profile/yx1ztudmwrh1vs3a6cuo.png",
+    "keahlian": [
+      "Public Speaking",
+      "Leadership / Organizational Management",
+      "Robotic"
+    ]
   },
   {
     "nim": "105225006",
@@ -429,7 +661,12 @@
     "program_studi": "Ilmu komputer",
     "angkatan": 2025,
     "jabatan": "Anggota Divisi Media Kreatif",
-    "foto": ""
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243653/hmik/cp/profile/nqav9zgtftkooyiqzqc8.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Web Development",
+      "Artificial Intelligence / Machine Learning"
+    ]
   },
   {
     "nim": "105223017",
@@ -437,8 +674,13 @@
     "email": "105223017@student.universitaspertamina.ac.id",
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
-    "jabatan": "Kadiv Publikasi \u0026 Dokumentasi",
-    "foto": ""
+    "jabatan": "Kadiv Publikasi & Dokumentasi",
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243654/hmik/cp/profile/fbqdwmbbysdn4m3jesk7.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Cloud Computing / DevOps",
+      "Leadership / Organizational Management"
+    ]
   },
   {
     "nim": "105223019",
@@ -446,8 +688,13 @@
     "email": "105223019@student.universitaspertamina.ac.id",
     "program_studi": "Ilmu komputer",
     "angkatan": 2023,
-    "jabatan": "Anggota Divisi Publikasi \u0026 Dokumentasi",
-    "foto": ""
+    "jabatan": "Anggota Divisi Publikasi & Dokumentasi",
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243655/hmik/cp/profile/o7udkwj5ckggxzk7gpod.png",
+    "keahlian": [
+      "Pemrograman / Software Development",
+      "Database",
+      "Project Management"
+    ]
   },
   {
     "nim": "105225028",
@@ -455,7 +702,12 @@
     "email": "105225028@student.universitaspertamina.ac.id",
     "program_studi": "Ilmu komputer",
     "angkatan": 2025,
-    "jabatan": "Anggota Divisi Publikasi \u0026 Dokumentasi",
-    "foto": ""
+    "jabatan": "Anggota Divisi Publikasi & Dokumentasi",
+    "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243656/hmik/cp/profile/yrrhhnp6zaig6fgaabm7.png",
+    "keahlian": [
+      "Mobile Development",
+      "Data Science / Data Analytics",
+      "Cybersecurity"
+    ]
   }
 ]

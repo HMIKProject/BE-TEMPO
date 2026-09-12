@@ -63,27 +63,16 @@ func main() {
 	// Hapus isi data sebelumnya agar tidak conflict (Opsional, untuk seeder lokal)
 	db.Exec("TRUNCATE TABLE pengguna, anggota, keahlian, minat_riset, keahlian_anggota, minat_riset_anggota RESTART IDENTITY CASCADE;")
 
-	// --- Seeder Keahlian ---
-	keahlianGolang := entity.Keahlian{NamaKeahlian: "Golang", Deskripsi: "Bahasa Pemrograman Backend"}
-	keahlianReact := entity.Keahlian{NamaKeahlian: "React JS", Deskripsi: "Library Frontend Modern"}
-	db.Create(&keahlianGolang)
-	db.Create(&keahlianReact)
-
-	// --- Seeder Minat Riset ---
-	risetAI := entity.MinatRiset{NamaMinat: "Artificial Intelligence", Deskripsi: "AI & Machine Learning"}
-	risetWeb := entity.MinatRiset{NamaMinat: "Web Development", Deskripsi: "Pengembangan Website"}
-	db.Create(&risetAI)
-	db.Create(&risetWeb)
-
 	// --- Seeder Pengguna & Anggota dari JSON ---
 	type AnggotaData struct {
-		Nim          string `json:"nim"`
-		NamaLengkap  string `json:"nama_lengkap"`
-		Email        string `json:"email"`
-		ProgramStudi string `json:"program_studi"`
-		Angkatan     int    `json:"angkatan"`
-		Jabatan      string `json:"jabatan"`
-		Foto         string `json:"foto"`
+		Nim          string   `json:"nim"`
+		NamaLengkap  string   `json:"nama_lengkap"`
+		Email        string   `json:"email"`
+		ProgramStudi string   `json:"program_studi"`
+		Angkatan     int      `json:"angkatan"`
+		Jabatan      string   `json:"jabatan"`
+		Foto         string   `json:"foto"`
+		Keahlian     []string `json:"keahlian"`
 	}
 
 	jsonFile, err := os.ReadFile("cmd/seeder/data_anggota.json")
@@ -119,9 +108,19 @@ func main() {
 		}
 		db.Create(&anggota)
 
-		// Dummy Keahlian dan Minat Riset agar profile tidak kosong
-		db.Create(&entity.KeahlianAnggota{IdAnggota: anggota.IdAnggota, IdKeahlian: keahlianGolang.IdKeahlian, TingkatPenguasaan: 3})
-		db.Create(&entity.MinatRisetAnggota{IdAnggota: anggota.IdAnggota, IdMinat: risetWeb.IdMinat})
+		// Memasukkan Keahlian Dinamis dari Array JSON
+		for _, namaKeahlian := range data.Keahlian {
+			var k entity.Keahlian
+			// Cari keahlian, jika tidak ada maka buat baru
+			db.Where(entity.Keahlian{NamaKeahlian: namaKeahlian}).FirstOrCreate(&k, entity.Keahlian{NamaKeahlian: namaKeahlian})
+			
+			// Buat jembatan relasi many-to-many
+			db.Create(&entity.KeahlianAnggota{
+				IdAnggota:         anggota.IdAnggota,
+				IdKeahlian:        k.IdKeahlian,
+				TingkatPenguasaan: 3,
+			})
+		}
 	}
 
 	fmt.Println("✅ Proses Seeding berhasil! Database siap digunakan.")
