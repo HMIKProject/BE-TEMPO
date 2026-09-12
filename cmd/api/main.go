@@ -55,9 +55,14 @@ func main() {
 	// 4. Mendaftarkan Seluruh Endpoint API
 	routes.SetupRoutes(router, db)
 
-	// 5. Menjalankan Server di port 8080
-	log.Println("🚀 Server Backend berjalan di http://localhost:8080")
-	if err := router.Run(":8080"); err != nil {
+	// 5. Menjalankan Server
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	log.Printf("🚀 Server Backend berjalan di port %s", port)
+	if err := router.Run(":" + port); err != nil {
 		log.Fatal("Gagal menjalankan server:", err)
 	}
 }
