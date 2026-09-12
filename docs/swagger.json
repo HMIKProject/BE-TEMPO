@@ -6,7 +6,6 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
     "basePath": "/api/v1",
     "paths": {
         "/company-profile/team": {
@@ -26,13 +25,13 @@
                     "200": {
                         "description": "Berhasil mengambil data",
                         "schema": {
-                            "$ref": "#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse"
+                            "$ref": "#/definitions/utils.JSendResponse"
                         }
                     },
                     "500": {
                         "description": "Gagal mengambil data dari server",
                         "schema": {
-                            "$ref": "#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse"
+                            "$ref": "#/definitions/utils.JSendResponse"
                         }
                     }
                 }
@@ -70,19 +69,19 @@
                     "200": {
                         "description": "Gambar berhasil diunggah",
                         "schema": {
-                            "$ref": "#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse"
+                            "$ref": "#/definitions/utils.JSendResponse"
                         }
                     },
                     "400": {
                         "description": "Input file tidak valid",
                         "schema": {
-                            "$ref": "#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse"
+                            "$ref": "#/definitions/utils.JSendResponse"
                         }
                     },
                     "500": {
                         "description": "Gagal mengunggah ke Cloudinary",
                         "schema": {
-                            "$ref": "#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse"
+                            "$ref": "#/definitions/utils.JSendResponse"
                         }
                     }
                 }
@@ -90,7 +89,7 @@
         }
     },
     "definitions": {
-        "github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse": {
+        "utils.JSendResponse": {
             "type": "object",
             "properties": {
                 "data": {},
@@ -104,14 +103,14 @@
                     "type": "string"
                 },
                 "meta": {
-                    "$ref": "#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.Meta"
+                    "$ref": "#/definitions/utils.Meta"
                 },
                 "status": {
                     "type": "string"
                 }
             }
         },
-        "github_com_HMIKProject_hmik-corex-backend_pkg_utils.Meta": {
+        "utils.Meta": {
             "type": "object",
             "properties": {
                 "current_page": {

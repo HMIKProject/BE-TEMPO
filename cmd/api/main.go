@@ -17,7 +17,6 @@ import (
 // @title HMIK CoreX API
 // @version 1.0
 // @description API Dokumentasi untuk Backend Sistem Himpunan Mahasiswa Ilmu Komputer
-// @host localhost:8080
 // @BasePath /api/v1
 func main() {
 	// Memuat file .env jika ada (Berguna untuk lokal, akan diabaikan jika di Cloud tanpa .env)
@@ -44,7 +43,9 @@ func main() {
 
 	// 3. Konfigurasi Middleware CORS (Sesuai Panduan HMIK_note)
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173", "https://hmik.kampus.ac.id"},
+		AllowOriginFunc: func(origin string) bool {
+			return true // Mengizinkan semua Frontend (Netlify/Localhost) mengakses API ini
+		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},

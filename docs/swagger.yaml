@@ -1,6 +1,6 @@
 basePath: /api/v1
 definitions:
-  github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse:
+  utils.JSendResponse:
     properties:
       data: {}
       errors:
@@ -10,11 +10,11 @@ definitions:
       message:
         type: string
       meta:
-        $ref: '#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.Meta'
+        $ref: '#/definitions/utils.Meta'
       status:
         type: string
     type: object
-  github_com_HMIKProject_hmik-corex-backend_pkg_utils.Meta:
+  utils.Meta:
     properties:
       current_page:
         type: integer
@@ -25,7 +25,6 @@ definitions:
       total_pages:
         type: integer
     type: object
-host: localhost:8080
 info:
   contact: {}
   description: API Dokumentasi untuk Backend Sistem Himpunan Mahasiswa Ilmu Komputer
@@ -44,11 +43,11 @@ paths:
         "200":
           description: Berhasil mengambil data
           schema:
-            $ref: '#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse'
+            $ref: '#/definitions/utils.JSendResponse'
         "500":
           description: Gagal mengambil data dari server
           schema:
-            $ref: '#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse'
+            $ref: '#/definitions/utils.JSendResponse'
       summary: Ambil daftar anggota tim HMIK
       tags:
       - Anggota
@@ -74,15 +73,15 @@ paths:
         "200":
           description: Gambar berhasil diunggah
           schema:
-            $ref: '#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse'
+            $ref: '#/definitions/utils.JSendResponse'
         "400":
           description: Input file tidak valid
           schema:
-            $ref: '#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse'
+            $ref: '#/definitions/utils.JSendResponse'
         "500":
           description: Gagal mengunggah ke Cloudinary
           schema:
-            $ref: '#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse'
+            $ref: '#/definitions/utils.JSendResponse'
       summary: Unggah gambar ke Cloudinary
       tags:
       - Upload

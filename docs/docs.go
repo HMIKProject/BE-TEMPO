@@ -32,13 +32,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Berhasil mengambil data",
                         "schema": {
-                            "$ref": "#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse"
+                            "$ref": "#/definitions/utils.JSendResponse"
                         }
                     },
                     "500": {
                         "description": "Gagal mengambil data dari server",
                         "schema": {
-                            "$ref": "#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse"
+                            "$ref": "#/definitions/utils.JSendResponse"
                         }
                     }
                 }
@@ -76,19 +76,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Gambar berhasil diunggah",
                         "schema": {
-                            "$ref": "#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse"
+                            "$ref": "#/definitions/utils.JSendResponse"
                         }
                     },
                     "400": {
                         "description": "Input file tidak valid",
                         "schema": {
-                            "$ref": "#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse"
+                            "$ref": "#/definitions/utils.JSendResponse"
                         }
                     },
                     "500": {
                         "description": "Gagal mengunggah ke Cloudinary",
                         "schema": {
-                            "$ref": "#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse"
+                            "$ref": "#/definitions/utils.JSendResponse"
                         }
                     }
                 }
@@ -96,7 +96,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_HMIKProject_hmik-corex-backend_pkg_utils.JSendResponse": {
+        "utils.JSendResponse": {
             "type": "object",
             "properties": {
                 "data": {},
@@ -110,14 +110,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "meta": {
-                    "$ref": "#/definitions/github_com_HMIKProject_hmik-corex-backend_pkg_utils.Meta"
+                    "$ref": "#/definitions/utils.Meta"
                 },
                 "status": {
                     "type": "string"
                 }
             }
         },
-        "github_com_HMIKProject_hmik-corex-backend_pkg_utils.Meta": {
+        "utils.Meta": {
             "type": "object",
             "properties": {
                 "current_page": {
@@ -140,7 +140,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "HMIK CoreX API",
