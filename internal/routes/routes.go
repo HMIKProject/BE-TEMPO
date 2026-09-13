@@ -21,6 +21,11 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	anggotaUsecase := usecase.NewAnggotaUsecase(anggotaRepo)
 	anggotaHandler := handler.NewAnggotaHandler(anggotaUsecase)
 
+	// Departemen
+	departemenRepo := repository.NewDepartemenRepository(db)
+	departemenUsecase := usecase.NewDepartemenUsecase(departemenRepo)
+	departemenHandler := handler.NewDepartemenHandler(departemenUsecase)
+
 	// Upload (Cloudinary)
 	uploadHandler := handler.NewUploadHandler()
 
@@ -34,6 +39,9 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	{
 		// Endpoint untuk halaman tim Company Profile
 		v1.GET("/company-profile/team", anggotaHandler.GetAllAnggota)
+
+		// Endpoint untuk Departemen
+		v1.GET("/departemen", departemenHandler.GetAllDepartemen)
 
 		// Endpoint untuk unggah file gambar
 		v1.POST("/upload", uploadHandler.UploadImage)

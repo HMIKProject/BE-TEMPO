@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/HMIKProject/hmik-corex-backend/internal/entity"
 	"github.com/joho/godotenv"
@@ -44,6 +45,10 @@ func main() {
 		"migration/000007.research.interests.up.sql",
 		"migration/000006_anggota_research_interests.up.sql",
 		"migration/000023_add_jabatan_to_anggota.up.sql",
+		"migration/000024_departemen.up.sql",
+		"migration/000025_program_kerja.up.sql",
+		"migration/000026_add_departemen_to_anggota.up.sql",
+		"migration/000027_add_foto_to_proker.up.sql",
 	}
 
 	fmt.Println("🏗️ Menjalankan skrip SQL untuk membangun tabel...")
@@ -61,7 +66,7 @@ func main() {
 	fmt.Println("🌱 Memasukkan data dummy ke database...")
 
 	// Hapus isi data sebelumnya agar tidak conflict (Opsional, untuk seeder lokal)
-	db.Exec("TRUNCATE TABLE pengguna, anggota, keahlian, minat_riset, keahlian_anggota, minat_riset_anggota RESTART IDENTITY CASCADE;")
+	db.Exec("TRUNCATE TABLE departemen, program_kerja, pengguna, anggota, keahlian, minat_riset, keahlian_anggota, minat_riset_anggota RESTART IDENTITY CASCADE;")
 
 	// --- Seeder Pengguna & Anggota dari JSON ---
 	type AnggotaData struct {
@@ -96,8 +101,26 @@ func main() {
 		if pengguna.FotoPengguna == "" {
 			pengguna.FotoPengguna = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + data.NamaLengkap
 		}
-		
 		db.Create(&pengguna)
+		
+		var idDepartemen *int64
+		if data.Jabatan != "" && data.Jabatan != "Ketua Himpunan" && data.Jabatan != "Wakil Ketua Himpunan" && data.Jabatan != "Sekretaris 1" && data.Jabatan != "Sekretaris 2" && data.Jabatan != "Bendahara 1" && data.Jabatan != "Bendahara 2" {
+			namaDept := data.Jabatan
+			if strings.Contains(data.Jabatan, "Departemen ") {
+				namaDept = strings.SplitN(data.Jabatan, "Departemen ", 2)[1]
+			} else if strings.Contains(data.Jabatan, "Divisi ") {
+				namaDept = strings.SplitN(data.Jabatan, "Divisi ", 2)[1]
+			} else if strings.Contains(data.Jabatan, "Kadiv ") {
+				namaDept = strings.SplitN(data.Jabatan, "Kadiv ", 2)[1]
+			}
+			
+			var dept entity.Departemen
+			res := db.Where(entity.Departemen{NamaDepartemen: namaDept}).FirstOrCreate(&dept, entity.Departemen{NamaDepartemen: namaDept, Deskripsi: "Deskripsi resmi departemen " + namaDept, Logo: ""})
+			if res.RowsAffected > 0 { 
+				db.Create(&entity.ProgramKerja{IdDepartemen: dept.IdDepartemen, NamaProker: "Proker Unggulan " + namaDept, Deskripsi: "Contoh deskripsi proker otomatis.", Foto: ""})
+			}
+			idDepartemen = &dept.IdDepartemen
+		}
 
 		anggota := entity.Anggota{
 			IdUser:       pengguna.IdPengguna,
@@ -105,6 +128,7 @@ func main() {
 			ProgramStudi: data.ProgramStudi,
 			Angkatan:     data.Angkatan,
 			Jabatan:      data.Jabatan,
+			IdDepartemen: idDepartemen,
 		}
 		db.Create(&anggota)
 

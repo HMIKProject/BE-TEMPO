@@ -1,0 +1,2 @@
+ALTER TABLE program_kerja
+ADD COLUMN IF NOT EXISTS foto VARCHAR(255);

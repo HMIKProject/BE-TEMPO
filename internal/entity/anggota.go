@@ -16,6 +16,10 @@ type Anggota struct {
 	DibuatPada   time.Time `gorm:"column:dibuat_pada;autoCreateTime"`
 	DiubahPada   time.Time `gorm:"column:diubah_pada;autoUpdateTime"`
 
+	// Relasi One-to-Many (Opsional, karena BPH mungkin tidak ada di departemen spesifik)
+	IdDepartemen *int64      `gorm:"column:id_departemen"`
+	Departemen   *Departemen `gorm:"foreignKey:IdDepartemen;references:IdDepartemen"`
+
 	// Relasi One-to-Many ke Tabel Perantara (Pivot)
 	KeahlianAnggota   []KeahlianAnggota   `gorm:"foreignKey:IdAnggota"`
 	MinatRisetAnggota []MinatRisetAnggota `gorm:"foreignKey:IdAnggota"`
