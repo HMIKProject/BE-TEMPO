@@ -26,6 +26,11 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	departemenUsecase := usecase.NewDepartemenUsecase(departemenRepo)
 	departemenHandler := handler.NewDepartemenHandler(departemenUsecase)
 
+	// Program Kerja
+	prokerRepo := repository.NewProgramKerjaRepository(db)
+	prokerUsecase := usecase.NewProgramKerjaUsecase(prokerRepo)
+	prokerHandler := handler.NewProgramKerjaHandler(prokerUsecase)
+
 	// Upload (Cloudinary)
 	uploadHandler := handler.NewUploadHandler()
 
@@ -42,6 +47,9 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 
 		// Endpoint untuk Departemen
 		v1.GET("/departemen", departemenHandler.GetAllDepartemen)
+
+		// Endpoint untuk Program Kerja (Global, filterable by status/is_unggulan)
+		v1.GET("/program-kerja", prokerHandler.GetAllProgramKerja)
 
 		// Endpoint untuk unggah file gambar
 		v1.POST("/upload", uploadHandler.UploadImage)

@@ -49,6 +49,7 @@ func main() {
 		"migration/000025_program_kerja.up.sql",
 		"migration/000026_add_departemen_to_anggota.up.sql",
 		"migration/000027_add_foto_to_proker.up.sql",
+		"migration/000028_add_is_unggulan_to_proker.up.sql",
 	}
 
 	fmt.Println("🏗️ Menjalankan skrip SQL untuk membangun tabel...")
