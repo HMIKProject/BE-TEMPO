@@ -8,10 +8,11 @@
     "jabatan": "Ketua Himpunan",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147765/hmik/cp/profile/hn9tybsxngppzgidnv5x.png",
     "keahlian": [
-      "SQL",
-      "Microsoft Excel",
-      "Berpikir Kritis",
-      "Pemecahan Masalah"
+      "C++",
+      "Golang",
+      "React JS",
+      "Figma",
+      "SQL"
     ]
   },
   {
@@ -23,11 +24,13 @@
     "jabatan": "Wakil Ketua Himpunan",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243617/hmik/cp/profile/osqfpmvq4nadosyilotw.png",
     "keahlian": [
-      "Figma",
-      "React JS",
-      "PostgreSQL",
+      "C++",
+      "Java",
       "Golang",
-      "AI Harness"
+      "React JS",
+      "Microsoft Office",
+      "Python",
+      "Web Development"
     ]
   },
   {
@@ -48,9 +51,7 @@
     "angkatan": 2024,
     "jabatan": "Sekretaris 2",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243618/hmik/cp/profile/kcmdbl5cjhshd09kprbx.png",
-    "keahlian": [
-      "Python"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223048",
@@ -60,12 +61,7 @@
     "angkatan": 2023,
     "jabatan": "Bendahara 1",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147767/hmik/cp/profile/nx2nxn8n40cj4wizcvbj.png",
-    "keahlian": [
-      "Python",
-      "Java",
-      "SQL",
-      "Microsoft Excel"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105224028",
@@ -75,9 +71,7 @@
     "angkatan": 2024,
     "jabatan": "Bendahara 2",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243619/hmik/cp/profile/tdpwdkacya4wuhcakuqr.png",
-    "keahlian": [
-      "Python"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223021",
@@ -88,7 +82,7 @@
     "jabatan": "Kepala Departemen Hubungan External",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147768/hmik/cp/profile/xnikbc5durr8vm4cw335.png",
     "keahlian": [
-      "C++"
+      "Python"
     ]
   },
   {
@@ -99,11 +93,7 @@
     "angkatan": 2023,
     "jabatan": "Sekretaris Departemen Hubungan External",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243620/hmik/cp/profile/zdbcnm4wwpoxwcyhby8l.png",
-    "keahlian": [
-      "Canva",
-      "Figma",
-      "Capcut"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223041",
@@ -113,14 +103,7 @@
     "angkatan": 2023,
     "jabatan": "Kadiv Pengabdian Masyarakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243621/hmik/cp/profile/o8wzrfwx7lu5p3rrqzxs.png",
-    "keahlian": [
-      "Python",
-      "SQL",
-      "Microsoft Excel",
-      "Java",
-      "C++",
-      "HTML"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223036",
@@ -130,17 +113,7 @@
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243622/hmik/cp/profile/u33ps6pifrw1nfnm3v9d.png",
-    "keahlian": [
-      "Python",
-      "Java",
-      "Figma",
-      "SQL",
-      "Microsoft Excel",
-      "ROS",
-      "Gazebo",
-      "C++",
-      "Microsoft Office"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223027",
@@ -150,15 +123,7 @@
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243623/hmik/cp/profile/dswi2vf1l56lvrt8irui.png",
-    "keahlian": [
-      "C++",
-      "Java",
-      "Golang",
-      "React JS",
-      "Microsoft Office",
-      "Python",
-      "Web Development"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223034",
@@ -168,17 +133,7 @@
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243625/hmik/cp/profile/avkma5pzaf78dtv7ft9h.png",
-    "keahlian": [
-      "Laravel",
-      "Vue JS",
-      "React JS",
-      "Golang",
-      "DevOps",
-      "Unity",
-      "C#",
-      "Figma",
-      "Trello"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223016",
@@ -188,13 +143,7 @@
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243626/hmik/cp/profile/fuzdnflnd7j8t2xuiqdm.png",
-    "keahlian": [
-      "C++",
-      "Golang",
-      "React JS",
-      "Figma",
-      "SQL"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223015",
@@ -204,10 +153,7 @@
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243627/hmik/cp/profile/cnvjv3rhwmcqkjzbcdde.png",
-    "keahlian": [
-      "Python",
-      "SQL"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105225004",
@@ -217,10 +163,7 @@
     "angkatan": 2025,
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243628/hmik/cp/profile/lmayd9ler5fbyjguijnl.png",
-    "keahlian": [
-      "Java",
-      "HTML"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223018",
@@ -230,10 +173,7 @@
     "angkatan": 2023,
     "jabatan": "Kadiv Kemitraan Strategis",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243629/hmik/cp/profile/zwuofd72pmnb5bpkkwby.png",
-    "keahlian": [
-      "Capcut",
-      "Canva"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223012",
@@ -243,9 +183,7 @@
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Kemitraan Strategis",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243630/hmik/cp/profile/l8nsbg4aczdh2t4qxn2s.png",
-    "keahlian": [
-      "C++"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105225029",
@@ -255,12 +193,7 @@
     "angkatan": 2025,
     "jabatan": "Anggota Divisi Kemitraan Strategis",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243632/hmik/cp/profile/jacb7untttevabgqi7p8.png",
-    "keahlian": [
-      "SQL",
-      "Microsoft Excel",
-      "Berpikir Kritis",
-      "Pemecahan Masalah"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223046",
@@ -270,13 +203,7 @@
     "angkatan": 2023,
     "jabatan": "Kepala Departemen Riset dan Teknologi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147769/hmik/cp/profile/qgdj9i7crgrkiv5u2awp.png",
-    "keahlian": [
-      "Figma",
-      "React JS",
-      "PostgreSQL",
-      "Golang",
-      "AI Harness"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105224030",
@@ -296,9 +223,7 @@
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Riset & Inovasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243634/hmik/cp/profile/rd5aqto59twwtkjcnj4e.png",
-    "keahlian": [
-      "Python"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105224044",
@@ -309,10 +234,10 @@
     "jabatan": "Anggota Divisi Riset & Inovasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243635/hmik/cp/profile/gkcaxoepu9o1w1hcwqwy.png",
     "keahlian": [
-      "Python",
-      "Java",
       "SQL",
-      "Microsoft Excel"
+      "Microsoft Excel",
+      "Berpikir Kritis",
+      "Pemecahan Masalah"
     ]
   },
   {
@@ -323,9 +248,7 @@
     "angkatan": 2025,
     "jabatan": "Anggota Divisi Riset & Inovasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243636/hmik/cp/profile/voh3ofjj52um6qlctsno.png",
-    "keahlian": [
-      "Python"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105224031",
@@ -335,9 +258,7 @@
     "angkatan": 2024,
     "jabatan": "Kadiv Pengembangan Produk",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243637/hmik/cp/profile/u93mwpze49vxwjwtkvsq.png",
-    "keahlian": [
-      "C++"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105224003",
@@ -347,11 +268,7 @@
     "angkatan": 2024,
     "jabatan": "Anggota Divisi Pengembangan Produk",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243638/hmik/cp/profile/dlzhi8z1wdu4lhdczw8y.png",
-    "keahlian": [
-      "Canva",
-      "Figma",
-      "Capcut"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223045",
@@ -361,14 +278,7 @@
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Pengembangan Produk",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243639/hmik/cp/profile/jurgf5wznxieeor86sfi.png",
-    "keahlian": [
-      "Python",
-      "SQL",
-      "Microsoft Excel",
-      "Java",
-      "C++",
-      "HTML"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223025",
@@ -378,17 +288,7 @@
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Pengembangan Produk",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243640/hmik/cp/profile/jexvnmrrmru4sguchszh.png",
-    "keahlian": [
-      "Python",
-      "Java",
-      "Figma",
-      "SQL",
-      "Microsoft Excel",
-      "ROS",
-      "Gazebo",
-      "C++",
-      "Microsoft Office"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105225021",
@@ -398,15 +298,7 @@
     "angkatan": 2025,
     "jabatan": "Anggota Divisi Pengembangan Produk",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243641/hmik/cp/profile/u77nmqvfyri3yfyxs00l.png",
-    "keahlian": [
-      "C++",
-      "Java",
-      "Golang",
-      "React JS",
-      "Microsoft Office",
-      "Python",
-      "Web Development"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223004",
@@ -417,15 +309,18 @@
     "jabatan": "Kepala Departemen Manahemen Internal",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147770/hmik/cp/profile/pejnovfdv43cvosv23cy.png",
     "keahlian": [
-      "Laravel",
-      "Vue JS",
-      "React JS",
-      "Golang",
-      "DevOps",
-      "Unity",
-      "C#",
+      "Python",
+      "C++",
+      "Git",
+      "Java",
+      "PHP",
+      "Kotlin",
       "Figma",
-      "Trello"
+      "HTML & CSS",
+      "Microsoft Office",
+      "Oracle VirtualBox",
+      "JavaScript",
+      "Laravel"
     ]
   },
   {
@@ -436,13 +331,7 @@
     "angkatan": 2023,
     "jabatan": "Sekretaris Departemen Manahemen Internal",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243642/hmik/cp/profile/ltn5cczskmwm8bx8dz7x.png",
-    "keahlian": [
-      "C++",
-      "Golang",
-      "React JS",
-      "Figma",
-      "SQL"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105224037",
@@ -452,10 +341,7 @@
     "angkatan": 2024,
     "jabatan": "Kadiv MSDA",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243643/hmik/cp/profile/dr6xhxb2dmrrvvu8iyhz.png",
-    "keahlian": [
-      "Python",
-      "SQL"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223050",
@@ -479,8 +365,15 @@
     "jabatan": "Kadiv Minat & Bakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243645/hmik/cp/profile/izzeevvbxi0ocvysutsv.png",
     "keahlian": [
-      "Capcut",
-      "Canva"
+      "Python",
+      "Java",
+      "Figma",
+      "SQL",
+      "Microsoft Excel",
+      "ROS",
+      "Gazebo",
+      "C++",
+      "Microsoft Office"
     ]
   },
   {
@@ -491,9 +384,7 @@
     "angkatan": 2025,
     "jabatan": "Anggota Divisi Minat & Bakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243646/hmik/cp/profile/im9jfaotu2nfvhpz2uto.png",
-    "keahlian": [
-      "C++"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105224034",
@@ -503,12 +394,7 @@
     "angkatan": 2024,
     "jabatan": "Kadiv Aset & Perlengkapan",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243647/hmik/cp/profile/qk9qq9et4rr5hmpbnopn.png",
-    "keahlian": [
-      "SQL",
-      "Microsoft Excel",
-      "Berpikir Kritis",
-      "Pemecahan Masalah"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105224020",
@@ -518,13 +404,7 @@
     "angkatan": 2024,
     "jabatan": "Anggota Divisi Aset & Perlengkapan",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243648/hmik/cp/profile/qqoztmi9fff3gcq636hh.png",
-    "keahlian": [
-      "Figma",
-      "React JS",
-      "PostgreSQL",
-      "Golang",
-      "AI Harness"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105224026",
@@ -544,9 +424,7 @@
     "angkatan": 2025,
     "jabatan": "Anggota Divisi Aset & Perlengkapan",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243650/hmik/cp/profile/oecmjhmsf9mxglhvjbty.png",
-    "keahlian": [
-      "Python"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223005",
@@ -557,10 +435,11 @@
     "jabatan": "Kepala Departemen Academy UP",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147772/hmik/cp/profile/yrddxsal8poam6uq8cp1.png",
     "keahlian": [
-      "Python",
-      "Java",
-      "SQL",
-      "Microsoft Excel"
+      "Figma",
+      "React JS",
+      "PostgreSQL",
+      "Golang",
+      "AI Harness"
     ]
   },
   {
@@ -571,9 +450,7 @@
     "angkatan": 2024,
     "jabatan": "Kadiv Akademik",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789247374/hmik/cp/profile/devc4rdcc6zlfxwkgzap.png",
-    "keahlian": [
-      "Python"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105224007",
@@ -583,9 +460,7 @@
     "angkatan": 2024,
     "jabatan": "Anggota Divisi Akademik",
     "foto": "",
-    "keahlian": [
-      "C++"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105224038",
@@ -595,11 +470,7 @@
     "angkatan": 2024,
     "jabatan": "Kadiv Keprofesian",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789247375/hmik/cp/profile/wtw3n8uxcssmd8gumgkm.png",
-    "keahlian": [
-      "Canva",
-      "Figma",
-      "Capcut"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105224015",
@@ -610,12 +481,7 @@
     "jabatan": "Anggota Divisi Keprofesian",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789247376/hmik/cp/profile/bktrbyhebo9xnkwtybqv.png",
     "keahlian": [
-      "Python",
-      "SQL",
-      "Microsoft Excel",
-      "Java",
-      "C++",
-      "HTML"
+      "Python"
     ]
   },
   {
@@ -626,17 +492,7 @@
     "angkatan": 2025,
     "jabatan": "Anggota Divisi Keprofesian",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789247377/hmik/cp/profile/debpdp2ask5fnagcwcvt.png",
-    "keahlian": [
-      "Python",
-      "Java",
-      "Figma",
-      "SQL",
-      "Microsoft Excel",
-      "ROS",
-      "Gazebo",
-      "C++",
-      "Microsoft Office"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223007",
@@ -647,13 +503,9 @@
     "jabatan": "Kepala Departemen Media Informasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147773/hmik/cp/profile/rpmvpb4uje8ekb0us1ru.png",
     "keahlian": [
-      "C++",
-      "Java",
-      "Golang",
-      "React JS",
-      "Microsoft Office",
-      "Python",
-      "Web Development"
+      "Canva",
+      "Figma",
+      "Capcut"
     ]
   },
   {
@@ -665,15 +517,12 @@
     "jabatan": "Sekretaris Departemen Media Informasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243651/hmik/cp/profile/p7w0zua7dpr7yzo3b8e0.png",
     "keahlian": [
-      "Laravel",
-      "Vue JS",
-      "React JS",
-      "Golang",
-      "DevOps",
-      "Unity",
-      "C#",
-      "Figma",
-      "Trello"
+      "Python",
+      "SQL",
+      "Microsoft Excel",
+      "Java",
+      "C++",
+      "HTML"
     ]
   },
   {
@@ -684,13 +533,7 @@
     "angkatan": 2023,
     "jabatan": "Kadiv Media Kreatif",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243652/hmik/cp/profile/yx1ztudmwrh1vs3a6cuo.png",
-    "keahlian": [
-      "C++",
-      "Golang",
-      "React JS",
-      "Figma",
-      "SQL"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105225006",
@@ -700,10 +543,7 @@
     "angkatan": 2025,
     "jabatan": "Anggota Divisi Media Kreatif",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243653/hmik/cp/profile/nqav9zgtftkooyiqzqc8.png",
-    "keahlian": [
-      "Python",
-      "SQL"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223017",
@@ -713,10 +553,7 @@
     "angkatan": 2023,
     "jabatan": "Kadiv Publikasi & Dokumentasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243654/hmik/cp/profile/fbqdwmbbysdn4m3jesk7.png",
-    "keahlian": [
-      "Java",
-      "HTML"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223019",
@@ -726,10 +563,7 @@
     "angkatan": 2023,
     "jabatan": "Anggota Divisi Publikasi & Dokumentasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243655/hmik/cp/profile/o7udkwj5ckggxzk7gpod.png",
-    "keahlian": [
-      "Capcut",
-      "Canva"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105225028",
@@ -739,8 +573,6 @@
     "angkatan": 2025,
     "jabatan": "Anggota Divisi Publikasi & Dokumentasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243656/hmik/cp/profile/yrrhhnp6zaig6fgaabm7.png",
-    "keahlian": [
-      "C++"
-    ]
+    "keahlian": []
   }
 ]
