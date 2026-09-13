@@ -8,9 +8,10 @@
     "jabatan": "Ketua Himpunan",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147765/hmik/cp/profile/hn9tybsxngppzgidnv5x.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Artificial Intelligence / Machine Learning",
-      "Cloud Computing / DevOps"
+      "SQL",
+      "Microsoft Excel",
+      "Berpikir Kritis",
+      "Pemecahan Masalah"
     ]
   },
   {
@@ -22,8 +23,11 @@
     "jabatan": "Wakil Ketua Himpunan",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243617/hmik/cp/profile/osqfpmvq4nadosyilotw.png",
     "keahlian": [
-      "Data Science / Data Analytics",
-      "Cybersecurity"
+      "Figma",
+      "React JS",
+      "PostgreSQL",
+      "Golang",
+      "AI Harness"
     ]
   },
   {
@@ -34,11 +38,7 @@
     "angkatan": 2023,
     "jabatan": "Sekretaris 1",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147766/hmik/cp/profile/rx2vr7hwh2zj1y7ze69j.png",
-    "keahlian": [
-      "Pemrograman / Software Development",
-      "Data Science / Data Analytics",
-      "Artificial Intelligence / Machine Learning"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105224019",
@@ -49,9 +49,7 @@
     "jabatan": "Sekretaris 2",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243618/hmik/cp/profile/kcmdbl5cjhshd09kprbx.png",
     "keahlian": [
-      "Web Development",
-      "UI/UX Design",
-      "Project Management"
+      "Python"
     ]
   },
   {
@@ -63,9 +61,10 @@
     "jabatan": "Bendahara 1",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147767/hmik/cp/profile/nx2nxn8n40cj4wizcvbj.png",
     "keahlian": [
-      "Cybersecurity",
-      "Multimedia / Video Editing",
-      "Public Speaking"
+      "Python",
+      "Java",
+      "SQL",
+      "Microsoft Excel"
     ]
   },
   {
@@ -77,9 +76,7 @@
     "jabatan": "Bendahara 2",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243619/hmik/cp/profile/tdpwdkacya4wuhcakuqr.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Artificial Intelligence / Machine Learning",
-      "Database"
+      "Python"
     ]
   },
   {
@@ -91,9 +88,7 @@
     "jabatan": "Kepala Departemen Hubungan External",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147768/hmik/cp/profile/xnikbc5durr8vm4cw335.png",
     "keahlian": [
-      "Data Science / Data Analytics",
-      "Artificial Intelligence / Machine Learning",
-      "Leadership / Organizational Management"
+      "C++"
     ]
   },
   {
@@ -105,9 +100,9 @@
     "jabatan": "Sekretaris Departemen Hubungan External",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243620/hmik/cp/profile/zdbcnm4wwpoxwcyhby8l.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Web Development",
-      "Artificial Intelligence / Machine Learning"
+      "Canva",
+      "Figma",
+      "Capcut"
     ]
   },
   {
@@ -119,9 +114,12 @@
     "jabatan": "Kadiv Pengabdian Masyarakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243621/hmik/cp/profile/o8wzrfwx7lu5p3rrqzxs.png",
     "keahlian": [
-      "UI/UX Design",
-      "Graphic Design",
-      "Project Management"
+      "Python",
+      "SQL",
+      "Microsoft Excel",
+      "Java",
+      "C++",
+      "HTML"
     ]
   },
   {
@@ -133,9 +131,15 @@
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243622/hmik/cp/profile/u33ps6pifrw1nfnm3v9d.png",
     "keahlian": [
-      "Data Science / Data Analytics",
-      "Technical Writing / Documentation",
-      "Digital Marketing / Social Media"
+      "Python",
+      "Java",
+      "Figma",
+      "SQL",
+      "Microsoft Excel",
+      "ROS",
+      "Gazebo",
+      "C++",
+      "Microsoft Office"
     ]
   },
   {
@@ -147,9 +151,13 @@
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243623/hmik/cp/profile/dswi2vf1l56lvrt8irui.png",
     "keahlian": [
-      "Public Speaking",
-      "Leadership / Organizational Management",
-      "Robotic"
+      "C++",
+      "Java",
+      "Golang",
+      "React JS",
+      "Microsoft Office",
+      "Python",
+      "Web Development"
     ]
   },
   {
@@ -161,9 +169,15 @@
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243625/hmik/cp/profile/avkma5pzaf78dtv7ft9h.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Web Development",
-      "Artificial Intelligence / Machine Learning"
+      "Laravel",
+      "Vue JS",
+      "React JS",
+      "Golang",
+      "DevOps",
+      "Unity",
+      "C#",
+      "Figma",
+      "Trello"
     ]
   },
   {
@@ -175,9 +189,11 @@
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243626/hmik/cp/profile/fuzdnflnd7j8t2xuiqdm.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Cloud Computing / DevOps",
-      "Leadership / Organizational Management"
+      "C++",
+      "Golang",
+      "React JS",
+      "Figma",
+      "SQL"
     ]
   },
   {
@@ -189,9 +205,8 @@
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243627/hmik/cp/profile/cnvjv3rhwmcqkjzbcdde.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Database",
-      "Project Management"
+      "Python",
+      "SQL"
     ]
   },
   {
@@ -203,9 +218,8 @@
     "jabatan": "Anggota Divisi Pengabdian Masyarakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243628/hmik/cp/profile/lmayd9ler5fbyjguijnl.png",
     "keahlian": [
-      "Mobile Development",
-      "Data Science / Data Analytics",
-      "Cybersecurity"
+      "Java",
+      "HTML"
     ]
   },
   {
@@ -217,9 +231,8 @@
     "jabatan": "Kadiv Kemitraan Strategis",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243629/hmik/cp/profile/zwuofd72pmnb5bpkkwby.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Web Development",
-      "UI/UX Design"
+      "Capcut",
+      "Canva"
     ]
   },
   {
@@ -231,9 +244,7 @@
     "jabatan": "Anggota Divisi Kemitraan Strategis",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243630/hmik/cp/profile/l8nsbg4aczdh2t4qxn2s.png",
     "keahlian": [
-      "UI/UX Design",
-      "Multimedia / Video Editing",
-      "Public Speaking"
+      "C++"
     ]
   },
   {
@@ -245,9 +256,10 @@
     "jabatan": "Anggota Divisi Kemitraan Strategis",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243632/hmik/cp/profile/jacb7untttevabgqi7p8.png",
     "keahlian": [
-      "Data Science / Data Analytics",
-      "Artificial Intelligence / Machine Learning",
-      "Cybersecurity"
+      "SQL",
+      "Microsoft Excel",
+      "Berpikir Kritis",
+      "Pemecahan Masalah"
     ]
   },
   {
@@ -259,9 +271,11 @@
     "jabatan": "Kepala Departemen Riset dan Teknologi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147769/hmik/cp/profile/qgdj9i7crgrkiv5u2awp.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Artificial Intelligence / Machine Learning",
-      "Cloud Computing / DevOps"
+      "Figma",
+      "React JS",
+      "PostgreSQL",
+      "Golang",
+      "AI Harness"
     ]
   },
   {
@@ -272,10 +286,7 @@
     "angkatan": 2024,
     "jabatan": "Kadiv Riset & Inovasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243633/hmik/cp/profile/yvntecprilz7v2t38zlp.png",
-    "keahlian": [
-      "Data Science / Data Analytics",
-      "Cybersecurity"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105223002",
@@ -286,9 +297,7 @@
     "jabatan": "Anggota Divisi Riset & Inovasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243634/hmik/cp/profile/rd5aqto59twwtkjcnj4e.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Data Science / Data Analytics",
-      "Artificial Intelligence / Machine Learning"
+      "Python"
     ]
   },
   {
@@ -300,9 +309,10 @@
     "jabatan": "Anggota Divisi Riset & Inovasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243635/hmik/cp/profile/gkcaxoepu9o1w1hcwqwy.png",
     "keahlian": [
-      "Web Development",
-      "UI/UX Design",
-      "Project Management"
+      "Python",
+      "Java",
+      "SQL",
+      "Microsoft Excel"
     ]
   },
   {
@@ -314,9 +324,7 @@
     "jabatan": "Anggota Divisi Riset & Inovasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243636/hmik/cp/profile/voh3ofjj52um6qlctsno.png",
     "keahlian": [
-      "Cybersecurity",
-      "Multimedia / Video Editing",
-      "Public Speaking"
+      "Python"
     ]
   },
   {
@@ -328,9 +336,7 @@
     "jabatan": "Kadiv Pengembangan Produk",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243637/hmik/cp/profile/u93mwpze49vxwjwtkvsq.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Artificial Intelligence / Machine Learning",
-      "Database"
+      "C++"
     ]
   },
   {
@@ -342,9 +348,9 @@
     "jabatan": "Anggota Divisi Pengembangan Produk",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243638/hmik/cp/profile/dlzhi8z1wdu4lhdczw8y.png",
     "keahlian": [
-      "Data Science / Data Analytics",
-      "Artificial Intelligence / Machine Learning",
-      "Leadership / Organizational Management"
+      "Canva",
+      "Figma",
+      "Capcut"
     ]
   },
   {
@@ -356,9 +362,12 @@
     "jabatan": "Anggota Divisi Pengembangan Produk",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243639/hmik/cp/profile/jurgf5wznxieeor86sfi.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Web Development",
-      "Artificial Intelligence / Machine Learning"
+      "Python",
+      "SQL",
+      "Microsoft Excel",
+      "Java",
+      "C++",
+      "HTML"
     ]
   },
   {
@@ -370,9 +379,15 @@
     "jabatan": "Anggota Divisi Pengembangan Produk",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243640/hmik/cp/profile/jexvnmrrmru4sguchszh.png",
     "keahlian": [
-      "UI/UX Design",
-      "Graphic Design",
-      "Project Management"
+      "Python",
+      "Java",
+      "Figma",
+      "SQL",
+      "Microsoft Excel",
+      "ROS",
+      "Gazebo",
+      "C++",
+      "Microsoft Office"
     ]
   },
   {
@@ -384,9 +399,13 @@
     "jabatan": "Anggota Divisi Pengembangan Produk",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243641/hmik/cp/profile/u77nmqvfyri3yfyxs00l.png",
     "keahlian": [
-      "Data Science / Data Analytics",
-      "Technical Writing / Documentation",
-      "Digital Marketing / Social Media"
+      "C++",
+      "Java",
+      "Golang",
+      "React JS",
+      "Microsoft Office",
+      "Python",
+      "Web Development"
     ]
   },
   {
@@ -398,9 +417,15 @@
     "jabatan": "Kepala Departemen Manahemen Internal",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147770/hmik/cp/profile/pejnovfdv43cvosv23cy.png",
     "keahlian": [
-      "Public Speaking",
-      "Leadership / Organizational Management",
-      "Robotic"
+      "Laravel",
+      "Vue JS",
+      "React JS",
+      "Golang",
+      "DevOps",
+      "Unity",
+      "C#",
+      "Figma",
+      "Trello"
     ]
   },
   {
@@ -412,9 +437,11 @@
     "jabatan": "Sekretaris Departemen Manahemen Internal",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243642/hmik/cp/profile/ltn5cczskmwm8bx8dz7x.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Web Development",
-      "Artificial Intelligence / Machine Learning"
+      "C++",
+      "Golang",
+      "React JS",
+      "Figma",
+      "SQL"
     ]
   },
   {
@@ -426,9 +453,8 @@
     "jabatan": "Kadiv MSDA",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243643/hmik/cp/profile/dr6xhxb2dmrrvvu8iyhz.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Cloud Computing / DevOps",
-      "Leadership / Organizational Management"
+      "Python",
+      "SQL"
     ]
   },
   {
@@ -440,9 +466,8 @@
     "jabatan": "Anggota Divisi MSDA",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243644/hmik/cp/profile/mfh2m35xrmmamnkqstkq.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Database",
-      "Project Management"
+      "Java",
+      "HTML"
     ]
   },
   {
@@ -454,9 +479,8 @@
     "jabatan": "Kadiv Minat & Bakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243645/hmik/cp/profile/izzeevvbxi0ocvysutsv.png",
     "keahlian": [
-      "Mobile Development",
-      "Data Science / Data Analytics",
-      "Cybersecurity"
+      "Capcut",
+      "Canva"
     ]
   },
   {
@@ -468,9 +492,7 @@
     "jabatan": "Anggota Divisi Minat & Bakat",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243646/hmik/cp/profile/im9jfaotu2nfvhpz2uto.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Web Development",
-      "UI/UX Design"
+      "C++"
     ]
   },
   {
@@ -482,9 +504,10 @@
     "jabatan": "Kadiv Aset & Perlengkapan",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243647/hmik/cp/profile/qk9qq9et4rr5hmpbnopn.png",
     "keahlian": [
-      "UI/UX Design",
-      "Multimedia / Video Editing",
-      "Public Speaking"
+      "SQL",
+      "Microsoft Excel",
+      "Berpikir Kritis",
+      "Pemecahan Masalah"
     ]
   },
   {
@@ -496,9 +519,11 @@
     "jabatan": "Anggota Divisi Aset & Perlengkapan",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243648/hmik/cp/profile/qqoztmi9fff3gcq636hh.png",
     "keahlian": [
-      "Data Science / Data Analytics",
-      "Artificial Intelligence / Machine Learning",
-      "Cybersecurity"
+      "Figma",
+      "React JS",
+      "PostgreSQL",
+      "Golang",
+      "AI Harness"
     ]
   },
   {
@@ -509,11 +534,7 @@
     "angkatan": 2024,
     "jabatan": "Anggota Divisi Aset & Perlengkapan",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243649/hmik/cp/profile/ntejava180i4it5tw5po.png",
-    "keahlian": [
-      "Pemrograman / Software Development",
-      "Artificial Intelligence / Machine Learning",
-      "Cloud Computing / DevOps"
-    ]
+    "keahlian": []
   },
   {
     "nim": "105225016",
@@ -524,8 +545,7 @@
     "jabatan": "Anggota Divisi Aset & Perlengkapan",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243650/hmik/cp/profile/oecmjhmsf9mxglhvjbty.png",
     "keahlian": [
-      "Data Science / Data Analytics",
-      "Cybersecurity"
+      "Python"
     ]
   },
   {
@@ -537,9 +557,10 @@
     "jabatan": "Kepala Departemen Academy UP",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147772/hmik/cp/profile/yrddxsal8poam6uq8cp1.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Data Science / Data Analytics",
-      "Artificial Intelligence / Machine Learning"
+      "Python",
+      "Java",
+      "SQL",
+      "Microsoft Excel"
     ]
   },
   {
@@ -551,9 +572,7 @@
     "jabatan": "Kadiv Akademik",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789247374/hmik/cp/profile/devc4rdcc6zlfxwkgzap.png",
     "keahlian": [
-      "Web Development",
-      "UI/UX Design",
-      "Project Management"
+      "Python"
     ]
   },
   {
@@ -565,9 +584,7 @@
     "jabatan": "Anggota Divisi Akademik",
     "foto": "",
     "keahlian": [
-      "Cybersecurity",
-      "Multimedia / Video Editing",
-      "Public Speaking"
+      "C++"
     ]
   },
   {
@@ -579,9 +596,9 @@
     "jabatan": "Kadiv Keprofesian",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789247375/hmik/cp/profile/wtw3n8uxcssmd8gumgkm.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Artificial Intelligence / Machine Learning",
-      "Database"
+      "Canva",
+      "Figma",
+      "Capcut"
     ]
   },
   {
@@ -593,9 +610,12 @@
     "jabatan": "Anggota Divisi Keprofesian",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789247376/hmik/cp/profile/bktrbyhebo9xnkwtybqv.png",
     "keahlian": [
-      "Data Science / Data Analytics",
-      "Artificial Intelligence / Machine Learning",
-      "Leadership / Organizational Management"
+      "Python",
+      "SQL",
+      "Microsoft Excel",
+      "Java",
+      "C++",
+      "HTML"
     ]
   },
   {
@@ -607,9 +627,15 @@
     "jabatan": "Anggota Divisi Keprofesian",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789247377/hmik/cp/profile/debpdp2ask5fnagcwcvt.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Web Development",
-      "Artificial Intelligence / Machine Learning"
+      "Python",
+      "Java",
+      "Figma",
+      "SQL",
+      "Microsoft Excel",
+      "ROS",
+      "Gazebo",
+      "C++",
+      "Microsoft Office"
     ]
   },
   {
@@ -621,9 +647,13 @@
     "jabatan": "Kepala Departemen Media Informasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789147773/hmik/cp/profile/rpmvpb4uje8ekb0us1ru.png",
     "keahlian": [
-      "UI/UX Design",
-      "Graphic Design",
-      "Project Management"
+      "C++",
+      "Java",
+      "Golang",
+      "React JS",
+      "Microsoft Office",
+      "Python",
+      "Web Development"
     ]
   },
   {
@@ -635,9 +665,15 @@
     "jabatan": "Sekretaris Departemen Media Informasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243651/hmik/cp/profile/p7w0zua7dpr7yzo3b8e0.png",
     "keahlian": [
-      "Data Science / Data Analytics",
-      "Technical Writing / Documentation",
-      "Digital Marketing / Social Media"
+      "Laravel",
+      "Vue JS",
+      "React JS",
+      "Golang",
+      "DevOps",
+      "Unity",
+      "C#",
+      "Figma",
+      "Trello"
     ]
   },
   {
@@ -649,9 +685,11 @@
     "jabatan": "Kadiv Media Kreatif",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243652/hmik/cp/profile/yx1ztudmwrh1vs3a6cuo.png",
     "keahlian": [
-      "Public Speaking",
-      "Leadership / Organizational Management",
-      "Robotic"
+      "C++",
+      "Golang",
+      "React JS",
+      "Figma",
+      "SQL"
     ]
   },
   {
@@ -663,9 +701,8 @@
     "jabatan": "Anggota Divisi Media Kreatif",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243653/hmik/cp/profile/nqav9zgtftkooyiqzqc8.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Web Development",
-      "Artificial Intelligence / Machine Learning"
+      "Python",
+      "SQL"
     ]
   },
   {
@@ -677,9 +714,8 @@
     "jabatan": "Kadiv Publikasi & Dokumentasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243654/hmik/cp/profile/fbqdwmbbysdn4m3jesk7.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Cloud Computing / DevOps",
-      "Leadership / Organizational Management"
+      "Java",
+      "HTML"
     ]
   },
   {
@@ -691,9 +727,8 @@
     "jabatan": "Anggota Divisi Publikasi & Dokumentasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243655/hmik/cp/profile/o7udkwj5ckggxzk7gpod.png",
     "keahlian": [
-      "Pemrograman / Software Development",
-      "Database",
-      "Project Management"
+      "Capcut",
+      "Canva"
     ]
   },
   {
@@ -705,9 +740,7 @@
     "jabatan": "Anggota Divisi Publikasi & Dokumentasi",
     "foto": "https://res.cloudinary.com/du9sbnbx9/image/upload/v1789243656/hmik/cp/profile/yrrhhnp6zaig6fgaabm7.png",
     "keahlian": [
-      "Mobile Development",
-      "Data Science / Data Analytics",
-      "Cybersecurity"
+      "C++"
     ]
   }
 ]
