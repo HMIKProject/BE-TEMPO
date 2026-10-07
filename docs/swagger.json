@@ -1,8 +1,12 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "API Dokumentasi untuk Backend Sistem Himpunan Mahasiswa Ilmu Komputer",
+        "title": "HMIK CoreX API",
+        "contact": {},
+        "version": "1.0"
     },
+    "basePath": "/api/v1",
     "paths": {
         "/api/v1/auth/login": {
             "post": {
