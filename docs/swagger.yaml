@@ -1,5 +1,29 @@
-basePath: /api/v1
 definitions:
+  entity.LoginRequest:
+    properties:
+      identifier:
+        description: Bisa berupa Email atau Username
+        example: hmik.human.01@hmik.com
+        type: string
+      password:
+        example: Human102230462026
+        type: string
+    required:
+    - identifier
+    - password
+    type: object
+  entity.LoginResponse:
+    properties:
+      id_pengguna:
+        example: 1
+        type: integer
+      nama_lengkap:
+        example: Budi Human Resource
+        type: string
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
   utils.JSendResponse:
     properties:
       data: {}
@@ -27,10 +51,39 @@ definitions:
     type: object
 info:
   contact: {}
-  description: API Dokumentasi untuk Backend Sistem Himpunan Mahasiswa Ilmu Komputer
-  title: HMIK CoreX API
-  version: "1.0"
 paths:
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Endpoint untuk mendapatkan JWT Token menggunakan email/username
+        dan password
+      parameters:
+      - description: Kredensial Login
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.LoginResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      summary: Login Pengurus HMIK
+      tags:
+      - Auth
   /company-profile/team:
     get:
       consumes:
@@ -51,6 +104,55 @@ paths:
       summary: Ambil daftar anggota tim HMIK
       tags:
       - Anggota
+  /departemen:
+    get:
+      consumes:
+      - application/json
+      description: Mengembalikan semua data departemen beserta anggota dan program
+        kerjanya
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil data departemen
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Gagal mengambil data dari server
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      summary: Ambil daftar departemen HMIK
+      tags:
+      - Departemen
+  /program-kerja:
+    get:
+      consumes:
+      - application/json
+      description: Mengembalikan data program kerja, bisa difilter berdasarkan status
+        (Mendatang) atau is_unggulan (true/false)
+      parameters:
+      - description: 'Filter berdasarkan status (Contoh: Mendatang, Terlaksana)'
+        in: query
+        name: status
+        type: string
+      - description: Filter berdasarkan apakah proker unggulan (true/false)
+        in: query
+        name: is_unggulan
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil data program kerja
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Gagal mengambil data dari server
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      summary: Ambil daftar program kerja HMIK
+      tags:
+      - ProgramKerja
   /upload:
     post:
       consumes:

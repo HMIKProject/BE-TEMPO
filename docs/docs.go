@@ -15,6 +15,58 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/auth/login": {
+            "post": {
+                "description": "Endpoint untuk mendapatkan JWT Token menggunakan email/username dan password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login Pengurus HMIK",
+                "parameters": [
+                    {
+                        "description": "Kredensial Login",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.LoginResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/company-profile/team": {
             "get": {
                 "description": "Mengembalikan semua data pengurus HMIK beserta keahlian dan minat risetnya",
@@ -31,6 +83,78 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "Berhasil mengambil data",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal mengambil data dari server",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/departemen": {
+            "get": {
+                "description": "Mengembalikan semua data departemen beserta anggota dan program kerjanya",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Departemen"
+                ],
+                "summary": "Ambil daftar departemen HMIK",
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil data departemen",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal mengambil data dari server",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/program-kerja": {
+            "get": {
+                "description": "Mengembalikan data program kerja, bisa difilter berdasarkan status (Mendatang) atau is_unggulan (true/false)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ProgramKerja"
+                ],
+                "summary": "Ambil daftar program kerja HMIK",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter berdasarkan status (Contoh: Mendatang, Terlaksana)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter berdasarkan apakah proker unggulan (true/false)",
+                        "name": "is_unggulan",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil data program kerja",
                         "schema": {
                             "$ref": "#/definitions/utils.JSendResponse"
                         }
@@ -96,6 +220,41 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "entity.LoginRequest": {
+            "type": "object",
+            "required": [
+                "identifier",
+                "password"
+            ],
+            "properties": {
+                "identifier": {
+                    "description": "Bisa berupa Email atau Username",
+                    "type": "string",
+                    "example": "hmik.human.01@hmik.com"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "Human102230462026"
+                }
+            }
+        },
+        "entity.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "id_pengguna": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "nama_lengkap": {
+                    "type": "string",
+                    "example": "Budi Human Resource"
+                },
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+            }
+        },
         "utils.JSendResponse": {
             "type": "object",
             "properties": {
@@ -139,12 +298,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
+	Version:          "",
 	Host:             "",
-	BasePath:         "/api/v1",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "HMIK CoreX API",
-	Description:      "API Dokumentasi untuk Backend Sistem Himpunan Mahasiswa Ilmu Komputer",
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

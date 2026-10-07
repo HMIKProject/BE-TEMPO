@@ -34,6 +34,11 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	// Upload (Cloudinary)
 	uploadHandler := handler.NewUploadHandler()
 
+	// Auth
+	penggunaRepo := repository.NewPenggunaRepository(db)
+	authUsecase := usecase.NewAuthUsecase(penggunaRepo)
+	authHandler := handler.NewAuthHandler(authUsecase)
+
 	// --- Mendaftarkan Routes ---
 
 	// Endpoint khusus untuk memunculkan halaman website Swagger UI
@@ -42,6 +47,12 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	// Grup API Versi 1
 	v1 := router.Group("/api/v1")
 	{
+		// Auth Routes
+		authGroup := v1.Group("/auth")
+		{
+			authGroup.POST("/login", authHandler.Login)
+		}
+
 		// Endpoint untuk halaman tim Company Profile
 		v1.GET("/company-profile/team", anggotaHandler.GetAllAnggota)
 
