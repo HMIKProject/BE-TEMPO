@@ -20,6 +20,9 @@ type Anggota struct {
 	IdDepartemen *int64      `gorm:"column:id_departemen"`
 	Departemen   *Departemen `gorm:"foreignKey:IdDepartemen;references:IdDepartemen"`
 
+	IdDivisi     *int64            `gorm:"column:id_divisi"`
+	Divisi       *DivisiDepartemen `gorm:"foreignKey:IdDivisi;references:IdDivisi"`
+
 	// Relasi One-to-Many ke Tabel Perantara (Pivot)
 	KeahlianAnggota   []KeahlianAnggota   `gorm:"foreignKey:IdAnggota"`
 	MinatRisetAnggota []MinatRisetAnggota `gorm:"foreignKey:IdAnggota"`

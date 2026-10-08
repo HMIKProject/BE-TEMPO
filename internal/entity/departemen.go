@@ -11,6 +11,7 @@ type Departemen struct {
 	DiperbaruiPada time.Time      `gorm:"column:diperbarui_pada;autoUpdateTime" json:"diperbarui_pada"`
 
 	// Relasi One-to-Many
-	ProgramKerja []ProgramKerja `gorm:"foreignKey:IdDepartemen" json:"program_kerja,omitempty"`
-	Anggota      []Anggota      `gorm:"foreignKey:IdDepartemen" json:"anggota,omitempty"`
+	Divisi       []DivisiDepartemen `gorm:"foreignKey:IdDepartemen" json:"divisi,omitempty"`
+	ProgramKerja []ProgramKerja     `gorm:"foreignKey:IdDepartemen" json:"program_kerja,omitempty"`
+	Anggota      []Anggota          `gorm:"foreignKey:IdDepartemen" json:"anggota,omitempty"`
 }

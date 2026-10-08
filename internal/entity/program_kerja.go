@@ -5,6 +5,7 @@ import "time"
 type ProgramKerja struct {
 	IdProker       int64      `gorm:"primaryKey;column:id_proker;autoIncrement" json:"id_proker"`
 	IdDepartemen   int64      `gorm:"column:id_departemen;not null" json:"id_departemen"`
+	IdDivisi       *int64     `gorm:"column:id_divisi" json:"id_divisi"`
 	NamaProker     string     `gorm:"column:nama_proker;type:varchar(255);not null" json:"nama_proker"`
 	Deskripsi      string     `gorm:"column:deskripsi;type:text" json:"deskripsi"`
 	Foto           string     `gorm:"column:foto;type:varchar(255)" json:"foto"`

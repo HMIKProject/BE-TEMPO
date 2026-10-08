@@ -20,6 +20,7 @@ func NewDepartemenRepository(db *gorm.DB) DepartemenRepository {
 func (r *departemenRepository) FindAll() ([]entity.Departemen, error) {
 	var depts []entity.Departemen
 	err := r.db.
+		Preload("Divisi").
 		Preload("ProgramKerja").
 		Preload("Anggota").
 		Preload("Anggota.Pengguna").
