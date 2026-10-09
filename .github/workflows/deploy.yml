@@ -6,8 +6,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # Nama image wajib huruf kecil semua (lowercase) untuk Docker
-  IMAGE_NAME: hmikproject/hmik-backend-api
+  # Mengubah nama package agar SAMA dengan nama repository untuk menghindari error permission_denied GITHUB_TOKEN
+  IMAGE_NAME: hmikproject/hmik-corex-backend
 
 jobs:
   build-and-push-image:
