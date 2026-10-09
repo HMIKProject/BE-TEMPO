@@ -188,15 +188,11 @@ func main() {
 	for _, data := range dataAnggota {
 		hashedSandi, _ := bcrypt.GenerateFromPassword([]byte("HMIK"+data.Nim), bcrypt.DefaultCost)
 		pengguna := entity.Pengguna{
-			NamaLengkap:  data.NamaLengkap,
 			Email:        data.Email,
 			Sandi:        string(hashedSandi),
-			FotoPengguna: data.Foto,
+			NamaPengguna: data.Jabatan, // Contoh penggunaan field sisa
 		}
 		
-		if pengguna.FotoPengguna == "" {
-			pengguna.FotoPengguna = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + data.NamaLengkap
-		}
 		db.Create(&pengguna)
 		
 		var idDepartemen *int64
@@ -248,14 +244,22 @@ func main() {
 			}
 		}
 
+		fotoProfil := data.Foto
+		if fotoProfil == "" {
+			fotoProfil = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + data.NamaLengkap
+		}
+
 		anggota := entity.Anggota{
-			IdUser:       pengguna.IdPengguna,
+			IdPengguna:   &pengguna.IdPengguna,
 			Nim:          data.Nim,
+			NamaLengkap:  data.NamaLengkap,
+			FotoProfil:   fotoProfil,
 			ProgramStudi: data.ProgramStudi,
 			Angkatan:     data.Angkatan,
 			Jabatan:      data.Jabatan,
 			IdDepartemen: idDepartemen,
 			IdDivisi:     idDivisi,
+			Status:       "Pengurus",
 		}
 		db.Create(&anggota)
 
