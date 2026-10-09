@@ -45,9 +45,9 @@ func (u *authUsecase) Login(req entity.LoginRequest) (entity.LoginResponse, erro
 
 	// 4. Kembalikan Response Sukses
 	return entity.LoginResponse{
-		Token:       token,
-		IDPengguna:  pengguna.IdPengguna,
-		NamaLengkap: pengguna.NamaLengkap,
+		Token:        token,
+		IDPengguna:   pengguna.IdPengguna,
+		NamaPengguna: pengguna.NamaPengguna,
 	}, nil
 }
 

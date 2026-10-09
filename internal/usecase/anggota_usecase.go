@@ -31,7 +31,9 @@ func (u *anggotaUsecase) GetAllAnggota() ([]entity.Anggota, error) {
 	
 	// Mengosongkan password agar tidak bocor ke response JSON
 	for i := range anggotas {
-		anggotas[i].Pengguna.Sandi = ""
+		if anggotas[i].Pengguna != nil {
+			anggotas[i].Pengguna.Sandi = ""
+		}
 	}
 	
 	return anggotas, nil

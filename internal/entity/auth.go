@@ -10,5 +10,5 @@ type LoginRequest struct {
 type LoginResponse struct {
 	Token       string `json:"token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
 	IDPengguna  int64  `json:"id_pengguna" example:"1"`
-	NamaLengkap string `json:"nama_lengkap" example:"Budi Human Resource"`
+	NamaPengguna string `json:"nama_pengguna" example:"Kepala Divisi"`
 }

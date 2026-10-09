@@ -26,7 +26,6 @@ func main() {
 
 	// Data Dummy Akun Slot
 	akun := entity.Pengguna{
-		NamaLengkap:  "Budi Human Resource",
 		NamaPengguna: "hmik.human.01",
 		Email:        "hmik.human.01@hmik.com",
 		Sandi:        string(hashedPassword),
