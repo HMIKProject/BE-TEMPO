@@ -18,8 +18,8 @@ definitions:
       id_pengguna:
         example: 1
         type: integer
-      nama_lengkap:
-        example: Budi Human Resource
+      nama_pengguna:
+        example: Kepala Divisi
         type: string
       token:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...

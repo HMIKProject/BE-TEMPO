@@ -245,9 +245,9 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1
                 },
-                "nama_lengkap": {
+                "nama_pengguna": {
                     "type": "string",
-                    "example": "Budi Human Resource"
+                    "example": "Kepala Divisi"
                 },
                 "token": {
                     "type": "string",
