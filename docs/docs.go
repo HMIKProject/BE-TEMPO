@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/auth/login": {
+        "/auth/login": {
             "post": {
                 "description": "Endpoint untuk mendapatkan JWT Token menggunakan email/username dan password",
                 "consumes": [
@@ -85,6 +85,211 @@ const docTemplate = `{
                         "description": "Berhasil mengambil data",
                         "schema": {
                             "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal mengambil data dari server",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/dashboard-admin-halaman-utama/ringkasan": {
+            "get": {
+                "description": "Mengembalikan agregasi 4 kartu metrik (Total Anggota Aktif, Total Modul, Total Proker, Voting Aktif)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard Admin - Halaman Utama"
+                ],
+                "summary": "Ambil seluruh ringkasan kartu Dashboard Admin Halaman Utama",
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil data ringkasan dashboard",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.DashboardStatsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal mengambil data dari server",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/dashboard-admin-halaman-utama/total-anggota-aktif": {
+            "get": {
+                "description": "Mengembalikan data kartu biru: total anggota berstatus pengurus/magang beserta pertumbuhannya",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard Admin - Halaman Utama"
+                ],
+                "summary": "Ambil detail kartu Total Anggota Aktif",
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil detail kartu Total Anggota Aktif",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.CardDetail"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal mengambil data dari server",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/dashboard-admin-halaman-utama/total-modul": {
+            "get": {
+                "description": "Mengembalikan data kartu kuning: total modul pembelajaran beserta pertumbuhannya",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard Admin - Halaman Utama"
+                ],
+                "summary": "Ambil detail kartu Total Modul",
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil detail kartu Total Modul",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.CardDetail"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal mengambil data dari server",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/dashboard-admin-halaman-utama/total-program-kerja": {
+            "get": {
+                "description": "Mengembalikan data kartu hijau: total program kerja himpunan beserta pertumbuhannya",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard Admin - Halaman Utama"
+                ],
+                "summary": "Ambil detail kartu Total Program Kerja",
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil detail kartu Total Program Kerja",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.CardDetail"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal mengambil data dari server",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/dashboard-admin-halaman-utama/voting-aktif": {
+            "get": {
+                "description": "Mengembalikan data kartu oranye: total voting aktif dan kegiatan pemilihan yang sedang berjalan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard Admin - Halaman Utama"
+                ],
+                "summary": "Ambil detail kartu Voting Aktif",
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil detail kartu Voting Aktif",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.CardDetail"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
@@ -220,6 +425,80 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "entity.CardDetail": {
+            "type": "object",
+            "properties": {
+                "card_key": {
+                    "type": "string"
+                },
+                "judul": {
+                    "type": "string"
+                },
+                "keterangan": {
+                    "type": "string"
+                },
+                "pertumbuhan_bulan_ini": {
+                    "type": "integer"
+                },
+                "tautan_aksi": {
+                    "description": "Rute navigasi: \"/admin/buku-induk-anggota\", dll.",
+                    "type": "string"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "warna_tema": {
+                    "description": "Contoh: \"blue\", \"yellow\", \"green\", \"orange\"",
+                    "type": "string"
+                }
+            }
+        },
+        "entity.DashboardStatsResponse": {
+            "type": "object",
+            "properties": {
+                "card_total_anggota_aktif": {
+                    "description": "Detail visual kartu spesifik",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entity.CardDetail"
+                        }
+                    ]
+                },
+                "card_total_modul": {
+                    "$ref": "#/definitions/entity.CardDetail"
+                },
+                "card_total_program_kerja": {
+                    "$ref": "#/definitions/entity.CardDetail"
+                },
+                "card_voting_aktif": {
+                    "$ref": "#/definitions/entity.CardDetail"
+                },
+                "mahasiswa_aktif": {
+                    "$ref": "#/definitions/entity.StatItem"
+                },
+                "modul": {
+                    "$ref": "#/definitions/entity.StatItem"
+                },
+                "program_kerja": {
+                    "$ref": "#/definitions/entity.StatItem"
+                },
+                "total_mahasiswa_aktif": {
+                    "type": "integer"
+                },
+                "total_modul": {
+                    "type": "integer"
+                },
+                "total_program_kerja": {
+                    "type": "integer"
+                },
+                "voting": {
+                    "$ref": "#/definitions/entity.VotingStatItem"
+                },
+                "voting_aktif": {
+                    "type": "integer"
+                }
+            }
+        },
         "entity.LoginRequest": {
             "type": "object",
             "required": [
@@ -252,6 +531,34 @@ const docTemplate = `{
                 "token": {
                     "type": "string",
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+            }
+        },
+        "entity.StatItem": {
+            "type": "object",
+            "properties": {
+                "keterangan": {
+                    "type": "string"
+                },
+                "pertumbuhan_bulan_ini": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.VotingStatItem": {
+            "type": "object",
+            "properties": {
+                "keterangan": {
+                    "type": "string"
+                },
+                "sedang_berjalan": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },
@@ -293,6 +600,13 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
@@ -303,7 +617,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "HMIK CoreX API",
-	Description:      "API Dokumentasi untuk Backend Sistem Himpunan Mahasiswa Ilmu Komputer",
+	Description:      "Dokumentasi API backend HMIK CoreX untuk Halaman Publik & Dashboard Admin.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

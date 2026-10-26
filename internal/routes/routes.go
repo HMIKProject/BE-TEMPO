@@ -16,6 +16,11 @@ import (
 func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	// --- Inisialisasi Layer Clean Architecture ---
 	
+	// Dashboard 
+	dashboardRepo := repository.NewDashboardRepository(db)
+	dashboardUsecase := usecase.NewDashboardUsecase(dashboardRepo)
+	dashboardHandler := handler.NewDashboardHandler(dashboardUsecase)
+	
 	// Anggota (Company Profile)
 	anggotaRepo := repository.NewAnggotaRepository(db)
 	anggotaUsecase := usecase.NewAnggotaUsecase(anggotaRepo)
@@ -64,5 +69,19 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 
 		// Endpoint untuk unggah file gambar
 		v1.POST("/upload", uploadHandler.UploadImage)
+		
+		// Endpoint Khusus Dashboard Admin - Halaman Utama (Spesifik per Card)
+		dashboardAdminGroup := v1.Group("/dashboard-admin-halaman-utama")
+		{
+			dashboardAdminGroup.GET("/ringkasan", dashboardHandler.GetDashboardStats)
+			dashboardAdminGroup.GET("/total-anggota-aktif", dashboardHandler.GetTotalAnggotaAktif)
+			dashboardAdminGroup.GET("/total-modul", dashboardHandler.GetTotalModul)
+			dashboardAdminGroup.GET("/total-program-kerja", dashboardHandler.GetTotalProgramKerja)
+			dashboardAdminGroup.GET("/voting-aktif", dashboardHandler.GetVotingAktif)
+		}
+
+		// Alias untuk fleksibilitas & kompatibilitas
+		v1.GET("/dashboard", dashboardHandler.GetDashboardStats)
+		v1.GET("/admin/dashboard/stats", dashboardHandler.GetDashboardStats)
 	}
 }

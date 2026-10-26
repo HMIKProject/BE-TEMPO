@@ -26,7 +26,7 @@ func NewAuthHandler(u usecase.AuthUsecase) *AuthHandler {
 // @Param request body entity.LoginRequest true "Kredensial Login"
 // @Success 200 {object} utils.JSendResponse{data=entity.LoginResponse}
 // @Failure 401 {object} utils.JSendResponse
-// @Router /api/v1/auth/login [post]
+// @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req entity.LoginRequest
 	

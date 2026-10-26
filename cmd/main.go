@@ -6,12 +6,20 @@ import (
 	"time"
 
 	"github.com/HMIKProject/hmik-corex-backend/config"
+	_ "github.com/HMIKProject/hmik-corex-backend/docs"
 	"github.com/HMIKProject/hmik-corex-backend/internal/routes"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
+// @title           HMIK CoreX API
+// @version         1.0
+// @description     Dokumentasi API backend HMIK CoreX untuk Halaman Publik & Dashboard Admin.
+// @BasePath        /api/v1
+// @securityDefinitions.apikey BearerAuth
+// @in              header
+// @name            Authorization
 func main() {
 	// Membaca file .env
 	if err := godotenv.Load(); err != nil {
