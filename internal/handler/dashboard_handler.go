@@ -23,9 +23,11 @@ func NewDashboardHandler(u usecase.DashboardUsecase) *DashboardHandler {
 // @Tags         Dashboard Admin - Halaman Utama
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Success      200  {object}  utils.JSendResponse{data=entity.DashboardStatsResponse}  "Berhasil mengambil data ringkasan dashboard"
+// @Failure      401  {object}  utils.JSendResponse  "Akses Ditolak: Token JWT tidak ditemukan atau tidak valid"
 // @Failure      500  {object}  utils.JSendResponse  "Gagal mengambil data dari server"
-// @Router       /dashboard-admin-halaman-utama/ringkasan [get]
+// @Router       /admin/dashboard/stats [get]
 func (h *DashboardHandler) GetDashboardStats(c *gin.Context) {
 	stats, err := h.usecase.GetDashboardStats(c.Request.Context())
 	if err != nil {
@@ -42,7 +44,9 @@ func (h *DashboardHandler) GetDashboardStats(c *gin.Context) {
 // @Tags         Dashboard Admin - Halaman Utama
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Success      200  {object}  utils.JSendResponse{data=entity.CardDetail}  "Berhasil mengambil detail kartu Total Anggota Aktif"
+// @Failure      401  {object}  utils.JSendResponse  "Akses Ditolak: Token JWT tidak ditemukan atau tidak valid"
 // @Failure      500  {object}  utils.JSendResponse  "Gagal mengambil data dari server"
 // @Router       /dashboard-admin-halaman-utama/total-anggota-aktif [get]
 func (h *DashboardHandler) GetTotalAnggotaAktif(c *gin.Context) {
@@ -61,7 +65,9 @@ func (h *DashboardHandler) GetTotalAnggotaAktif(c *gin.Context) {
 // @Tags         Dashboard Admin - Halaman Utama
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Success      200  {object}  utils.JSendResponse{data=entity.CardDetail}  "Berhasil mengambil detail kartu Total Modul"
+// @Failure      401  {object}  utils.JSendResponse  "Akses Ditolak: Token JWT tidak ditemukan atau tidak valid"
 // @Failure      500  {object}  utils.JSendResponse  "Gagal mengambil data dari server"
 // @Router       /dashboard-admin-halaman-utama/total-modul [get]
 func (h *DashboardHandler) GetTotalModul(c *gin.Context) {
@@ -80,7 +86,9 @@ func (h *DashboardHandler) GetTotalModul(c *gin.Context) {
 // @Tags         Dashboard Admin - Halaman Utama
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Success      200  {object}  utils.JSendResponse{data=entity.CardDetail}  "Berhasil mengambil detail kartu Total Program Kerja"
+// @Failure      401  {object}  utils.JSendResponse  "Akses Ditolak: Token JWT tidak ditemukan atau tidak valid"
 // @Failure      500  {object}  utils.JSendResponse  "Gagal mengambil data dari server"
 // @Router       /dashboard-admin-halaman-utama/total-program-kerja [get]
 func (h *DashboardHandler) GetTotalProgramKerja(c *gin.Context) {
@@ -99,7 +107,9 @@ func (h *DashboardHandler) GetTotalProgramKerja(c *gin.Context) {
 // @Tags         Dashboard Admin - Halaman Utama
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Success      200  {object}  utils.JSendResponse{data=entity.CardDetail}  "Berhasil mengambil detail kartu Voting Aktif"
+// @Failure      401  {object}  utils.JSendResponse  "Akses Ditolak: Token JWT tidak ditemukan atau tidak valid"
 // @Failure      500  {object}  utils.JSendResponse  "Gagal mengambil data dari server"
 // @Router       /dashboard-admin-halaman-utama/voting-aktif [get]
 func (h *DashboardHandler) GetVotingAktif(c *gin.Context) {

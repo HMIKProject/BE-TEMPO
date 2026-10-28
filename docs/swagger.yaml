@@ -123,6 +123,37 @@ info:
   title: HMIK CoreX API
   version: "1.0"
 paths:
+  /admin/dashboard/stats:
+    get:
+      consumes:
+      - application/json
+      description: Mengembalikan agregasi 4 kartu metrik (Total Anggota Aktif, Total
+        Modul, Total Proker, Voting Aktif)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil data ringkasan dashboard
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.DashboardStatsResponse'
+              type: object
+        "401":
+          description: 'Akses Ditolak: Token JWT tidak ditemukan atau tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Gagal mengambil data dari server
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Ambil seluruh ringkasan kartu Dashboard Admin Halaman Utama
+      tags:
+      - Dashboard Admin - Halaman Utama
   /auth/login:
     post:
       consumes:
@@ -175,31 +206,6 @@ paths:
       summary: Ambil daftar anggota tim HMIK
       tags:
       - Anggota
-  /dashboard-admin-halaman-utama/ringkasan:
-    get:
-      consumes:
-      - application/json
-      description: Mengembalikan agregasi 4 kartu metrik (Total Anggota Aktif, Total
-        Modul, Total Proker, Voting Aktif)
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Berhasil mengambil data ringkasan dashboard
-          schema:
-            allOf:
-            - $ref: '#/definitions/utils.JSendResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/entity.DashboardStatsResponse'
-              type: object
-        "500":
-          description: Gagal mengambil data dari server
-          schema:
-            $ref: '#/definitions/utils.JSendResponse'
-      summary: Ambil seluruh ringkasan kartu Dashboard Admin Halaman Utama
-      tags:
-      - Dashboard Admin - Halaman Utama
   /dashboard-admin-halaman-utama/total-anggota-aktif:
     get:
       consumes:
@@ -218,10 +224,16 @@ paths:
                 data:
                   $ref: '#/definitions/entity.CardDetail'
               type: object
+        "401":
+          description: 'Akses Ditolak: Token JWT tidak ditemukan atau tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
         "500":
           description: Gagal mengambil data dari server
           schema:
             $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
       summary: Ambil detail kartu Total Anggota Aktif
       tags:
       - Dashboard Admin - Halaman Utama
@@ -243,10 +255,16 @@ paths:
                 data:
                   $ref: '#/definitions/entity.CardDetail'
               type: object
+        "401":
+          description: 'Akses Ditolak: Token JWT tidak ditemukan atau tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
         "500":
           description: Gagal mengambil data dari server
           schema:
             $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
       summary: Ambil detail kartu Total Modul
       tags:
       - Dashboard Admin - Halaman Utama
@@ -268,10 +286,16 @@ paths:
                 data:
                   $ref: '#/definitions/entity.CardDetail'
               type: object
+        "401":
+          description: 'Akses Ditolak: Token JWT tidak ditemukan atau tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
         "500":
           description: Gagal mengambil data dari server
           schema:
             $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
       summary: Ambil detail kartu Total Program Kerja
       tags:
       - Dashboard Admin - Halaman Utama
@@ -293,10 +317,16 @@ paths:
                 data:
                   $ref: '#/definitions/entity.CardDetail'
               type: object
+        "401":
+          description: 'Akses Ditolak: Token JWT tidak ditemukan atau tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
         "500":
           description: Gagal mengambil data dari server
           schema:
             $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
       summary: Ambil detail kartu Voting Aktif
       tags:
       - Dashboard Admin - Halaman Utama

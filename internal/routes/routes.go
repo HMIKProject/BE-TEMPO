@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/HMIKProject/hmik-corex-backend/internal/handler"
+	"github.com/HMIKProject/hmik-corex-backend/internal/middleware"
 	"github.com/HMIKProject/hmik-corex-backend/internal/repository"
 	"github.com/HMIKProject/hmik-corex-backend/internal/usecase"
 	"github.com/gin-gonic/gin"
@@ -70,8 +71,19 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 		// Endpoint untuk unggah file gambar
 		v1.POST("/upload", uploadHandler.UploadImage)
 		
-		// Endpoint Khusus Dashboard Admin - Halaman Utama (Spesifik per Card)
+		// Jalur Rute Admin yang Dilindungi Middleware Token JWT (Standar Obsidian)
+		adminGroup := v1.Group("/admin")
+		adminGroup.Use(middleware.AuthMiddleware())
+		{
+			dashboardGroup := adminGroup.Group("/dashboard")
+			{
+				dashboardGroup.GET("/stats", dashboardHandler.GetDashboardStats)
+			}
+		}
+
+		// Rute Kompatibilitas Khusus Dashboard Admin (Terproteksi Middleware JWT)
 		dashboardAdminGroup := v1.Group("/dashboard-admin-halaman-utama")
+		dashboardAdminGroup.Use(middleware.AuthMiddleware())
 		{
 			dashboardAdminGroup.GET("/ringkasan", dashboardHandler.GetDashboardStats)
 			dashboardAdminGroup.GET("/total-anggota-aktif", dashboardHandler.GetTotalAnggotaAktif)
@@ -80,8 +92,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 			dashboardAdminGroup.GET("/voting-aktif", dashboardHandler.GetVotingAktif)
 		}
 
-		// Alias untuk fleksibilitas & kompatibilitas
-		v1.GET("/dashboard", dashboardHandler.GetDashboardStats)
-		v1.GET("/admin/dashboard/stats", dashboardHandler.GetDashboardStats)
+		// Alias untuk fleksibilitas (Terproteksi Middleware JWT)
+		v1.GET("/dashboard", middleware.AuthMiddleware(), dashboardHandler.GetDashboardStats)
 	}
 }

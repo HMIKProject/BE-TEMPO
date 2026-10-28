@@ -15,6 +15,58 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin/dashboard/stats": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengembalikan agregasi 4 kartu metrik (Total Anggota Aktif, Total Modul, Total Proker, Voting Aktif)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard Admin - Halaman Utama"
+                ],
+                "summary": "Ambil seluruh ringkasan kartu Dashboard Admin Halaman Utama",
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil data ringkasan dashboard",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.DashboardStatsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token JWT tidak ditemukan atau tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal mengambil data dari server",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "Endpoint untuk mendapatkan JWT Token menggunakan email/username dan password",
@@ -96,49 +148,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/dashboard-admin-halaman-utama/ringkasan": {
-            "get": {
-                "description": "Mengembalikan agregasi 4 kartu metrik (Total Anggota Aktif, Total Modul, Total Proker, Voting Aktif)",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Dashboard Admin - Halaman Utama"
-                ],
-                "summary": "Ambil seluruh ringkasan kartu Dashboard Admin Halaman Utama",
-                "responses": {
-                    "200": {
-                        "description": "Berhasil mengambil data ringkasan dashboard",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/utils.JSendResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entity.DashboardStatsResponse"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Gagal mengambil data dari server",
-                        "schema": {
-                            "$ref": "#/definitions/utils.JSendResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/dashboard-admin-halaman-utama/total-anggota-aktif": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Mengembalikan data kartu biru: total anggota berstatus pengurus/magang beserta pertumbuhannya",
                 "consumes": [
                     "application/json"
@@ -169,6 +185,12 @@ const docTemplate = `{
                             ]
                         }
                     },
+                    "401": {
+                        "description": "Akses Ditolak: Token JWT tidak ditemukan atau tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
                     "500": {
                         "description": "Gagal mengambil data dari server",
                         "schema": {
@@ -180,6 +202,11 @@ const docTemplate = `{
         },
         "/dashboard-admin-halaman-utama/total-modul": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Mengembalikan data kartu kuning: total modul pembelajaran beserta pertumbuhannya",
                 "consumes": [
                     "application/json"
@@ -210,6 +237,12 @@ const docTemplate = `{
                             ]
                         }
                     },
+                    "401": {
+                        "description": "Akses Ditolak: Token JWT tidak ditemukan atau tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
                     "500": {
                         "description": "Gagal mengambil data dari server",
                         "schema": {
@@ -221,6 +254,11 @@ const docTemplate = `{
         },
         "/dashboard-admin-halaman-utama/total-program-kerja": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Mengembalikan data kartu hijau: total program kerja himpunan beserta pertumbuhannya",
                 "consumes": [
                     "application/json"
@@ -251,6 +289,12 @@ const docTemplate = `{
                             ]
                         }
                     },
+                    "401": {
+                        "description": "Akses Ditolak: Token JWT tidak ditemukan atau tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
                     "500": {
                         "description": "Gagal mengambil data dari server",
                         "schema": {
@@ -262,6 +306,11 @@ const docTemplate = `{
         },
         "/dashboard-admin-halaman-utama/voting-aktif": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Mengembalikan data kartu oranye: total voting aktif dan kegiatan pemilihan yang sedang berjalan",
                 "consumes": [
                     "application/json"
@@ -290,6 +339,12 @@ const docTemplate = `{
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token JWT tidak ditemukan atau tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
                         }
                     },
                     "500": {
