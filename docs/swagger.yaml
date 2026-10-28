@@ -1,5 +1,53 @@
 basePath: /api/v1
 definitions:
+  entity.CardDetail:
+    properties:
+      card_key:
+        type: string
+      judul:
+        type: string
+      keterangan:
+        type: string
+      pertumbuhan_bulan_ini:
+        type: integer
+      tautan_aksi:
+        description: 'Rute navigasi: "/admin/buku-induk-anggota", dll.'
+        type: string
+      total:
+        type: integer
+      warna_tema:
+        description: 'Contoh: "blue", "yellow", "green", "orange"'
+        type: string
+    type: object
+  entity.DashboardStatsResponse:
+    properties:
+      card_total_anggota_aktif:
+        allOf:
+        - $ref: '#/definitions/entity.CardDetail'
+        description: Detail visual kartu spesifik
+      card_total_modul:
+        $ref: '#/definitions/entity.CardDetail'
+      card_total_program_kerja:
+        $ref: '#/definitions/entity.CardDetail'
+      card_voting_aktif:
+        $ref: '#/definitions/entity.CardDetail'
+      mahasiswa_aktif:
+        $ref: '#/definitions/entity.StatItem'
+      modul:
+        $ref: '#/definitions/entity.StatItem'
+      program_kerja:
+        $ref: '#/definitions/entity.StatItem'
+      total_mahasiswa_aktif:
+        type: integer
+      total_modul:
+        type: integer
+      total_program_kerja:
+        type: integer
+      voting:
+        $ref: '#/definitions/entity.VotingStatItem'
+      voting_aktif:
+        type: integer
+    type: object
   entity.LoginRequest:
     properties:
       identifier:
@@ -24,6 +72,24 @@ definitions:
       token:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
+    type: object
+  entity.StatItem:
+    properties:
+      keterangan:
+        type: string
+      pertumbuhan_bulan_ini:
+        type: integer
+      total:
+        type: integer
+    type: object
+  entity.VotingStatItem:
+    properties:
+      keterangan:
+        type: string
+      sedang_berjalan:
+        type: integer
+      total:
+        type: integer
     type: object
   utils.JSendResponse:
     properties:
@@ -52,11 +118,12 @@ definitions:
     type: object
 info:
   contact: {}
-  description: API Dokumentasi untuk Backend Sistem Himpunan Mahasiswa Ilmu Komputer
+  description: Dokumentasi API backend HMIK CoreX untuk Halaman Publik & Dashboard
+    Admin.
   title: HMIK CoreX API
   version: "1.0"
 paths:
-  /api/v1/auth/login:
+  /auth/login:
     post:
       consumes:
       - application/json
@@ -108,6 +175,131 @@ paths:
       summary: Ambil daftar anggota tim HMIK
       tags:
       - Anggota
+  /dashboard-admin-halaman-utama/ringkasan:
+    get:
+      consumes:
+      - application/json
+      description: Mengembalikan agregasi 4 kartu metrik (Total Anggota Aktif, Total
+        Modul, Total Proker, Voting Aktif)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil data ringkasan dashboard
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.DashboardStatsResponse'
+              type: object
+        "500":
+          description: Gagal mengambil data dari server
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      summary: Ambil seluruh ringkasan kartu Dashboard Admin Halaman Utama
+      tags:
+      - Dashboard Admin - Halaman Utama
+  /dashboard-admin-halaman-utama/total-anggota-aktif:
+    get:
+      consumes:
+      - application/json
+      description: 'Mengembalikan data kartu biru: total anggota berstatus pengurus/magang
+        beserta pertumbuhannya'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil detail kartu Total Anggota Aktif
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.CardDetail'
+              type: object
+        "500":
+          description: Gagal mengambil data dari server
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      summary: Ambil detail kartu Total Anggota Aktif
+      tags:
+      - Dashboard Admin - Halaman Utama
+  /dashboard-admin-halaman-utama/total-modul:
+    get:
+      consumes:
+      - application/json
+      description: 'Mengembalikan data kartu kuning: total modul pembelajaran beserta
+        pertumbuhannya'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil detail kartu Total Modul
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.CardDetail'
+              type: object
+        "500":
+          description: Gagal mengambil data dari server
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      summary: Ambil detail kartu Total Modul
+      tags:
+      - Dashboard Admin - Halaman Utama
+  /dashboard-admin-halaman-utama/total-program-kerja:
+    get:
+      consumes:
+      - application/json
+      description: 'Mengembalikan data kartu hijau: total program kerja himpunan beserta
+        pertumbuhannya'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil detail kartu Total Program Kerja
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.CardDetail'
+              type: object
+        "500":
+          description: Gagal mengambil data dari server
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      summary: Ambil detail kartu Total Program Kerja
+      tags:
+      - Dashboard Admin - Halaman Utama
+  /dashboard-admin-halaman-utama/voting-aktif:
+    get:
+      consumes:
+      - application/json
+      description: 'Mengembalikan data kartu oranye: total voting aktif dan kegiatan
+        pemilihan yang sedang berjalan'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil detail kartu Voting Aktif
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.CardDetail'
+              type: object
+        "500":
+          description: Gagal mengambil data dari server
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      summary: Ambil detail kartu Voting Aktif
+      tags:
+      - Dashboard Admin - Halaman Utama
   /departemen:
     get:
       consumes:
@@ -191,4 +383,9 @@ paths:
       summary: Unggah gambar ke Cloudinary
       tags:
       - Upload
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

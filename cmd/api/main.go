@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	_ "github.com/HMIKProject/hmik-corex-backend/docs"
 	"github.com/HMIKProject/hmik-corex-backend/internal/routes"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -14,10 +15,13 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-// @title HMIK CoreX API
-// @version 1.0
-// @description API Dokumentasi untuk Backend Sistem Himpunan Mahasiswa Ilmu Komputer
-// @BasePath /api/v1
+// @title           HMIK CoreX API
+// @version         1.0
+// @description     API Dokumentasi untuk Backend Sistem Himpunan Mahasiswa Ilmu Komputer
+// @BasePath        /api/v1
+// @securityDefinitions.apikey BearerAuth
+// @in              header
+// @name            Authorization
 func main() {
 	// Memuat file .env jika ada (Berguna untuk lokal, akan diabaikan jika di Cloud tanpa .env)
 	godotenv.Load()
