@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	_ "github.com/HMIKProject/hmik-corex-backend/docs"
@@ -45,10 +46,16 @@ func main() {
 	// 2. Inisiasi Mesin Gin
 	router := gin.Default()
 
-	// 3. Konfigurasi Middleware CORS (Sesuai Panduan HMIK_note)
+	// 3. Konfigurasi Middleware CORS Terproteksi (Sesuai Panduan HMIK_note)
 	router.Use(cors.New(cors.Config{
 		AllowOriginFunc: func(origin string) bool {
-			return true // Mengizinkan semua Frontend (Netlify/Localhost) mengakses API ini
+			if origin == "http://localhost:5173" || origin == "http://localhost:3000" || origin == "https://hmik.kampus.ac.id" {
+				return true
+			}
+			if strings.HasSuffix(origin, ".netlify.app") {
+				return true
+			}
+			return false
 		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},

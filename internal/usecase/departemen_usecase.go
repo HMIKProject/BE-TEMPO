@@ -18,5 +18,20 @@ func NewDepartemenUsecase(repo repository.DepartemenRepository) DepartemenUsecas
 }
 
 func (u *departemenUsecase) GetAllDepartemen() ([]entity.Departemen, error) {
-	return u.repo.FindAll()
+	depts, err := u.repo.FindAll()
+	if err != nil {
+		return nil, err
+	}
+
+	// Sanitasi kredensial pengguna agar tidak bocor
+	for i := range depts {
+		for j := range depts[i].Anggota {
+			if depts[i].Anggota[j].Pengguna != nil {
+				depts[i].Anggota[j].Pengguna.Sandi = ""
+				depts[i].Anggota[j].Pengguna.NomorTelepon = ""
+			}
+		}
+	}
+
+	return depts, nil
 }

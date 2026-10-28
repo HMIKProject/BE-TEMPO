@@ -430,7 +430,12 @@ const docTemplate = `{
         },
         "/upload": {
             "post": {
-                "description": "Menerima file form-data gambar dan mengunggahnya ke Cloudinary, mengembalikan URL gambar",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Menerima file form-data gambar terverifikasi (JPEG, PNG, WebP, GIF max 5MB) dan mengunggahnya ke Cloudinary",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -444,7 +449,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "file",
-                        "description": "File gambar yang akan diunggah",
+                        "description": "File gambar yang akan diunggah (maksimal 5MB, format: jpg, jpeg, png, webp, gif)",
                         "name": "image",
                         "in": "formData",
                         "required": true
@@ -464,7 +469,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Input file tidak valid",
+                        "description": "Input file tidak valid atau ukuran/format ditolak",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token JWT tidak ditemukan atau tidak valid",
                         "schema": {
                             "$ref": "#/definitions/utils.JSendResponse"
                         }

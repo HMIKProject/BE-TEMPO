@@ -68,9 +68,6 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 		// Endpoint untuk Program Kerja (Global, filterable by status/is_unggulan)
 		v1.GET("/program-kerja", prokerHandler.GetAllProgramKerja)
 
-		// Endpoint untuk unggah file gambar
-		v1.POST("/upload", uploadHandler.UploadImage)
-		
 		// Jalur Rute Admin yang Dilindungi Middleware Token JWT (Standar Obsidian)
 		adminGroup := v1.Group("/admin")
 		adminGroup.Use(middleware.AuthMiddleware())
@@ -79,7 +76,13 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 			{
 				dashboardGroup.GET("/stats", dashboardHandler.GetDashboardStats)
 			}
+
+			// Endpoint unggah file gambar admin
+			adminGroup.POST("/upload", uploadHandler.UploadImage)
 		}
+
+		// Rute upload terproteksi JWT (Backward Compatibility)
+		v1.POST("/upload", middleware.AuthMiddleware(), uploadHandler.UploadImage)
 
 		// Rute Kompatibilitas Khusus Dashboard Admin (Terproteksi Middleware JWT)
 		dashboardAdminGroup := v1.Group("/dashboard-admin-halaman-utama")

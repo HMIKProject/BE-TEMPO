@@ -32,7 +32,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	
 	// Bind JSON dari request body ke struct LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Format request tidak valid"})
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Format request tidak valid: "+err.Error(), nil))
 		return
 	}
 
