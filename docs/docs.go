@@ -67,6 +67,231 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/pemira/chart": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengembalikan data perolehan suara per paslon secara realtime untuk visualisasi grafik batang pleno",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Pemira"
+                ],
+                "summary": "Ambil Data Grafik Perolehan Suara Pemilu (Admin)",
+                "responses": {
+                    "200": {
+                        "description": "Data grafik pemilu berhasil diambil",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.ElectionChartResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token admin tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal mengambil data grafik pemilu",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/pemira/pemilih": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengembalikan daftar pemilih tetap dengan pagination, filter pencarian (nama/nim), dan filter status memilih",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Pemira"
+                ],
+                "summary": "Ambil Daftar Pemilih DPT (Admin)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cari berdasarkan nama atau NIM",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter status memilih (true/false)",
+                        "name": "status_memilih",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Batas jumlah data per halaman (default: 20)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset pagination data",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Daftar pemilih DPT berhasil diambil",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.VoterListResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token admin tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal mengambil data pemilih",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/pemira/pemilih/{id}/reset": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengembalikan status hak pilih mahasiswa menjadi belum memilih jika terjadi kendala force majeure",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Pemira"
+                ],
+                "summary": "Reset Status Hak Pilih Pemilih (Admin)",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Pemilih di tabel DPT",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status hak pilih pemilih berhasil di-reset",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "ID pemilih tidak valid atau gagal melakukan reset",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token admin tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal mereset status pemilih",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/pemira/stats": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengembalikan agregat 4 kartu metrik: Suara Masuk, Total DPT, Persentase Partisipasi, Total Paslon",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Pemira"
+                ],
+                "summary": "Ambil Ringkasan Metrik Pemilu (Admin)",
+                "responses": {
+                    "200": {
+                        "description": "Statistik pemilu berhasil diambil",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.ElectionStatsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token admin tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal mengambil data statistik",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "Endpoint untuk mendapatkan JWT Token menggunakan email/username dan password",
@@ -385,6 +610,272 @@ const docTemplate = `{
                 }
             }
         },
+        "/pemira/auth/request-otp": {
+            "post": {
+                "description": "Memvalidasi NIM dan email kampus mahasiswa terdaftar di DPT, kemudian mengirimkan kode 6-digit OTP",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pemira"
+                ],
+                "summary": "Permintaan Kode OTP Pemilih",
+                "parameters": [
+                    {
+                        "description": "Kredensial NIM \u0026 Email Kampus",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RequestOTPRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OTP berhasil dikirim",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.RequestOTPResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Validasi gagal atau akun tidak memenuhi syarat",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/pemira/auth/resend-otp": {
+            "post": {
+                "description": "Mengirimkan kembali kode OTP baru jika jeda cooldown 60 detik telah terpenuhi",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pemira"
+                ],
+                "summary": "Kirim Ulang Kode OTP Pemilih",
+                "parameters": [
+                    {
+                        "description": "NIM Mahasiswa",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.ResendOTPRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Kode OTP baru berhasil dikirim",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.RequestOTPResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Masih dalam masa cooldown atau data tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/pemira/auth/verify-otp": {
+            "post": {
+                "description": "Memvalidasi kode OTP 6-digit pemilih dan mengembalikan Ballot JWT Token (15 menit) untuk mengakses bilik suara",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pemira"
+                ],
+                "summary": "Verifikasi Kode OTP \u0026 Terbitkan Ballot Token",
+                "parameters": [
+                    {
+                        "description": "NIM dan Kode OTP",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.VerifyOTPRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Verifikasi berhasil, token diterbitkan",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.VerifyOTPResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Kode OTP salah, expired, atau format tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/pemira/kandidat": {
+            "get": {
+                "description": "Mengambil seluruh kandidat pasangan calon ketua \u0026 wakil ketua pada periode pemira aktif",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pemira"
+                ],
+                "summary": "Ambil Daftar Paslon Aktif Pemira",
+                "responses": {
+                    "200": {
+                        "description": "Daftar paslon aktif berhasil diambil",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/entity.Paslon"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal mengambil data paslon",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/pemira/vote": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mencatat suara pemilih secara atomik dan anonim (Anti Double-Voting) menggunakan Ballot Token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pemira"
+                ],
+                "summary": "Pemberian Suara di Bilik Suara (Cast Vote)",
+                "parameters": [
+                    {
+                        "description": "ID Paslon yang dipilih",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.CastVoteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Suara berhasil dicatat secara sah dan anonim",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.CastVoteResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Hak suara sudah pernah digunakan atau paslon tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Ballot token tidak valid atau sesi kadaluarsa",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal memproses transaksi suara",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/program-kerja": {
             "get": {
                 "description": "Mengembalikan data program kerja, bisa difilter berdasarkan status (Mendatang) atau is_unggulan (true/false)",
@@ -491,6 +982,19 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "entity.BallotVoterInfo": {
+            "type": "object",
+            "properties": {
+                "nim": {
+                    "type": "string",
+                    "example": "10123001"
+                },
+                "status_memilih": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
         "entity.CardDetail": {
             "type": "object",
             "properties": {
@@ -516,6 +1020,31 @@ const docTemplate = `{
                 "warna_tema": {
                     "description": "Contoh: \"blue\", \"yellow\", \"green\", \"orange\"",
                     "type": "string"
+                }
+            }
+        },
+        "entity.CastVoteRequest": {
+            "type": "object",
+            "required": [
+                "id_paslon"
+            ],
+            "properties": {
+                "id_paslon": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "entity.CastVoteResponse": {
+            "type": "object",
+            "properties": {
+                "status_vote": {
+                    "type": "string",
+                    "example": "COMPLETED"
+                },
+                "waktu_tercatat": {
+                    "type": "string",
+                    "example": "2026-11-04T15:30:00Z"
                 }
             }
         },
@@ -565,6 +1094,75 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.ElectionChartCandidate": {
+            "type": "object",
+            "properties": {
+                "foto_paslon": {
+                    "type": "string",
+                    "example": "https://res.cloudinary.com/.../paslon1.png"
+                },
+                "id_paslon": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "nama_paslon": {
+                    "type": "string",
+                    "example": "Nanami Kento \u0026 Loid Forger"
+                },
+                "nomor_urut": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "persentase": {
+                    "type": "number",
+                    "example": 67.89
+                },
+                "total_suara": {
+                    "type": "integer",
+                    "example": 222
+                }
+            }
+        },
+        "entity.ElectionChartResponse": {
+            "type": "object",
+            "properties": {
+                "candidates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.ElectionChartCandidate"
+                    }
+                },
+                "is_live": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "total_suara": {
+                    "type": "integer",
+                    "example": 327
+                }
+            }
+        },
+        "entity.ElectionStatsResponse": {
+            "type": "object",
+            "properties": {
+                "persentase_partisipasi": {
+                    "type": "number",
+                    "example": 72.67
+                },
+                "total_dpt": {
+                    "type": "integer",
+                    "example": 450
+                },
+                "total_paslon": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "total_suara_masuk": {
+                    "type": "integer",
+                    "example": 327
+                }
+            }
+        },
         "entity.LoginRequest": {
             "type": "object",
             "required": [
@@ -600,6 +1198,126 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.Paslon": {
+            "type": "object",
+            "properties": {
+                "dibuat_pada": {
+                    "type": "string"
+                },
+                "diperbarui_pada": {
+                    "type": "string"
+                },
+                "foto_paslon": {
+                    "type": "string"
+                },
+                "id_paslon": {
+                    "type": "integer"
+                },
+                "id_pemira": {
+                    "type": "integer"
+                },
+                "misi": {
+                    "type": "string"
+                },
+                "nama_kabinet": {
+                    "type": "string"
+                },
+                "nama_ketua": {
+                    "type": "string"
+                },
+                "nama_wakil": {
+                    "type": "string"
+                },
+                "nim_ketua": {
+                    "type": "string"
+                },
+                "nim_wakil": {
+                    "type": "string"
+                },
+                "nomor_urut": {
+                    "type": "integer"
+                },
+                "visi": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Pemilih": {
+            "type": "object",
+            "properties": {
+                "dibuat_pada": {
+                    "type": "string"
+                },
+                "diperbarui_pada": {
+                    "type": "string"
+                },
+                "email_kampus": {
+                    "type": "string"
+                },
+                "id_pemilih": {
+                    "type": "integer"
+                },
+                "id_pemira": {
+                    "type": "integer"
+                },
+                "nim": {
+                    "type": "string"
+                },
+                "status_memilih": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "entity.RequestOTPRequest": {
+            "type": "object",
+            "required": [
+                "email_kampus",
+                "nim"
+            ],
+            "properties": {
+                "email_kampus": {
+                    "type": "string",
+                    "example": "10123001@student.universitaspertamina.ac.id"
+                },
+                "nim": {
+                    "type": "string",
+                    "example": "10123001"
+                }
+            }
+        },
+        "entity.RequestOTPResponse": {
+            "type": "object",
+            "properties": {
+                "cooldown_detik": {
+                    "type": "integer",
+                    "example": 60
+                },
+                "email_tujuan": {
+                    "type": "string",
+                    "example": "10123001@student.universitaspertamina.ac.id"
+                },
+                "masa_berlaku_menit": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "nim": {
+                    "type": "string",
+                    "example": "10123001"
+                }
+            }
+        },
+        "entity.ResendOTPRequest": {
+            "type": "object",
+            "required": [
+                "nim"
+            ],
+            "properties": {
+                "nim": {
+                    "type": "string",
+                    "example": "10123001"
+                }
+            }
+        },
         "entity.StatItem": {
             "type": "object",
             "properties": {
@@ -611,6 +1329,55 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "entity.VerifyOTPRequest": {
+            "type": "object",
+            "required": [
+                "kode_otp",
+                "nim"
+            ],
+            "properties": {
+                "kode_otp": {
+                    "type": "string",
+                    "example": "748291"
+                },
+                "nim": {
+                    "type": "string",
+                    "example": "10123001"
+                }
+            }
+        },
+        "entity.VerifyOTPResponse": {
+            "type": "object",
+            "properties": {
+                "ballot_token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                },
+                "expires_in": {
+                    "description": "15 menit (dalam detik)",
+                    "type": "integer",
+                    "example": 900
+                },
+                "pemilih": {
+                    "$ref": "#/definitions/entity.BallotVoterInfo"
+                }
+            }
+        },
+        "entity.VoterListResponse": {
+            "type": "object",
+            "properties": {
+                "total_data": {
+                    "type": "integer",
+                    "example": 450
+                },
+                "voters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Pemilih"
+                    }
                 }
             }
         },
@@ -683,7 +1450,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "HMIK CoreX API",
-	Description:      "Dokumentasi API backend HMIK CoreX untuk Halaman Publik & Dashboard Admin.",
+	Description:      "API Dokumentasi untuk Backend Sistem Himpunan Mahasiswa Ilmu Komputer",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

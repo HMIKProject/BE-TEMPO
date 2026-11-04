@@ -45,6 +45,11 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	authUsecase := usecase.NewAuthUsecase(penggunaRepo)
 	authHandler := handler.NewAuthHandler(authUsecase)
 
+	// Pemira (E-Voting)
+	pemiraRepo := repository.NewPemiraRepository(db)
+	pemiraUsecase := usecase.NewPemiraUsecase(pemiraRepo)
+	pemiraHandler := handler.NewPemiraHandler(pemiraUsecase)
+
 	// --- Mendaftarkan Routes ---
 
 	// Endpoint khusus untuk memunculkan halaman website Swagger UI
@@ -57,6 +62,20 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 		authGroup := v1.Group("/auth")
 		{
 			authGroup.POST("/login", authHandler.Login)
+		}
+
+		// Pemira (E-Voting) Voter Routes
+		pemiraGroup := v1.Group("/pemira")
+		{
+			pemiraAuthGroup := pemiraGroup.Group("/auth")
+			{
+				pemiraAuthGroup.POST("/request-otp", pemiraHandler.RequestOTP)
+				pemiraAuthGroup.POST("/verify-otp", pemiraHandler.VerifyOTP)
+				pemiraAuthGroup.POST("/resend-otp", pemiraHandler.ResendOTP)
+			}
+
+			pemiraGroup.GET("/kandidat", pemiraHandler.GetActiveCandidates)
+			pemiraGroup.POST("/vote", middleware.VoterMiddleware(), pemiraHandler.CastVote)
 		}
 
 		// Endpoint untuk halaman tim Company Profile
@@ -75,6 +94,15 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 			dashboardGroup := adminGroup.Group("/dashboard")
 			{
 				dashboardGroup.GET("/stats", dashboardHandler.GetDashboardStats)
+			}
+
+			// Pemira Monitoring & Management
+			adminPemiraGroup := adminGroup.Group("/pemira")
+			{
+				adminPemiraGroup.GET("/stats", pemiraHandler.GetElectionStats)
+				adminPemiraGroup.GET("/chart", pemiraHandler.GetElectionChart)
+				adminPemiraGroup.GET("/pemilih", pemiraHandler.GetVoters)
+				adminPemiraGroup.POST("/pemilih/:id/reset", pemiraHandler.ResetVoter)
 			}
 
 			// Endpoint unggah file gambar admin

@@ -1,5 +1,14 @@
 basePath: /api/v1
 definitions:
+  entity.BallotVoterInfo:
+    properties:
+      nim:
+        example: "10123001"
+        type: string
+      status_memilih:
+        example: false
+        type: boolean
+    type: object
   entity.CardDetail:
     properties:
       card_key:
@@ -17,6 +26,23 @@ definitions:
         type: integer
       warna_tema:
         description: 'Contoh: "blue", "yellow", "green", "orange"'
+        type: string
+    type: object
+  entity.CastVoteRequest:
+    properties:
+      id_paslon:
+        example: 1
+        type: integer
+    required:
+    - id_paslon
+    type: object
+  entity.CastVoteResponse:
+    properties:
+      status_vote:
+        example: COMPLETED
+        type: string
+      waktu_tercatat:
+        example: "2026-11-04T15:30:00Z"
         type: string
     type: object
   entity.DashboardStatsResponse:
@@ -48,6 +74,55 @@ definitions:
       voting_aktif:
         type: integer
     type: object
+  entity.ElectionChartCandidate:
+    properties:
+      foto_paslon:
+        example: https://res.cloudinary.com/.../paslon1.png
+        type: string
+      id_paslon:
+        example: 1
+        type: integer
+      nama_paslon:
+        example: Nanami Kento & Loid Forger
+        type: string
+      nomor_urut:
+        example: 1
+        type: integer
+      persentase:
+        example: 67.89
+        type: number
+      total_suara:
+        example: 222
+        type: integer
+    type: object
+  entity.ElectionChartResponse:
+    properties:
+      candidates:
+        items:
+          $ref: '#/definitions/entity.ElectionChartCandidate'
+        type: array
+      is_live:
+        example: true
+        type: boolean
+      total_suara:
+        example: 327
+        type: integer
+    type: object
+  entity.ElectionStatsResponse:
+    properties:
+      persentase_partisipasi:
+        example: 72.67
+        type: number
+      total_dpt:
+        example: 450
+        type: integer
+      total_paslon:
+        example: 2
+        type: integer
+      total_suara_masuk:
+        example: 327
+        type: integer
+    type: object
   entity.LoginRequest:
     properties:
       identifier:
@@ -73,6 +148,87 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
     type: object
+  entity.Paslon:
+    properties:
+      dibuat_pada:
+        type: string
+      diperbarui_pada:
+        type: string
+      foto_paslon:
+        type: string
+      id_paslon:
+        type: integer
+      id_pemira:
+        type: integer
+      misi:
+        type: string
+      nama_kabinet:
+        type: string
+      nama_ketua:
+        type: string
+      nama_wakil:
+        type: string
+      nim_ketua:
+        type: string
+      nim_wakil:
+        type: string
+      nomor_urut:
+        type: integer
+      visi:
+        type: string
+    type: object
+  entity.Pemilih:
+    properties:
+      dibuat_pada:
+        type: string
+      diperbarui_pada:
+        type: string
+      email_kampus:
+        type: string
+      id_pemilih:
+        type: integer
+      id_pemira:
+        type: integer
+      nim:
+        type: string
+      status_memilih:
+        type: boolean
+    type: object
+  entity.RequestOTPRequest:
+    properties:
+      email_kampus:
+        example: 10123001@student.universitaspertamina.ac.id
+        type: string
+      nim:
+        example: "10123001"
+        type: string
+    required:
+    - email_kampus
+    - nim
+    type: object
+  entity.RequestOTPResponse:
+    properties:
+      cooldown_detik:
+        example: 60
+        type: integer
+      email_tujuan:
+        example: 10123001@student.universitaspertamina.ac.id
+        type: string
+      masa_berlaku_menit:
+        example: 5
+        type: integer
+      nim:
+        example: "10123001"
+        type: string
+    type: object
+  entity.ResendOTPRequest:
+    properties:
+      nim:
+        example: "10123001"
+        type: string
+    required:
+    - nim
+    type: object
   entity.StatItem:
     properties:
       keterangan:
@@ -81,6 +237,40 @@ definitions:
         type: integer
       total:
         type: integer
+    type: object
+  entity.VerifyOTPRequest:
+    properties:
+      kode_otp:
+        example: "748291"
+        type: string
+      nim:
+        example: "10123001"
+        type: string
+    required:
+    - kode_otp
+    - nim
+    type: object
+  entity.VerifyOTPResponse:
+    properties:
+      ballot_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      expires_in:
+        description: 15 menit (dalam detik)
+        example: 900
+        type: integer
+      pemilih:
+        $ref: '#/definitions/entity.BallotVoterInfo'
+    type: object
+  entity.VoterListResponse:
+    properties:
+      total_data:
+        example: 450
+        type: integer
+      voters:
+        items:
+          $ref: '#/definitions/entity.Pemilih'
+        type: array
     type: object
   entity.VotingStatItem:
     properties:
@@ -118,8 +308,7 @@ definitions:
     type: object
 info:
   contact: {}
-  description: Dokumentasi API backend HMIK CoreX untuk Halaman Publik & Dashboard
-    Admin.
+  description: API Dokumentasi untuk Backend Sistem Himpunan Mahasiswa Ilmu Komputer
   title: HMIK CoreX API
   version: "1.0"
 paths:
@@ -154,6 +343,144 @@ paths:
       summary: Ambil seluruh ringkasan kartu Dashboard Admin Halaman Utama
       tags:
       - Dashboard Admin - Halaman Utama
+  /admin/pemira/chart:
+    get:
+      description: Mengembalikan data perolehan suara per paslon secara realtime untuk
+        visualisasi grafik batang pleno
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data grafik pemilu berhasil diambil
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.ElectionChartResponse'
+              type: object
+        "401":
+          description: 'Akses Ditolak: Token admin tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Gagal mengambil data grafik pemilu
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Ambil Data Grafik Perolehan Suara Pemilu (Admin)
+      tags:
+      - Admin - Pemira
+  /admin/pemira/pemilih:
+    get:
+      description: Mengembalikan daftar pemilih tetap dengan pagination, filter pencarian
+        (nama/nim), dan filter status memilih
+      parameters:
+      - description: Cari berdasarkan nama atau NIM
+        in: query
+        name: search
+        type: string
+      - description: Filter status memilih (true/false)
+        in: query
+        name: status_memilih
+        type: boolean
+      - description: 'Batas jumlah data per halaman (default: 20)'
+        in: query
+        name: limit
+        type: integer
+      - description: Offset pagination data
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Daftar pemilih DPT berhasil diambil
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.VoterListResponse'
+              type: object
+        "401":
+          description: 'Akses Ditolak: Token admin tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Gagal mengambil data pemilih
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Ambil Daftar Pemilih DPT (Admin)
+      tags:
+      - Admin - Pemira
+  /admin/pemira/pemilih/{id}/reset:
+    post:
+      description: Mengembalikan status hak pilih mahasiswa menjadi belum memilih
+        jika terjadi kendala force majeure
+      parameters:
+      - description: ID Pemilih di tabel DPT
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status hak pilih pemilih berhasil di-reset
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "400":
+          description: ID pemilih tidak valid atau gagal melakukan reset
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "401":
+          description: 'Akses Ditolak: Token admin tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Gagal mereset status pemilih
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Reset Status Hak Pilih Pemilih (Admin)
+      tags:
+      - Admin - Pemira
+  /admin/pemira/stats:
+    get:
+      description: 'Mengembalikan agregat 4 kartu metrik: Suara Masuk, Total DPT,
+        Persentase Partisipasi, Total Paslon'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Statistik pemilu berhasil diambil
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.ElectionStatsResponse'
+              type: object
+        "401":
+          description: 'Akses Ditolak: Token admin tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Gagal mengambil data statistik
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Ambil Ringkasan Metrik Pemilu (Admin)
+      tags:
+      - Admin - Pemira
   /auth/login:
     post:
       consumes:
@@ -350,6 +677,169 @@ paths:
       summary: Ambil daftar departemen HMIK
       tags:
       - Departemen
+  /pemira/auth/request-otp:
+    post:
+      consumes:
+      - application/json
+      description: Memvalidasi NIM dan email kampus mahasiswa terdaftar di DPT, kemudian
+        mengirimkan kode 6-digit OTP
+      parameters:
+      - description: Kredensial NIM & Email Kampus
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RequestOTPRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OTP berhasil dikirim
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.RequestOTPResponse'
+              type: object
+        "400":
+          description: Validasi gagal atau akun tidak memenuhi syarat
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      summary: Permintaan Kode OTP Pemilih
+      tags:
+      - Pemira
+  /pemira/auth/resend-otp:
+    post:
+      consumes:
+      - application/json
+      description: Mengirimkan kembali kode OTP baru jika jeda cooldown 60 detik telah
+        terpenuhi
+      parameters:
+      - description: NIM Mahasiswa
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.ResendOTPRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Kode OTP baru berhasil dikirim
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.RequestOTPResponse'
+              type: object
+        "400":
+          description: Masih dalam masa cooldown atau data tidak valid
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      summary: Kirim Ulang Kode OTP Pemilih
+      tags:
+      - Pemira
+  /pemira/auth/verify-otp:
+    post:
+      consumes:
+      - application/json
+      description: Memvalidasi kode OTP 6-digit pemilih dan mengembalikan Ballot JWT
+        Token (15 menit) untuk mengakses bilik suara
+      parameters:
+      - description: NIM dan Kode OTP
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.VerifyOTPRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Verifikasi berhasil, token diterbitkan
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.VerifyOTPResponse'
+              type: object
+        "400":
+          description: Kode OTP salah, expired, atau format tidak valid
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      summary: Verifikasi Kode OTP & Terbitkan Ballot Token
+      tags:
+      - Pemira
+  /pemira/kandidat:
+    get:
+      description: Mengambil seluruh kandidat pasangan calon ketua & wakil ketua pada
+        periode pemira aktif
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Daftar paslon aktif berhasil diambil
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entity.Paslon'
+                  type: array
+              type: object
+        "500":
+          description: Gagal mengambil data paslon
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      summary: Ambil Daftar Paslon Aktif Pemira
+      tags:
+      - Pemira
+  /pemira/vote:
+    post:
+      consumes:
+      - application/json
+      description: Mencatat suara pemilih secara atomik dan anonim (Anti Double-Voting)
+        menggunakan Ballot Token
+      parameters:
+      - description: ID Paslon yang dipilih
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CastVoteRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Suara berhasil dicatat secara sah dan anonim
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.CastVoteResponse'
+              type: object
+        "400":
+          description: Hak suara sudah pernah digunakan atau paslon tidak valid
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "401":
+          description: Ballot token tidak valid atau sesi kadaluarsa
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Gagal memproses transaksi suara
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Pemberian Suara di Bilik Suara (Cast Vote)
+      tags:
+      - Pemira
   /program-kerja:
     get:
       consumes:
