@@ -45,7 +45,7 @@ func sendSMTPEmail(toEmail, nim, otpCode string) error {
 		smtpPort = "587"
 	}
 	smtpUser := os.Getenv("SMTP_USER")
-	smtpPass := os.Getenv("SMTP_PASSWORD")
+	smtpPass := strings.ReplaceAll(os.Getenv("SMTP_PASSWORD"), " ", "")
 	senderName := os.Getenv("SMTP_SENDER_NAME")
 	if senderName == "" {
 		senderName = "KPU HMIK Universitas Pertamina"
