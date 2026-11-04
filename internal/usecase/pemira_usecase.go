@@ -1,0 +1,349 @@
+package usecase
+
+import (
+	"context"
+	"errors"
+	"math"
+	"os"
+	"strings"
+	"time"
+
+	"github.com/HMIKProject/hmik-corex-backend/internal/entity"
+	"github.com/HMIKProject/hmik-corex-backend/internal/repository"
+	"github.com/HMIKProject/hmik-corex-backend/pkg/utils"
+	"github.com/golang-jwt/jwt/v5"
+)
+
+// PemiraUsecase mendefinisikan seluruh logika bisnis untuk alur Pemilihan Raya (Pemilih & Admin)
+type PemiraUsecase interface {
+	// 1. Voter Authentication
+	RequestOTP(ctx context.Context, req entity.RequestOTPRequest) (*entity.RequestOTPResponse, error)
+	VerifyOTP(ctx context.Context, req entity.VerifyOTPRequest) (*entity.VerifyOTPResponse, error)
+	ResendOTP(ctx context.Context, req entity.ResendOTPRequest) (*entity.RequestOTPResponse, error)
+
+	// 2. Voting Booth (Bilik Suara)
+	GetActiveCandidates(ctx context.Context) ([]entity.Paslon, error)
+	CastVote(ctx context.Context, nim string, idPemira int64, req entity.CastVoteRequest) (*entity.CastVoteResponse, error)
+
+	// 3. Admin CMS Monitoring
+	GetElectionStats(ctx context.Context) (*entity.ElectionStatsResponse, error)
+	GetElectionChart(ctx context.Context) (*entity.ElectionChartResponse, error)
+	GetVoters(ctx context.Context, search string, status *bool, limit, offset int) (*entity.VoterListResponse, error)
+	ResetVoter(ctx context.Context, id int64) error
+}
+
+type pemiraUsecase struct {
+	pemiraRepo repository.PemiraRepository
+}
+
+// NewPemiraUsecase membuat instance baru PemiraUsecase
+func NewPemiraUsecase(repo repository.PemiraRepository) PemiraUsecase {
+	return &pemiraUsecase{pemiraRepo: repo}
+}
+
+// ==========================================
+// 1. VOTER AUTHENTICATION USECASES
+// ==========================================
+
+func (u *pemiraUsecase) RequestOTP(ctx context.Context, req entity.RequestOTPRequest) (*entity.RequestOTPResponse, error) {
+	// 1. Validasi Domain Email Institusi Mahasiswa
+	email := strings.TrimSpace(strings.ToLower(req.EmailKampus))
+	if !strings.HasSuffix(email, "@student.universitaspertamina.ac.id") {
+		return nil, errors.New("hanya email resmi mahasiswa (@student.universitaspertamina.ac.id) yang diizinkan masuk")
+	}
+
+	// 2. Cek Periode Pemira yang Sedang Aktif
+	pemira, err := u.pemiraRepo.GetActivePemira(ctx)
+	if err != nil {
+		return nil, errors.New("tidak ada pemilihan raya yang sedang aktif saat ini")
+	}
+
+	now := time.Now()
+	if now.Before(pemira.TanggalMulai) || now.After(pemira.TanggalSelesai) {
+		return nil, errors.New("bilik suara sedang berada di luar jadwal pemungutan suara resmi")
+	}
+
+	// 3. Cari Data Pemilih di DPT
+	pemilih, err := u.pemiraRepo.FindPemilihByNimAndPemira(ctx, req.NIM, pemira.IdPemira)
+	if err != nil {
+		return nil, errors.New("NIM Anda tidak terdaftar dalam Daftar Pemilih Tetap (DPT)")
+	}
+
+	// 4. Validasi Kesesuaian Email di DPT
+	if strings.ToLower(pemilih.EmailKampus) != email {
+		return nil, errors.New("email yang Anda masukkan tidak sesuai dengan data email DPT Anda")
+	}
+
+	// 5. Validasi Anti Double-Voting
+	if pemilih.StatusMemilih {
+		return nil, errors.New("hak suara Anda sudah digunakan sebelumnya. Akses ke bilik suara ditutup")
+	}
+
+	// 6. Validasi Cooldown Resend (60 Detik)
+	if pemilih.OtpExpired != nil {
+		// OtpExpired diset 5 menit ke depan, jadi jika sisa waktu > 4 menit berarti baru dibuat < 60 detik lalu
+		remaining := pemilih.OtpExpired.Sub(now)
+		if remaining > 4*time.Minute {
+			return nil, errors.New("harap tunggu 60 detik sebelum meminta kode OTP kembali")
+		}
+	}
+
+	// 7. Generate OTP Kriptografis 6 Digit
+	otp, err := utils.GenerateCryptoOTP(6)
+	if err != nil {
+		return nil, errors.New("gagal memproses pembuatan kode verifikasi")
+	}
+
+	// 8. Simpan OTP ke Database dengan Masa Berlaku 5 Menit
+	expiredAt := now.Add(5 * time.Minute)
+	if err := u.pemiraRepo.UpdateOTP(ctx, pemilih.IdPemilih, otp, expiredAt); err != nil {
+		return nil, errors.New("gagal memperbarui kode verifikasi pemilih")
+	}
+
+	// 9. Kirim OTP via Mailer (Dual-Mode: SMTP / Console Fallback)
+	if err := utils.SendOTPEmail(pemilih.EmailKampus, pemilih.Nim, otp); err != nil {
+		return nil, errors.New("gagal mengirimkan email verifikasi, silakan coba beberapa saat lagi")
+	}
+
+	return &entity.RequestOTPResponse{
+		NIM:              pemilih.Nim,
+		EmailTujuan:      pemilih.EmailKampus,
+		MasaBerlakuMenit: 5,
+		CooldownDetik:    60,
+	}, nil
+}
+
+func (u *pemiraUsecase) VerifyOTP(ctx context.Context, req entity.VerifyOTPRequest) (*entity.VerifyOTPResponse, error) {
+	// 1. Cek Periode Pemira Aktif
+	pemira, err := u.pemiraRepo.GetActivePemira(ctx)
+	if err != nil {
+		return nil, errors.New("tidak ada pemilihan raya yang sedang aktif saat ini")
+	}
+
+	// 2. Cari Data Pemilih di DPT
+	pemilih, err := u.pemiraRepo.FindPemilihByNimAndPemira(ctx, req.NIM, pemira.IdPemira)
+	if err != nil {
+		return nil, errors.New("NIM tidak ditemukan dalam DPT")
+	}
+
+	// 3. Validasi Hak Suara
+	if pemilih.StatusMemilih {
+		return nil, errors.New("hak suara Anda sudah digunakan sebelumnya")
+	}
+
+	// 4. Validasi Keberadaan & Masa Berlaku OTP
+	if pemilih.KodeOtp == "" || pemilih.OtpExpired == nil {
+		return nil, errors.New("kode OTP belum pernah diminta, silakan lakukan login kembali")
+	}
+
+	now := time.Now()
+	if now.After(*pemilih.OtpExpired) {
+		return nil, errors.New("kode OTP telah kedaluwarsa (melebihi 5 menit), silakan minta kode baru")
+	}
+
+	// 5. Cocokkan Kode OTP
+	if pemilih.KodeOtp != req.KodeOTP {
+		return nil, errors.New("kode OTP yang Anda masukkan salah")
+	}
+
+	// 6. Hanguskan Kode OTP Seketika (One-Time Invalidation)
+	_ = u.pemiraRepo.ClearOTP(ctx, pemilih.IdPemilih)
+
+	// 7. Terbitkan Ballot JWT Token (Masa Aktif 15 Menit)
+	ballotToken, err := u.generateBallotJWT(pemilih.Nim, pemira.IdPemira)
+	if err != nil {
+		return nil, errors.New("gagal menerbitkan tiket masuk bilik suara")
+	}
+
+	return &entity.VerifyOTPResponse{
+		BallotToken: ballotToken,
+		ExpiresIn:   900, // 15 menit dalam detik
+		Pemilih: entity.BallotVoterInfo{
+			NIM:           pemilih.Nim,
+			StatusMemilih: false,
+		},
+	}, nil
+}
+
+func (u *pemiraUsecase) ResendOTP(ctx context.Context, req entity.ResendOTPRequest) (*entity.RequestOTPResponse, error) {
+	pemira, err := u.pemiraRepo.GetActivePemira(ctx)
+	if err != nil {
+		return nil, errors.New("tidak ada pemilihan raya yang sedang aktif saat ini")
+	}
+
+	pemilih, err := u.pemiraRepo.FindPemilihByNimAndPemira(ctx, req.NIM, pemira.IdPemira)
+	if err != nil {
+		return nil, errors.New("NIM Anda tidak terdaftar dalam DPT")
+	}
+
+	return u.RequestOTP(ctx, entity.RequestOTPRequest{
+		NIM:         pemilih.Nim,
+		EmailKampus: pemilih.EmailKampus,
+	})
+}
+
+// ==========================================
+// 2. VOTING BOOTH (BILIK SUARA) USECASES
+// ==========================================
+
+func (u *pemiraUsecase) GetActiveCandidates(ctx context.Context) ([]entity.Paslon, error) {
+	pemira, err := u.pemiraRepo.GetActivePemira(ctx)
+	if err != nil {
+		return nil, errors.New("tidak ada pemilihan raya yang sedang aktif saat ini")
+	}
+
+	paslons, err := u.pemiraRepo.GetPaslonByPemiraID(ctx, pemira.IdPemira)
+	if err != nil {
+		return nil, errors.New("gagal memuat data pasangan calon")
+	}
+
+	return paslons, nil
+}
+
+func (u *pemiraUsecase) CastVote(ctx context.Context, nim string, idPemira int64, req entity.CastVoteRequest) (*entity.CastVoteResponse, error) {
+	// 1. Validasi Keberadaan Paslon
+	paslon, err := u.pemiraRepo.GetPaslonByID(ctx, req.IdPaslon)
+	if err != nil || paslon.IdPemira != idPemira {
+		return nil, errors.New("pasangan calon yang Anda pilih tidak valid untuk periode pemilu ini")
+	}
+
+	// 2. Eksekusi Transaksi Atomik (SELECT FOR UPDATE + LUBER JURDIL INSERT)
+	if err := u.pemiraRepo.CastVote(ctx, idPemira, nim, req.IdPaslon); err != nil {
+		return nil, err
+	}
+
+	return &entity.CastVoteResponse{
+		StatusVote:    "COMPLETED",
+		WaktuTercatat: time.Now(),
+	}, nil
+}
+
+// ==========================================
+// 3. ADMIN CMS MONITORING USECASES
+// ==========================================
+
+func (u *pemiraUsecase) GetElectionStats(ctx context.Context) (*entity.ElectionStatsResponse, error) {
+	pemira, err := u.pemiraRepo.GetActivePemira(ctx)
+	if err != nil {
+		// Jika belum ada pemira berjalan, kembalikan data 0 tanpa crash
+		return &entity.ElectionStatsResponse{
+			TotalSuaraMasuk:       0,
+			TotalDPT:              0,
+			PersentasePartisipasi: 0,
+			TotalPaslon:           0,
+		}, nil
+	}
+
+	totalSuara, _ := u.pemiraRepo.CountTotalSuara(ctx, pemira.IdPemira)
+	totalDPT, _ := u.pemiraRepo.CountTotalDPT(ctx, pemira.IdPemira)
+	paslons, _ := u.pemiraRepo.GetPaslonByPemiraID(ctx, pemira.IdPemira)
+
+	var partisipasi float64 = 0
+	if totalDPT > 0 {
+		partisipasi = math.Round((float64(totalSuara)/float64(totalDPT)*100)*100) / 100
+	}
+
+	return &entity.ElectionStatsResponse{
+		TotalSuaraMasuk:       totalSuara,
+		TotalDPT:              totalDPT,
+		PersentasePartisipasi: partisipasi,
+		TotalPaslon:           int64(len(paslons)),
+	}, nil
+}
+
+func (u *pemiraUsecase) GetElectionChart(ctx context.Context) (*entity.ElectionChartResponse, error) {
+	pemira, err := u.pemiraRepo.GetActivePemira(ctx)
+	if err != nil {
+		return &entity.ElectionChartResponse{
+			TotalSuara: 0,
+			IsLive:     false,
+			Candidates: []entity.ElectionChartCandidate{},
+		}, nil
+	}
+
+	totalSuara, _ := u.pemiraRepo.CountTotalSuara(ctx, pemira.IdPemira)
+	suaraMap, _ := u.pemiraRepo.CountSuaraPerPaslon(ctx, pemira.IdPemira)
+	paslons, _ := u.pemiraRepo.GetPaslonByPemiraID(ctx, pemira.IdPemira)
+
+	candidates := make([]entity.ElectionChartCandidate, 0, len(paslons))
+	for _, p := range paslons {
+		count := suaraMap[p.IdPaslon]
+		var pct float64 = 0
+		if totalSuara > 0 {
+			pct = math.Round((float64(count)/float64(totalSuara)*100)*100) / 100
+		}
+
+		nama := p.NamaKetua
+		if p.NamaWakil != "" {
+			nama = p.NamaKetua + " & " + p.NamaWakil
+		}
+
+		candidates = append(candidates, entity.ElectionChartCandidate{
+			IdPaslon:   p.IdPaslon,
+			NomorUrut:  p.NomorUrut,
+			NamaPaslon: nama,
+			FotoPaslon: p.FotoPaslon,
+			TotalSuara: count,
+			Persentase: pct,
+		})
+	}
+
+	return &entity.ElectionChartResponse{
+		TotalSuara: totalSuara,
+		IsLive:     pemira.Status == "BERJALAN",
+		Candidates: candidates,
+	}, nil
+}
+
+func (u *pemiraUsecase) GetVoters(ctx context.Context, search string, status *bool, limit, offset int) (*entity.VoterListResponse, error) {
+	pemira, err := u.pemiraRepo.GetActivePemira(ctx)
+	if err != nil {
+		return &entity.VoterListResponse{
+			Voters:    []entity.Pemilih{},
+			TotalData: 0,
+		}, nil
+	}
+
+	if limit <= 0 {
+		limit = 10
+	}
+
+	voters, total, err := u.pemiraRepo.GetPemilihList(ctx, pemira.IdPemira, search, status, limit, offset)
+	if err != nil {
+		return nil, errors.New("gagal memuat data DPT")
+	}
+
+	return &entity.VoterListResponse{
+		Voters:    voters,
+		TotalData: total,
+	}, nil
+}
+
+func (u *pemiraUsecase) ResetVoter(ctx context.Context, id int64) error {
+	if err := u.pemiraRepo.ResetPemilihStatus(ctx, id); err != nil {
+		return errors.New("gagal mereset status pemilih")
+	}
+	return nil
+}
+
+// ==========================================
+// TOKEN HELPER (BALLOT JWT)
+// ==========================================
+
+// generateBallotJWT menerbitkan tiket masuk bilik suara khusus pemilih berdurasi 15 menit
+func (u *pemiraUsecase) generateBallotJWT(nim string, idPemira int64) (string, error) {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		secret = "rahasia_untuk_local_development_saja"
+	}
+
+	claims := jwt.MapClaims{
+		"nim":       nim,
+		"id_pemira": idPemira,
+		"role":      "voter",
+		"exp":       time.Now().Add(15 * time.Minute).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(secret))
+}
