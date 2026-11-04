@@ -6,6 +6,7 @@ import (
 	"net/smtp"
 	"os"
 	"strings"
+	"time"
 )
 
 // SendOTPEmail mengirimkan kode OTP ke email tujuan dengan deteksi mode otomatis (Dual-Mode Architecture).
@@ -54,20 +55,37 @@ func sendSMTPEmail(toEmail, nim, otpCode string) error {
 	auth := smtp.PlainAuth("", smtpUser, smtpPass, smtpHost)
 
 	subject := fmt.Sprintf("[PEMIRA HMIK] Kode Verifikasi Masuk Bilik Suara: %s", otpCode)
-	body := buildOTPEmailHTML(nim, otpCode)
+	boundary := fmt.Sprintf("hmik_pemira_%d", time.Now().UnixNano())
+	messageID := fmt.Sprintf("<%d.%s@gmail.com>", time.Now().UnixNano(), strings.Split(smtpUser, "@")[0])
+	dateHeader := time.Now().Format(time.RFC1123Z)
 
-	headers := make(map[string]string)
-	headers["From"] = fmt.Sprintf("%s <%s>", senderName, smtpUser)
-	headers["To"] = toEmail
-	headers["Subject"] = subject
-	headers["MIME-Version"] = "1.0"
-	headers["Content-Type"] = "text/html; charset=\"UTF-8\""
+	textBody := fmt.Sprintf("PEMILIHAN RAYA HMIK UNIVERSITAS PERTAMINA\r\n\r\n"+
+		"Halo Mahasiswa (NIM: %s),\r\n\r\n"+
+		"Berikut kode verifikasi untuk menggunakan hak suara Anda di Bilik Suara Virtual:\r\n"+
+		">>> %s <<<\r\n\r\n"+
+		"Kode verifikasi ini hanya berlaku selama 5 menit.\r\n"+
+		"Jangan pernah membagikan kode ini kepada siapa pun.\r\n\r\n"+
+		"© Komisi Pemilihan Umum HMIK - Universitas Pertamina", nim, otpCode)
 
-	message := ""
-	for k, v := range headers {
-		message += fmt.Sprintf("%s: %s\r\n", k, v)
-	}
-	message += "\r\n" + body
+	htmlBody := buildOTPEmailHTML(nim, otpCode)
+
+	message := fmt.Sprintf("From: %s <%s>\r\n"+
+		"To: %s\r\n"+
+		"Subject: %s\r\n"+
+		"Date: %s\r\n"+
+		"Message-ID: %s\r\n"+
+		"MIME-Version: 1.0\r\n"+
+		"Content-Type: multipart/alternative; boundary=\"%s\"\r\n\r\n"+
+		"--%s\r\n"+
+		"Content-Type: text/plain; charset=\"UTF-8\"\r\n"+
+		"Content-Transfer-Encoding: 8bit\r\n\r\n"+
+		"%s\r\n\r\n"+
+		"--%s\r\n"+
+		"Content-Type: text/html; charset=\"UTF-8\"\r\n"+
+		"Content-Transfer-Encoding: 8bit\r\n\r\n"+
+		"%s\r\n\r\n"+
+		"--%s--\r\n",
+		senderName, smtpUser, toEmail, subject, dateHeader, messageID, boundary, boundary, textBody, boundary, htmlBody, boundary)
 
 	addr := fmt.Sprintf("%s:%s", smtpHost, smtpPort)
 	return smtp.SendMail(addr, auth, smtpUser, []string{toEmail}, []byte(message))
