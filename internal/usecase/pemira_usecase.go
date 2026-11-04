@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math"
 	"os"
 	"strings"
@@ -58,8 +59,8 @@ func (u *pemiraUsecase) RequestOTP(ctx context.Context, req entity.RequestOTPReq
 		return nil, errors.New("tidak ada pemilihan raya yang sedang aktif saat ini")
 	}
 
-	now := time.Now()
-	if now.Before(pemira.TanggalMulai) || now.After(pemira.TanggalSelesai) {
+	now := time.Now().UTC()
+	if now.Before(pemira.TanggalMulai.UTC()) || now.After(pemira.TanggalSelesai.UTC()) {
 		return nil, errors.New("bilik suara sedang berada di luar jadwal pemungutan suara resmi")
 	}
 
@@ -91,10 +92,17 @@ func (u *pemiraUsecase) RequestOTP(ctx context.Context, req entity.RequestOTPReq
 
 	// 6. Validasi Cooldown Resend (60 Detik)
 	if pemilih.OtpExpired != nil {
-		// OtpExpired diset 5 menit ke depan, jadi jika sisa waktu > 4 menit berarti baru dibuat < 60 detik lalu
-		remaining := pemilih.OtpExpired.Sub(now)
-		if remaining > 4*time.Minute {
-			return nil, errors.New("harap tunggu 60 detik sebelum meminta kode OTP kembali")
+		expiredAt := pemilih.OtpExpired.UTC()
+		// OTP berlaku 5 menit, berarti waktu pembuatan = expiredAt - 5 menit
+		createdAt := expiredAt.Add(-5 * time.Minute)
+
+		elapsed := now.Sub(createdAt)
+		if elapsed >= 0 && elapsed < 60*time.Second {
+			sisaDetik := int((60*time.Second - elapsed).Seconds()) + 1
+			if sisaDetik > 60 {
+				sisaDetik = 60
+			}
+			return nil, fmt.Errorf("harap tunggu %d detik sebelum meminta kode OTP kembali", sisaDetik)
 		}
 	}
 
@@ -104,7 +112,7 @@ func (u *pemiraUsecase) RequestOTP(ctx context.Context, req entity.RequestOTPReq
 		return nil, errors.New("gagal memproses pembuatan kode verifikasi")
 	}
 
-	// 8. Simpan OTP ke Database dengan Masa Berlaku 5 Menit
+	// 8. Simpan OTP ke Database dengan Masa Berlaku 5 Menit (UTC)
 	expiredAt := now.Add(5 * time.Minute)
 	if err := u.pemiraRepo.UpdateOTP(ctx, pemilih.IdPemilih, otp, expiredAt); err != nil {
 		return nil, errors.New("gagal memperbarui kode verifikasi pemilih")
@@ -146,8 +154,8 @@ func (u *pemiraUsecase) VerifyOTP(ctx context.Context, req entity.VerifyOTPReque
 		return nil, errors.New("kode OTP belum pernah diminta, silakan lakukan login kembali")
 	}
 
-	now := time.Now()
-	if now.After(*pemilih.OtpExpired) {
+	now := time.Now().UTC()
+	if now.After(pemilih.OtpExpired.UTC()) {
 		return nil, errors.New("kode OTP telah kedaluwarsa (melebihi 5 menit), silakan minta kode baru")
 	}
 
