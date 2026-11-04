@@ -63,15 +63,25 @@ func (u *pemiraUsecase) RequestOTP(ctx context.Context, req entity.RequestOTPReq
 		return nil, errors.New("bilik suara sedang berada di luar jadwal pemungutan suara resmi")
 	}
 
-	// 3. Cari Data Pemilih di DPT
+	// 3. Cari Data Pemilih di DPT (Real-Time Auto-Registration)
 	pemilih, err := u.pemiraRepo.FindPemilihByNimAndPemira(ctx, req.NIM, pemira.IdPemira)
 	if err != nil {
-		return nil, errors.New("NIM Anda tidak terdaftar dalam Daftar Pemilih Tetap (DPT)")
-	}
-
-	// 4. Validasi Kesesuaian Email di DPT
-	if strings.ToLower(pemilih.EmailKampus) != email {
-		return nil, errors.New("email yang Anda masukkan tidak sesuai dengan data email DPT Anda")
+		// Mahasiswa baru pertama kali meminta OTP -> Daftarkan secara otomatis ke DPT Real-Time
+		newPemilih := &entity.Pemilih{
+			IdPemira:      pemira.IdPemira,
+			Nim:           req.NIM,
+			EmailKampus:   email,
+			StatusMemilih: false,
+		}
+		if err := u.pemiraRepo.CreatePemilih(ctx, newPemilih); err != nil {
+			return nil, errors.New("gagal mendaftarkan data pemilih")
+		}
+		pemilih = newPemilih
+	} else {
+		// 4. Jika sudah pernah terdaftar, validasi kesesuaian email
+		if strings.ToLower(pemilih.EmailKampus) != email {
+			return nil, errors.New("email yang Anda masukkan tidak sesuai dengan email yang terdaftar untuk NIM ini")
+		}
 	}
 
 	// 5. Validasi Anti Double-Voting
@@ -173,7 +183,7 @@ func (u *pemiraUsecase) ResendOTP(ctx context.Context, req entity.ResendOTPReque
 
 	pemilih, err := u.pemiraRepo.FindPemilihByNimAndPemira(ctx, req.NIM, pemira.IdPemira)
 	if err != nil {
-		return nil, errors.New("NIM Anda tidak terdaftar dalam DPT")
+		return nil, errors.New("NIM Anda belum pernah meminta kode OTP sebelumnya")
 	}
 
 	return u.RequestOTP(ctx, entity.RequestOTPRequest{

@@ -22,6 +22,7 @@ type PemiraRepository interface {
 	GetPaslonByID(ctx context.Context, idPaslon int64) (*entity.Paslon, error)
 
 	// 3. Pemilih (DPT & Autentikasi OTP)
+	CreatePemilih(ctx context.Context, pemilih *entity.Pemilih) error
 	FindPemilihByNimAndPemira(ctx context.Context, nim string, idPemira int64) (*entity.Pemilih, error)
 	UpdateOTP(ctx context.Context, idPemilih int64, otpCode string, expiredAt time.Time) error
 	ClearOTP(ctx context.Context, idPemilih int64) error
@@ -98,6 +99,10 @@ func (r *pemiraRepository) GetPaslonByID(ctx context.Context, idPaslon int64) (*
 // ==========================================
 // 3. PEMILIH (DPT & OTP) QUERIES
 // ==========================================
+
+func (r *pemiraRepository) CreatePemilih(ctx context.Context, pemilih *entity.Pemilih) error {
+	return r.db.WithContext(ctx).Create(pemilih).Error
+}
 
 func (r *pemiraRepository) FindPemilihByNimAndPemira(ctx context.Context, nim string, idPemira int64) (*entity.Pemilih, error) {
 	var pemilih entity.Pemilih

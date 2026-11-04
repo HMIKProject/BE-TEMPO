@@ -103,6 +103,40 @@ func TestPemiraE2E_FullLifecycle(t *testing.T) {
 		}
 	})
 
+	// --- 2b. Auto-Register Mahasiswa Baru Belum Ada di DPT ---
+	t.Run("2b. Auto-Register Mahasiswa Baru Belum Ada di DPT", func(t *testing.T) {
+		newStudentNIM := "105223888"
+		newStudentEmail := "105223888@student.universitaspertamina.ac.id"
+
+		// Hapus jika sebelumnya ada
+		db.Exec("DELETE FROM pemilih WHERE nim = ?", newStudentNIM)
+
+		body, _ := json.Marshal(map[string]string{
+			"nim":          newStudentNIM,
+			"email_kampus": newStudentEmail,
+		})
+		req, _ := http.NewRequest(http.MethodPost, "/api/v1/pemira/auth/request-otp", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		if w.Code != http.StatusOK {
+			t.Fatalf("Ekspektasi 200 OK untuk auto-register, dapat: %d, body: %s", w.Code, w.Body.String())
+		}
+
+		// Pastikan mahasiswa langsung tercatat di tabel pemilih
+		var check entity.Pemilih
+		if err := db.Where("nim = ?", newStudentNIM).First(&check).Error; err != nil {
+			t.Fatalf("Mahasiswa baru gagal tercatat di tabel pemilih: %v", err)
+		}
+		if check.EmailKampus != newStudentEmail || check.StatusMemilih != false {
+			t.Errorf("Data pemilih yang dibuat tidak sesuai: %+v", check)
+		}
+
+		// Cleanup
+		db.Exec("DELETE FROM pemilih WHERE nim = ?", newStudentNIM)
+	})
+
 	// Ambil kode OTP yang tersimpan di DB
 	var pemilih entity.Pemilih
 	if err := db.Where("nim = ?", testNIM).First(&pemilih).Error; err != nil {
