@@ -15,19 +15,26 @@ import (
 func SendOTPEmail(emailTujuan, nim, otpCode string) error {
 	appEnv := strings.ToLower(os.Getenv("APP_ENV"))
 	smtpHost := os.Getenv("SMTP_HOST")
+	smtpUser := os.Getenv("SMTP_USER")
 
-	// 1. FALLBACK / DEVELOPMENT MODE
-	if appEnv == "development" || appEnv == "" || smtpHost == "" {
-		log.Println("================================================================")
-		log.Printf("📧 [DEV MAILER - CONSOLE FALLBACK]")
-		log.Printf("   Tujuan   : %s (NIM: %s)", emailTujuan, nim)
-		log.Printf("   KODE OTP : >>> %s <<< (Masa Berlaku: 5 Menit)", otpCode)
-		log.Println("================================================================")
+	// 1. PRODUCTION / SMTP MODE (Aktif jika SMTP_HOST & SMTP_USER terisi dan APP_ENV bukan "development")
+	if smtpHost != "" && smtpUser != "" && appEnv != "development" {
+		err := sendSMTPEmail(emailTujuan, nim, otpCode)
+		if err != nil {
+			log.Printf("⚠️ [SMTP ERROR] Gagal mengirim email ke %s: %v", emailTujuan, err)
+			return err
+		}
+		log.Printf("✅ [SMTP SUCCESS] Email OTP berhasil dikirimkan ke %s via %s", emailTujuan, smtpHost)
 		return nil
 	}
 
-	// 2. PRODUCTION MODE (Kirim via SMTP TLS)
-	return sendSMTPEmail(emailTujuan, nim, otpCode)
+	// 2. FALLBACK / DEVELOPMENT MODE (Cetak ke konsol terminal)
+	log.Println("================================================================")
+	log.Printf("📧 [DEV MAILER - CONSOLE FALLBACK]")
+	log.Printf("   Tujuan   : %s (NIM: %s)", emailTujuan, nim)
+	log.Printf("   KODE OTP : >>> %s <<< (Masa Berlaku: 5 Menit)", otpCode)
+	log.Println("================================================================")
+	return nil
 }
 
 // sendSMTPEmail melakukan transmisi paket email HTML via protokol SMTP
