@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strconv"
 	"testing"
 	"time"
 
@@ -297,3 +298,190 @@ func TestPemiraE2E_FullLifecycle(t *testing.T) {
 		}
 	})
 }
+
+func TestAdminPemiraCRUD_And_PelantikanMPIK(t *testing.T) {
+	router, db := setupTestRouter(t)
+	adminToken := generateAdminTestToken()
+
+	// 1. Create Paslon Baru
+	var newPaslonID int64
+	t.Run("1. Admin Tambah Paslon Baru Berhasil", func(t *testing.T) {
+		body, _ := json.Marshal(entity.CreatePaslonRequest{
+			NomorUrut:   99,
+			NimKetua:    "105223091",
+			NamaKetua:   "Test Kahim",
+			NimWakil:    "105223092",
+			NamaWakil:   "Test Wakahim",
+			NamaKabinet: "Kabinet Sinergi Uji",
+			FotoPaslon:  "https://example.com/test.png",
+			Visi:        "Visi Uji Coba",
+			Misi:        "Misi Uji Coba",
+		})
+		req, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/pemira/kandidat", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+adminToken)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		if w.Code != http.StatusCreated {
+			t.Fatalf("Ekspektasi 201 Created, dapat: %d, body: %s", w.Code, w.Body.String())
+		}
+
+		var resp struct {
+			Data entity.Paslon `json:"data"`
+		}
+		if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+			t.Fatalf("Gagal unmarshal paslon: %v", err)
+		}
+		newPaslonID = resp.Data.IdPaslon
+		if newPaslonID == 0 {
+			t.Fatalf("ID Paslon baru tidak boleh 0")
+		}
+	})
+
+	// 2. Update Paslon
+	t.Run("2. Admin Update Paslon Berhasil", func(t *testing.T) {
+		body, _ := json.Marshal(entity.UpdatePaslonRequest{
+			NomorUrut:   99,
+			NimKetua:    "105223091",
+			NamaKetua:   "Test Kahim Diperbarui",
+			NimWakil:    "105223092",
+			NamaWakil:   "Test Wakahim Diperbarui",
+			NamaKabinet: "Kabinet Sinergi Uji Diperbarui",
+			FotoPaslon:  "https://example.com/test_updated.png",
+			Visi:        "Visi Terupdate",
+			Misi:        "Misi Terupdate",
+		})
+		req, _ := http.NewRequest(http.MethodPut, "/api/v1/admin/pemira/kandidat/"+strconv.FormatInt(newPaslonID, 10), bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+adminToken)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		if w.Code != http.StatusOK {
+			t.Fatalf("Ekspektasi 200 OK, dapat: %d, body: %s", w.Code, w.Body.String())
+		}
+	})
+
+	// 3. Settings & Status Control
+	t.Run("3. Admin Ambil & Update Pengaturan Acara", func(t *testing.T) {
+		// GET Settings
+		reqGet, _ := http.NewRequest(http.MethodGet, "/api/v1/admin/pemira/settings", nil)
+		reqGet.Header.Set("Authorization", "Bearer "+adminToken)
+		wGet := httptest.NewRecorder()
+		router.ServeHTTP(wGet, reqGet)
+
+		if wGet.Code != http.StatusOK {
+			t.Fatalf("Ekspektasi 200 OK get settings, dapat: %d", wGet.Code)
+		}
+
+		// PUT Schedule
+		scheduleBody, _ := json.Marshal(entity.UpdatePemiraScheduleRequest{
+			TahunPeriode:   "2026/2027",
+			TanggalMulai:   time.Now().Add(-24 * time.Hour),
+			TanggalSelesai: time.Now().Add(48 * time.Hour),
+		})
+		reqPut, _ := http.NewRequest(http.MethodPut, "/api/v1/admin/pemira/settings", bytes.NewBuffer(scheduleBody))
+		reqPut.Header.Set("Content-Type", "application/json")
+		reqPut.Header.Set("Authorization", "Bearer "+adminToken)
+		wPut := httptest.NewRecorder()
+		router.ServeHTTP(wPut, reqPut)
+
+		if wPut.Code != http.StatusOK {
+			t.Fatalf("Ekspektasi 200 OK update schedule, dapat: %d", wPut.Code)
+		}
+
+		// POST Status Trigger
+		statusBody, _ := json.Marshal(entity.UpdatePemiraStatusRequest{Status: "BERJALAN"})
+		reqStatus, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/pemira/status", bytes.NewBuffer(statusBody))
+		reqStatus.Header.Set("Content-Type", "application/json")
+		reqStatus.Header.Set("Authorization", "Bearer "+adminToken)
+		wStatus := httptest.NewRecorder()
+		router.ServeHTTP(wStatus, reqStatus)
+
+		if wStatus.Code != http.StatusOK {
+			t.Fatalf("Ekspektasi 200 OK update status, dapat: %d", wStatus.Code)
+		}
+	})
+
+	// 4. Strict Deletion Protection (LUBER JURDIL)
+	t.Run("4. Proteksi Penghapusan Paslon Berjalan Benar", func(t *testing.T) {
+		// Paslon 1 sudah memiliki suara -> harus DITOLAK (400 Bad Request)
+		reqDelVoted, _ := http.NewRequest(http.MethodDelete, "/api/v1/admin/pemira/kandidat/1", nil)
+		reqDelVoted.Header.Set("Authorization", "Bearer "+adminToken)
+		wDelVoted := httptest.NewRecorder()
+		router.ServeHTTP(wDelVoted, reqDelVoted)
+
+		if wDelVoted.Code != http.StatusBadRequest {
+			t.Errorf("Ekspektasi 400 Bad Request untuk paslon dengan suara masuk, dapat: %d", wDelVoted.Code)
+		}
+
+		// Paslon baru yang belum punya suara -> boleh dihapus
+		reqDelNew, _ := http.NewRequest(http.MethodDelete, "/api/v1/admin/pemira/kandidat/"+strconv.FormatInt(newPaslonID, 10), nil)
+		reqDelNew.Header.Set("Authorization", "Bearer "+adminToken)
+		wDelNew := httptest.NewRecorder()
+		router.ServeHTTP(wDelNew, reqDelNew)
+
+		if wDelNew.Code != http.StatusOK {
+			t.Errorf("Ekspektasi 200 OK untuk paslon tanpa suara, dapat: %d", wDelNew.Code)
+		}
+	})
+
+	// 5. Pelantikan MPIK & Transisi Manajemen Himpunan
+	t.Run("5. Pengesahan & Pelantikan MPIK", func(t *testing.T) {
+		// Ubah status ke SELESAI agar syarat pelantikan terpenuhi
+		statusSelesai, _ := json.Marshal(entity.UpdatePemiraStatusRequest{Status: "SELESAI"})
+		reqStatus, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/pemira/status", bytes.NewBuffer(statusSelesai))
+		reqStatus.Header.Set("Content-Type", "application/json")
+		reqStatus.Header.Set("Authorization", "Bearer "+adminToken)
+		wStatus := httptest.NewRecorder()
+		router.ServeHTTP(wStatus, reqStatus)
+
+		if wStatus.Code != http.StatusOK {
+			t.Fatalf("Gagal mengubah status pemira ke SELESAI: %d", wStatus.Code)
+		}
+
+		// Eksekusi Pelantikan MPIK
+		reqPelantikan, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/pemira/pelantikan-mpik", nil)
+		reqPelantikan.Header.Set("Authorization", "Bearer "+adminToken)
+		wPelantikan := httptest.NewRecorder()
+		router.ServeHTTP(wPelantikan, reqPelantikan)
+
+		if wPelantikan.Code != http.StatusOK {
+			t.Fatalf("Ekspektasi 200 OK pelantikan MPIK, dapat: %d, body: %s", wPelantikan.Code, wPelantikan.Body.String())
+		}
+
+		var resp struct {
+			Data entity.PelantikanMPIKResponse `json:"data"`
+		}
+		if err := json.Unmarshal(wPelantikan.Body.Bytes(), &resp); err != nil {
+			t.Fatalf("Gagal parse response pelantikan: %v", err)
+		}
+
+		if resp.Data.StatusPelantikan != "APPROVED" {
+			t.Errorf("Ekspektasi status APPROVED, dapat: %s", resp.Data.StatusPelantikan)
+		}
+
+		// Verifikasi Kabinet Aktif di DB
+		var activeKabinet entity.Kabinet
+		if err := db.Where("is_aktif = ?", true).First(&activeKabinet).Error; err != nil {
+			t.Fatalf("Gagal menemukan kabinet aktif baru di DB: %v", err)
+		}
+
+		// Verifikasi BPH Terdaftar di Anggota dengan Angkatan Ekstraksi
+		if resp.Data.KetuaBaru != nil {
+			if resp.Data.KetuaBaru.Angkatan < 2000 {
+				t.Errorf("Ekstraksi angkatan Ketua tidak valid: %d", resp.Data.KetuaBaru.Angkatan)
+			}
+		}
+
+		// Reset kembali status Pemira ke BERJALAN agar bilik suara aktif untuk sesi testing berikutnya
+		statusBerjalan, _ := json.Marshal(entity.UpdatePemiraStatusRequest{Status: "BERJALAN"})
+		reqResetStatus, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/pemira/status", bytes.NewBuffer(statusBerjalan))
+		reqResetStatus.Header.Set("Content-Type", "application/json")
+		reqResetStatus.Header.Set("Authorization", "Bearer "+adminToken)
+		wReset := httptest.NewRecorder()
+		router.ServeHTTP(wReset, reqResetStatus)
+	})
+}
+

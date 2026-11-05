@@ -93,3 +93,71 @@ type VoterListResponse struct {
 	Voters    []Pemilih `json:"voters"`
 	TotalData int64     `json:"total_data" example:"450"`
 }
+
+// ==========================================
+// ADMIN CANDIDATE (PASLON) CRUD DTOs
+// ==========================================
+
+// CreatePaslonRequest payload penambahan paslon baru oleh admin
+type CreatePaslonRequest struct {
+	NomorUrut   int    `json:"nomor_urut" binding:"required" example:"3"`
+	NimKetua    string `json:"nim_ketua" binding:"required" example:"105223001"`
+	NamaKetua   string `json:"nama_ketua" binding:"required" example:"Calon Ketua"`
+	NimWakil    string `json:"nim_wakil" binding:"required" example:"105223002"`
+	NamaWakil   string `json:"nama_wakil" binding:"required" example:"Calon Wakil"`
+	NamaKabinet string `json:"nama_kabinet" binding:"required" example:"Kabinet Bersama"`
+	FotoPaslon  string `json:"foto_paslon" example:"https://..."`
+	Visi        string `json:"visi" example:"Mewujudkan HMIK unggul"`
+	Misi        string `json:"misi" example:"1. Kolaborasi riset"`
+}
+
+// UpdatePaslonRequest payload edit paslon oleh admin
+type UpdatePaslonRequest struct {
+	NomorUrut   int    `json:"nomor_urut" binding:"required" example:"3"`
+	NimKetua    string `json:"nim_ketua" binding:"required" example:"105223001"`
+	NamaKetua   string `json:"nama_ketua" binding:"required" example:"Calon Ketua"`
+	NimWakil    string `json:"nim_wakil" binding:"required" example:"105223002"`
+	NamaWakil   string `json:"nama_wakil" binding:"required" example:"Calon Wakil"`
+	NamaKabinet string `json:"nama_kabinet" binding:"required" example:"Kabinet Bersama"`
+	FotoPaslon  string `json:"foto_paslon" example:"https://..."`
+	Visi        string `json:"visi" example:"Mewujudkan HMIK unggul"`
+	Misi        string `json:"misi" example:"1. Kolaborasi riset"`
+}
+
+// ==========================================
+// ADMIN ELECTION CONTROL & MPIK DTOs
+// ==========================================
+
+// ElectionSettingsResponse data parameter & kontrol acara pemira
+type ElectionSettingsResponse struct {
+	IdPemira       int64     `json:"id_pemira" example:"1"`
+	TahunPeriode   string    `json:"tahun_periode" example:"2026/2027"`
+	Status         string    `json:"status" example:"BERJALAN"`
+	TanggalMulai   time.Time `json:"tanggal_mulai"`
+	TanggalSelesai time.Time `json:"tanggal_selesai"`
+	TotalPaslon    int64     `json:"total_paslon" example:"2"`
+	TotalSuara     int64     `json:"total_suara" example:"327"`
+	MpikStatus     string    `json:"mpik_status" example:"PENDING"`
+	WinningPaslon  *Paslon   `json:"winning_paslon,omitempty"`
+}
+
+// UpdatePemiraStatusRequest payload saklar pemicu status pemira
+type UpdatePemiraStatusRequest struct {
+	Status string `json:"status" binding:"required,oneof=DRAFT BERJALAN SELESAI" example:"BERJALAN"`
+}
+
+// UpdatePemiraScheduleRequest payload pengaturan jadwal acara
+type UpdatePemiraScheduleRequest struct {
+	TahunPeriode   string    `json:"tahun_periode" binding:"required" example:"2026/2027"`
+	TanggalMulai   time.Time `json:"tanggal_mulai" binding:"required"`
+	TanggalSelesai time.Time `json:"tanggal_selesai" binding:"required"`
+}
+
+// PelantikanMPIKResponse konfirmasi pelantikan kabinet dan BPH baru pasca sidang MPIK
+type PelantikanMPIKResponse struct {
+	StatusPelantikan string   `json:"status_pelantikan" example:"APPROVED"`
+	Pesan            string   `json:"pesan" example:"Pelantikan berhasil! Kabinet dan BPH baru telah aktif di Manajemen Himpunan."`
+	KabinetBaru      Kabinet  `json:"kabinet_baru"`
+	KetuaBaru        *Anggota `json:"ketua_baru,omitempty"`
+	WakilBaru        *Anggota `json:"wakil_baru,omitempty"`
+}

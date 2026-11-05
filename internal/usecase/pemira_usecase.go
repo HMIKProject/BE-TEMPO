@@ -13,6 +13,7 @@ import (
 	"github.com/HMIKProject/hmik-corex-backend/internal/repository"
 	"github.com/HMIKProject/hmik-corex-backend/pkg/utils"
 	"github.com/golang-jwt/jwt/v5"
+	"strconv"
 )
 
 // PemiraUsecase mendefinisikan seluruh logika bisnis untuk alur Pemilihan Raya (Pemilih & Admin)
@@ -31,6 +32,19 @@ type PemiraUsecase interface {
 	GetElectionChart(ctx context.Context) (*entity.ElectionChartResponse, error)
 	GetVoters(ctx context.Context, search string, status *bool, limit, offset int) (*entity.VoterListResponse, error)
 	ResetVoter(ctx context.Context, id int64) error
+
+	// 4. Admin Candidate (Paslon) CRUD
+	CreateCandidate(ctx context.Context, req entity.CreatePaslonRequest) (*entity.Paslon, error)
+	UpdateCandidate(ctx context.Context, id int64, req entity.UpdatePaslonRequest) (*entity.Paslon, error)
+	DeleteCandidate(ctx context.Context, id int64) error
+
+	// 5. Admin Settings & Status Trigger
+	GetElectionSettings(ctx context.Context) (*entity.ElectionSettingsResponse, error)
+	UpdateElectionSchedule(ctx context.Context, req entity.UpdatePemiraScheduleRequest) error
+	UpdateElectionStatus(ctx context.Context, req entity.UpdatePemiraStatusRequest) error
+
+	// 6. Pelantikan MPIK & Transisi Manajemen Himpunan
+	PelantikanMPIK(ctx context.Context) (*entity.PelantikanMPIKResponse, error)
 }
 
 type pemiraUsecase struct {
@@ -365,3 +379,232 @@ func (u *pemiraUsecase) generateBallotJWT(nim string, idPemira int64) (string, e
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(secret))
 }
+
+// ==========================================
+// 4. ADMIN CANDIDATE (PASLON) CRUD USECASES
+// ==========================================
+
+func (u *pemiraUsecase) CreateCandidate(ctx context.Context, req entity.CreatePaslonRequest) (*entity.Paslon, error) {
+	pemira, err := u.pemiraRepo.GetLatestPemira(ctx)
+	if err != nil {
+		return nil, errors.New("belum ada periode pemilihan raya yang terdaftar")
+	}
+
+	paslon := entity.Paslon{
+		IdPemira:    pemira.IdPemira,
+		NomorUrut:   req.NomorUrut,
+		NimKetua:    req.NimKetua,
+		NamaKetua:   req.NamaKetua,
+		NimWakil:    req.NimWakil,
+		NamaWakil:   req.NamaWakil,
+		NamaKabinet: req.NamaKabinet,
+		FotoPaslon:  req.FotoPaslon,
+		Visi:        req.Visi,
+		Misi:        req.Misi,
+	}
+
+	if err := u.pemiraRepo.CreatePaslon(ctx, &paslon); err != nil {
+		return nil, fmt.Errorf("gagal menambahkan pasangan calon: %w", err)
+	}
+
+	return &paslon, nil
+}
+
+func (u *pemiraUsecase) UpdateCandidate(ctx context.Context, id int64, req entity.UpdatePaslonRequest) (*entity.Paslon, error) {
+	paslon, err := u.pemiraRepo.GetPaslonByID(ctx, id)
+	if err != nil {
+		return nil, errors.New("data pasangan calon tidak ditemukan")
+	}
+
+	paslon.NomorUrut = req.NomorUrut
+	paslon.NimKetua = req.NimKetua
+	paslon.NamaKetua = req.NamaKetua
+	paslon.NimWakil = req.NimWakil
+	paslon.NamaWakil = req.NamaWakil
+	paslon.NamaKabinet = req.NamaKabinet
+	if req.FotoPaslon != "" {
+		paslon.FotoPaslon = req.FotoPaslon
+	}
+	paslon.Visi = req.Visi
+	paslon.Misi = req.Misi
+
+	if err := u.pemiraRepo.UpdatePaslon(ctx, paslon); err != nil {
+		return nil, fmt.Errorf("gagal memperbarui pasangan calon: %w", err)
+	}
+
+	return paslon, nil
+}
+
+func (u *pemiraUsecase) DeleteCandidate(ctx context.Context, id int64) error {
+	// Proteksi Integritas Suara (Asas LUBER JURDIL):
+	// Kandidat dilarang dihapus jika sudah ada surat suara sah yang masuk ke bilik suara
+	count, err := u.pemiraRepo.CountSuaraByPaslon(ctx, id)
+	if err != nil {
+		return errors.New("gagal memeriksa integritas suara paslon")
+	}
+	if count > 0 {
+		return errors.New("kandidat tidak dapat dihapus karena sudah memiliki suara tercatat dalam bilik suara (Prinsip LUBER JURDIL)")
+	}
+
+	return u.pemiraRepo.DeletePaslon(ctx, id)
+}
+
+// ==========================================
+// 5. ADMIN SETTINGS & STATUS TRIGGER
+// ==========================================
+
+func (u *pemiraUsecase) GetElectionSettings(ctx context.Context) (*entity.ElectionSettingsResponse, error) {
+	pemira, err := u.pemiraRepo.GetLatestPemira(ctx)
+	if err != nil {
+		return nil, errors.New("data pengaturan pemilihan raya belum tersedia")
+	}
+
+	paslons, _ := u.pemiraRepo.GetPaslonByPemiraID(ctx, pemira.IdPemira)
+	totalSuara, _ := u.pemiraRepo.CountTotalSuara(ctx, pemira.IdPemira)
+
+	var winningPaslon *entity.Paslon
+	mpikStatus := "PENDING"
+	if pemira.Status == "SELESAI" {
+		winner, _, errWinner := u.pemiraRepo.GetWinningPaslon(ctx, pemira.IdPemira)
+		if errWinner == nil && winner != nil {
+			winningPaslon = winner
+			mpikStatus = "READY_FOR_INAUGURATION"
+		}
+	}
+
+	return &entity.ElectionSettingsResponse{
+		IdPemira:       pemira.IdPemira,
+		TahunPeriode:   pemira.TahunPeriode,
+		Status:         pemira.Status,
+		TanggalMulai:   pemira.TanggalMulai,
+		TanggalSelesai: pemira.TanggalSelesai,
+		TotalPaslon:    int64(len(paslons)),
+		TotalSuara:     totalSuara,
+		MpikStatus:     mpikStatus,
+		WinningPaslon:  winningPaslon,
+	}, nil
+}
+
+func (u *pemiraUsecase) UpdateElectionSchedule(ctx context.Context, req entity.UpdatePemiraScheduleRequest) error {
+	pemira, err := u.pemiraRepo.GetLatestPemira(ctx)
+	if err != nil {
+		return errors.New("data pemilihan raya tidak ditemukan")
+	}
+
+	if req.TanggalSelesai.Before(req.TanggalMulai) {
+		return errors.New("tanggal selesai tidak boleh mendahului tanggal mulai")
+	}
+
+	return u.pemiraRepo.UpdatePemiraSchedule(ctx, pemira.IdPemira, req.TahunPeriode, req.TanggalMulai, req.TanggalSelesai)
+}
+
+func (u *pemiraUsecase) UpdateElectionStatus(ctx context.Context, req entity.UpdatePemiraStatusRequest) error {
+	status := strings.ToUpper(strings.TrimSpace(req.Status))
+	if status != "DRAFT" && status != "BERJALAN" && status != "SELESAI" {
+		return errors.New("status pemira tidak valid. Pilihan status yang tersedia: DRAFT, BERJALAN, SELESAI")
+	}
+
+	pemira, err := u.pemiraRepo.GetLatestPemira(ctx)
+	if err != nil {
+		return errors.New("data pemilihan raya tidak ditemukan")
+	}
+
+	return u.pemiraRepo.UpdatePemiraStatus(ctx, pemira.IdPemira, status)
+}
+
+// ==========================================
+// 6. PELANTIKAN MPIK & TRANSISI MANAJEMEN HIMPUNAN
+// ==========================================
+
+func (u *pemiraUsecase) PelantikanMPIK(ctx context.Context) (*entity.PelantikanMPIKResponse, error) {
+	// 1. Validasi Status Pemira Harus SELESAI
+	pemira, err := u.pemiraRepo.GetLatestPemira(ctx)
+	if err != nil {
+		return nil, errors.New("data pemilihan raya tidak ditemukan")
+	}
+	if pemira.Status != "SELESAI" {
+		return nil, errors.New("pelantikan MPIK hanya dapat dilakukan jika status pemilihan raya telah SELESAI")
+	}
+
+	// 2. Dapatkan Paslon Pemenang berdasarkan akumulasi suara terbanyak
+	winner, _, err := u.pemiraRepo.GetWinningPaslon(ctx, pemira.IdPemira)
+	if err != nil || winner == nil {
+		return nil, fmt.Errorf("tidak dapat memproses pelantikan: %v", err)
+	}
+
+	// 3. Ekstrak Tahun Mulai & Tahun Selesai dari Tahun Periode
+	tahunMulai, tahunSelesai := parsePeriodeYears(pemira.TahunPeriode)
+
+	// 4. Promosikan ke Tabel Kabinet (Nonaktifkan Kabinet Lama, Aktifkan Kabinet Baru)
+	kabinet := entity.Kabinet{
+		NamaKabinet:  winner.NamaKabinet,
+		TahunMulai:   tahunMulai,
+		TahunSelesai: tahunSelesai,
+		LogoKabinet:  winner.FotoPaslon,
+		Visi:         winner.Visi,
+		Misi:         winner.Misi,
+		IsAktif:      true,
+	}
+	if err := u.pemiraRepo.PromoteKabinet(ctx, &kabinet); err != nil {
+		return nil, fmt.Errorf("gagal meresmikan kabinet baru: %w", err)
+	}
+
+	// 5. Ekstrak Angkatan Otomatis dari 2 Digit NIM (contoh: 105223049 -> 2023)
+	angkatanKetua := parseAngkatanFromNIM(winner.NimKetua)
+	angkatanWakil := parseAngkatanFromNIM(winner.NimWakil)
+
+	// 6. Upsert Data Ketua Himpunan ke Tabel Anggota (Status = Pengurus, BPH id_departemen = null)
+	ketua, err := u.pemiraRepo.UpsertAnggotaBPH(ctx, winner.NimKetua, winner.NamaKetua, "Ketua Himpunan", angkatanKetua, winner.FotoPaslon)
+	if err != nil {
+		return nil, fmt.Errorf("gagal mencatat data Ketua Himpunan baru: %w", err)
+	}
+
+	// 7. Upsert Data Wakil Ketua Himpunan ke Tabel Anggota
+	wakil, err := u.pemiraRepo.UpsertAnggotaBPH(ctx, winner.NimWakil, winner.NamaWakil, "Wakil Ketua Himpunan", angkatanWakil, winner.FotoPaslon)
+	if err != nil {
+		return nil, fmt.Errorf("gagal mencatat data Wakil Ketua Himpunan baru: %w", err)
+	}
+
+	// 8. Demisionerkan BPH Lama (Ubah status Pengurus lama yang bukan Ketua/Wakil baru menjadi Demisioner)
+	_ = u.pemiraRepo.DemisionerkanPengurusLama(ctx, []string{winner.NimKetua, winner.NimWakil})
+
+	return &entity.PelantikanMPIKResponse{
+		StatusPelantikan: "APPROVED",
+		Pesan:            fmt.Sprintf("Pelantikan berhasil! Kabinet %s resmi dilantik oleh MPIK dan BPH baru telah terintegrasi ke Manajemen Himpunan.", winner.NamaKabinet),
+		KabinetBaru:      kabinet,
+		KetuaBaru:        ketua,
+		WakilBaru:        wakil,
+	}, nil
+}
+
+// Helpers
+func parsePeriodeYears(periode string) (int, int) {
+	nowYear := time.Now().Year()
+	clean := strings.ReplaceAll(periode, "/", "-")
+	parts := strings.Split(clean, "-")
+	if len(parts) >= 2 {
+		y1, err1 := strconv.Atoi(strings.TrimSpace(parts[0]))
+		y2, err2 := strconv.Atoi(strings.TrimSpace(parts[1]))
+		if err1 == nil && err2 == nil && y1 > 2000 && y2 > 2000 {
+			return y1, y2
+		}
+	} else if len(parts) == 1 {
+		y1, err := strconv.Atoi(strings.TrimSpace(parts[0]))
+		if err == nil && y1 > 2000 {
+			return y1, y1 + 1
+		}
+	}
+	return nowYear, nowYear + 1
+}
+
+func parseAngkatanFromNIM(nim string) int {
+	clean := strings.TrimSpace(nim)
+	if len(clean) >= 6 {
+		yyStr := clean[4:6]
+		if yy, err := strconv.Atoi(yyStr); err == nil && yy >= 0 && yy <= 99 {
+			return 2000 + yy
+		}
+	}
+	return time.Now().Year()
+}
+

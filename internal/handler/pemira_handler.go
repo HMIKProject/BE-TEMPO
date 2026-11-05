@@ -260,3 +260,189 @@ func (h *PemiraHandler) ResetVoter(c *gin.Context) {
 
 	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Status hak pilih berhasil di-reset menjadi belum memilih", nil))
 }
+
+// CreateCandidate godoc
+// @Summary      Tambah Pasangan Calon Baru (Admin)
+// @Description  Mendaftarkan paslon baru beserta visi, misi, dan informasi ketua/wakil
+// @Tags         Admin - Pemira
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body entity.CreatePaslonRequest true "Data Paslon Baru"
+// @Success      201 {object} utils.JSendResponse{data=entity.Paslon} "Pasangan calon berhasil ditambahkan"
+// @Failure      400 {object} utils.JSendResponse "Format request tidak valid atau data gagal disimpan"
+// @Failure      401 {object} utils.JSendResponse "Akses Ditolak: Token admin tidak valid"
+// @Router       /admin/pemira/kandidat [post]
+func (h *PemiraHandler) CreateCandidate(c *gin.Context) {
+	var req entity.CreatePaslonRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Format request tidak valid: "+err.Error(), nil))
+		return
+	}
+
+	res, err := h.usecase.CreateCandidate(c.Request.Context(), req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse(err.Error(), nil))
+		return
+	}
+
+	c.JSON(http.StatusCreated, utils.BuildSuccessResponse("Pasangan calon berhasil ditambahkan", res))
+}
+
+// UpdateCandidate godoc
+// @Summary      Perbarui Pasangan Calon (Admin)
+// @Description  Memperbarui data paslon yang sudah ada berdasarkan ID
+// @Tags         Admin - Pemira
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id path int true "ID Paslon"
+// @Param        request body entity.UpdatePaslonRequest true "Data Paslon Diperbarui"
+// @Success      200 {object} utils.JSendResponse{data=entity.Paslon} "Data pasangan calon berhasil diperbarui"
+// @Failure      400 {object} utils.JSendResponse "ID tidak valid atau update gagal"
+// @Failure      401 {object} utils.JSendResponse "Akses Ditolak: Token admin tidak valid"
+// @Router       /admin/pemira/kandidat/{id} [put]
+func (h *PemiraHandler) UpdateCandidate(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("ID paslon tidak valid", nil))
+		return
+	}
+
+	var req entity.UpdatePaslonRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Format request tidak valid: "+err.Error(), nil))
+		return
+	}
+
+	res, err := h.usecase.UpdateCandidate(c.Request.Context(), id, req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse(err.Error(), nil))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Data pasangan calon berhasil diperbarui", res))
+}
+
+// DeleteCandidate godoc
+// @Summary      Hapus Pasangan Calon (Admin)
+// @Description  Menghapus data paslon (Dilindungi: jika suara sudah masuk, penghapusan ditolak demi LUBER JURDIL)
+// @Tags         Admin - Pemira
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id path int true "ID Paslon"
+// @Success      200 {object} utils.JSendResponse "Pasangan calon berhasil dihapus"
+// @Failure      400 {object} utils.JSendResponse "ID tidak valid atau suara sudah masuk sehingga dilarang dihapus"
+// @Failure      401 {object} utils.JSendResponse "Akses Ditolak: Token admin tidak valid"
+// @Router       /admin/pemira/kandidat/{id} [delete]
+func (h *PemiraHandler) DeleteCandidate(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("ID paslon tidak valid", nil))
+		return
+	}
+
+	if err := h.usecase.DeleteCandidate(c.Request.Context(), id); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse(err.Error(), nil))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Pasangan calon berhasil dihapus", nil))
+}
+
+// GetElectionSettings godoc
+// @Summary      Ambil Pengaturan & Parameter Acara Pemira (Admin)
+// @Description  Mengembalikan konfigurasi status, periode waktu, jadwal, serta status MPIK
+// @Tags         Admin - Pemira
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200 {object} utils.JSendResponse{data=entity.ElectionSettingsResponse} "Pengaturan pemira berhasil diambil"
+// @Failure      401 {object} utils.JSendResponse "Akses Ditolak: Token admin tidak valid"
+// @Failure      500 {object} utils.JSendResponse "Gagal memuat pengaturan pemira"
+// @Router       /admin/pemira/settings [get]
+func (h *PemiraHandler) GetElectionSettings(c *gin.Context) {
+	settings, err := h.usecase.GetElectionSettings(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.BuildErrorResponse(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Pengaturan pemira berhasil diambil", settings))
+}
+
+// UpdateElectionSchedule godoc
+// @Summary      Perbarui Jadwal Acara Pemira (Admin)
+// @Description  Memperbarui tanggal mulai, tanggal selesai, dan tahun periode pemilihan raya
+// @Tags         Admin - Pemira
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body entity.UpdatePemiraScheduleRequest true "Data Jadwal Baru"
+// @Success      200 {object} utils.JSendResponse "Jadwal pemilihan raya berhasil diperbarui"
+// @Failure      400 {object} utils.JSendResponse "Format jadwal tidak valid"
+// @Failure      401 {object} utils.JSendResponse "Akses Ditolak: Token admin tidak valid"
+// @Router       /admin/pemira/settings [put]
+func (h *PemiraHandler) UpdateElectionSchedule(c *gin.Context) {
+	var req entity.UpdatePemiraScheduleRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Format request tidak valid: "+err.Error(), nil))
+		return
+	}
+
+	if err := h.usecase.UpdateElectionSchedule(c.Request.Context(), req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse(err.Error(), nil))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Jadwal pemilihan raya berhasil diperbarui", nil))
+}
+
+// UpdateElectionStatus godoc
+// @Summary      Ubah Status Pemira / Saklar Pemicu (Admin)
+// @Description  Mengubah status pelaksanaan pemilihan raya (DRAFT, BERJALAN, SELESAI)
+// @Tags         Admin - Pemira
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body entity.UpdatePemiraStatusRequest true "Status Baru"
+// @Success      200 {object} utils.JSendResponse "Status pemilihan raya berhasil diubah"
+// @Failure      400 {object} utils.JSendResponse "Status tidak valid"
+// @Failure      401 {object} utils.JSendResponse "Akses Ditolak: Token admin tidak valid"
+// @Router       /admin/pemira/status [post]
+func (h *PemiraHandler) UpdateElectionStatus(c *gin.Context) {
+	var req entity.UpdatePemiraStatusRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Format request tidak valid: "+err.Error(), nil))
+		return
+	}
+
+	if err := h.usecase.UpdateElectionStatus(c.Request.Context(), req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse(err.Error(), nil))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Status pemilihan raya berhasil diubah", nil))
+}
+
+// PelantikanMPIK godoc
+// @Summary      Pengesahan & Pelantikan MPIK (Admin)
+// @Description  Mengesahkan paslon pemenang pemira, membentuk kabinet aktif baru, dan memperbarui BPH di manajemen himpunan
+// @Tags         Admin - Pemira
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200 {object} utils.JSendResponse{data=entity.PelantikanMPIKResponse} "Pelantikan MPIK berhasil disahkan"
+// @Failure      400 {object} utils.JSendResponse "Pemira belum selesai atau data pemenang tidak lengkap"
+// @Failure      401 {object} utils.JSendResponse "Akses Ditolak: Token admin tidak valid"
+// @Router       /admin/pemira/pelantikan-mpik [post]
+func (h *PemiraHandler) PelantikanMPIK(c *gin.Context) {
+	res, err := h.usecase.PelantikanMPIK(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse(err.Error(), nil))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Pelantikan MPIK berhasil disahkan", res))
+}
+

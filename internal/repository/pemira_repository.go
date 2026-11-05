@@ -16,10 +16,17 @@ type PemiraRepository interface {
 	// 1. Pemira
 	GetActivePemira(ctx context.Context) (*entity.Pemira, error)
 	GetPemiraByID(ctx context.Context, idPemira int64) (*entity.Pemira, error)
+	GetLatestPemira(ctx context.Context) (*entity.Pemira, error)
+	UpdatePemiraStatus(ctx context.Context, idPemira int64, status string) error
+	UpdatePemiraSchedule(ctx context.Context, idPemira int64, tahunPeriode string, tMulai, tSelesai time.Time) error
 
 	// 2. Paslon (Kandidat)
 	GetPaslonByPemiraID(ctx context.Context, idPemira int64) ([]entity.Paslon, error)
 	GetPaslonByID(ctx context.Context, idPaslon int64) (*entity.Paslon, error)
+	CreatePaslon(ctx context.Context, paslon *entity.Paslon) error
+	UpdatePaslon(ctx context.Context, paslon *entity.Paslon) error
+	DeletePaslon(ctx context.Context, idPaslon int64) error
+	CountSuaraByPaslon(ctx context.Context, idPaslon int64) (int64, error)
 
 	// 3. Pemilih (DPT & Autentikasi OTP)
 	CreatePemilih(ctx context.Context, pemilih *entity.Pemilih) error
@@ -34,6 +41,12 @@ type PemiraRepository interface {
 	CountTotalSuara(ctx context.Context, idPemira int64) (int64, error)
 	CountSuaraPerPaslon(ctx context.Context, idPemira int64) (map[int64]int64, error)
 	CountTotalDPT(ctx context.Context, idPemira int64) (int64, error)
+
+	// 5. Pelantikan MPIK & Transisi Manajemen Himpunan
+	GetWinningPaslon(ctx context.Context, idPemira int64) (*entity.Paslon, int64, error)
+	PromoteKabinet(ctx context.Context, kabinet *entity.Kabinet) error
+	UpsertAnggotaBPH(ctx context.Context, nim, nama, jabatan string, angkatan int, foto string) (*entity.Anggota, error)
+	DemisionerkanPengurusLama(ctx context.Context, exceptNIMs []string) error
 }
 
 type pemiraRepository struct {
@@ -242,4 +255,145 @@ func (r *pemiraRepository) CountTotalDPT(ctx context.Context, idPemira int64) (i
 		Where("id_pemira = ?", idPemira).
 		Count(&count).Error
 	return count, err
+}
+
+func (r *pemiraRepository) GetLatestPemira(ctx context.Context) (*entity.Pemira, error) {
+	var pemira entity.Pemira
+	err := r.db.WithContext(ctx).Order("id_pemira DESC").First(&pemira).Error
+	if err != nil {
+		return nil, err
+	}
+	return &pemira, nil
+}
+
+func (r *pemiraRepository) UpdatePemiraStatus(ctx context.Context, idPemira int64, status string) error {
+	return r.db.WithContext(ctx).Model(&entity.Pemira{}).
+		Where("id_pemira = ?", idPemira).
+		Update("status", status).Error
+}
+
+func (r *pemiraRepository) UpdatePemiraSchedule(ctx context.Context, idPemira int64, tahunPeriode string, tMulai, tSelesai time.Time) error {
+	return r.db.WithContext(ctx).Model(&entity.Pemira{}).
+		Where("id_pemira = ?", idPemira).
+		Updates(map[string]interface{}{
+			"tahun_periode":   tahunPeriode,
+			"tanggal_mulai":   tMulai,
+			"tanggal_selesai": tSelesai,
+			"diperbarui_pada": time.Now(),
+		}).Error
+}
+
+func (r *pemiraRepository) CreatePaslon(ctx context.Context, paslon *entity.Paslon) error {
+	return r.db.WithContext(ctx).Create(paslon).Error
+}
+
+func (r *pemiraRepository) UpdatePaslon(ctx context.Context, paslon *entity.Paslon) error {
+	return r.db.WithContext(ctx).Save(paslon).Error
+}
+
+func (r *pemiraRepository) DeletePaslon(ctx context.Context, idPaslon int64) error {
+	return r.db.WithContext(ctx).Delete(&entity.Paslon{}, idPaslon).Error
+}
+
+func (r *pemiraRepository) CountSuaraByPaslon(ctx context.Context, idPaslon int64) (int64, error) {
+	var count int64
+	err := r.db.WithContext(ctx).Table("suara").
+		Where("id_paslon = ?", idPaslon).
+		Count(&count).Error
+	return count, err
+}
+
+func (r *pemiraRepository) GetWinningPaslon(ctx context.Context, idPemira int64) (*entity.Paslon, int64, error) {
+	type voteResult struct {
+		IdPaslon int64 `gorm:"column:id_paslon"`
+		Total    int64 `gorm:"column:total"`
+	}
+	var topVote voteResult
+	err := r.db.WithContext(ctx).Table("suara").
+		Select("id_paslon, count(*) as total").
+		Where("id_pemira = ?", idPemira).
+		Group("id_paslon").
+		Order("total DESC").
+		Limit(1).
+		Scan(&topVote).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	if topVote.IdPaslon == 0 {
+		return nil, 0, errors.New("belum ada surat suara yang masuk untuk menentukan pemenang")
+	}
+
+	var paslon entity.Paslon
+	if err := r.db.WithContext(ctx).First(&paslon, topVote.IdPaslon).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return &paslon, topVote.Total, nil
+}
+
+func (r *pemiraRepository) PromoteKabinet(ctx context.Context, kabinet *entity.Kabinet) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// 1. Nonaktifkan kabinet lama
+		if err := tx.Model(&entity.Kabinet{}).Where("is_aktif = ?", true).Update("is_aktif", false).Error; err != nil {
+			return err
+		}
+
+		// 2. Tambahkan kabinet baru
+		kabinet.IsAktif = true
+		if err := tx.Create(kabinet).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func (r *pemiraRepository) UpsertAnggotaBPH(ctx context.Context, nim, nama, jabatan string, angkatan int, foto string) (*entity.Anggota, error) {
+	var existing entity.Anggota
+	err := r.db.WithContext(ctx).Where("nim = ?", nim).First(&existing).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			newAnggota := entity.Anggota{
+				Nim:          nim,
+				NamaLengkap:  nama,
+				ProgramStudi: "Ilmu komputer",
+				Angkatan:     angkatan,
+				Jabatan:      jabatan,
+				Status:       "Pengurus",
+				FotoProfil:   foto,
+			}
+			if err := r.db.WithContext(ctx).Create(&newAnggota).Error; err != nil {
+				return nil, err
+			}
+			return &newAnggota, nil
+		}
+		return nil, err
+	}
+
+	updates := map[string]interface{}{
+		"nama_lengkap": nama,
+		"jabatan":      jabatan,
+		"status":       "Pengurus",
+		"diubah_pada":  time.Now(),
+	}
+	if foto != "" {
+		updates["foto_profil"] = foto
+	}
+	if err := r.db.WithContext(ctx).Model(&existing).Updates(updates).Error; err != nil {
+		return nil, err
+	}
+
+	r.db.WithContext(ctx).First(&existing, existing.IdAnggota)
+	return &existing, nil
+}
+
+func (r *pemiraRepository) DemisionerkanPengurusLama(ctx context.Context, exceptNIMs []string) error {
+	query := r.db.WithContext(ctx).Model(&entity.Anggota{}).
+		Where("jabatan IN ?", []string{"Ketua Himpunan", "Wakil Ketua Himpunan"}).
+		Where("status = ?", "Pengurus")
+	if len(exceptNIMs) > 0 {
+		query = query.Where("nim NOT IN ?", exceptNIMs)
+	}
+	return query.Update("status", "Demisioner").Error
 }

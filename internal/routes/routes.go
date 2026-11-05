@@ -103,6 +103,19 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 				adminPemiraGroup.GET("/chart", pemiraHandler.GetElectionChart)
 				adminPemiraGroup.GET("/pemilih", pemiraHandler.GetVoters)
 				adminPemiraGroup.POST("/pemilih/:id/reset", pemiraHandler.ResetVoter)
+
+				// Manajemen Paslon (Kandidat) CRUD
+				adminPemiraGroup.POST("/kandidat", pemiraHandler.CreateCandidate)
+				adminPemiraGroup.PUT("/kandidat/:id", pemiraHandler.UpdateCandidate)
+				adminPemiraGroup.DELETE("/kandidat/:id", pemiraHandler.DeleteCandidate)
+
+				// Pengaturan Acara & Status Trigger
+				adminPemiraGroup.GET("/settings", pemiraHandler.GetElectionSettings)
+				adminPemiraGroup.PUT("/settings", pemiraHandler.UpdateElectionSchedule)
+				adminPemiraGroup.POST("/status", pemiraHandler.UpdateElectionStatus)
+
+				// Pelantikan MPIK & Transisi Manajemen Himpunan
+				adminPemiraGroup.POST("/pelantikan-mpik", pemiraHandler.PelantikanMPIK)
 			}
 
 			// Endpoint unggah file gambar admin
