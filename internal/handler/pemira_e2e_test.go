@@ -22,6 +22,7 @@ import (
 
 func setupTestRouter(t *testing.T) (*gin.Engine, *gorm.DB) {
 	_ = godotenv.Load("../../.env")
+	_ = os.Setenv("APP_ENV", "development")
 
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
@@ -68,6 +69,9 @@ func TestPemiraE2E_FullLifecycle(t *testing.T) {
 	// Persiapkan test voter
 	testNIM := "105223099"
 	testEmail := "105223099@student.universitaspertamina.ac.id"
+
+	// Pastikan pemira aktif untuk test bilik suara
+	db.Exec("UPDATE pemira SET status = 'BERJALAN', tanggal_mulai = NOW() - INTERVAL '1 day', tanggal_selesai = NOW() + INTERVAL '2 day' WHERE id_pemira = 1")
 
 	// Reset status voter di DB sebelum test
 	db.Exec("UPDATE pemilih SET status_memilih = false, kode_otp = NULL, otp_expired = NULL WHERE nim = ?", testNIM)
@@ -406,8 +410,10 @@ func TestAdminPemiraCRUD_And_PelantikanMPIK(t *testing.T) {
 
 	// 4. Strict Deletion Protection (LUBER JURDIL)
 	t.Run("4. Proteksi Penghapusan Paslon Berjalan Benar", func(t *testing.T) {
-		// Paslon 1 sudah memiliki suara -> harus DITOLAK (400 Bad Request)
-		reqDelVoted, _ := http.NewRequest(http.MethodDelete, "/api/v1/admin/pemira/kandidat/1", nil)
+		// Masukkan suara sah untuk paslon 5 agar proteksi penghapusan paslon teruji
+		db.Exec("INSERT INTO suara (id_pemira, id_paslon, waktu_memilih) VALUES (1, 5, NOW())")
+
+		reqDelVoted, _ := http.NewRequest(http.MethodDelete, "/api/v1/admin/pemira/kandidat/5", nil)
 		reqDelVoted.Header.Set("Authorization", "Bearer "+adminToken)
 		wDelVoted := httptest.NewRecorder()
 		router.ServeHTTP(wDelVoted, reqDelVoted)
@@ -475,13 +481,16 @@ func TestAdminPemiraCRUD_And_PelantikanMPIK(t *testing.T) {
 			}
 		}
 
-		// Reset kembali status Pemira ke BERJALAN agar bilik suara aktif untuk sesi testing berikutnya
+		// Reset kembali status Pemira ke BERJALAN dan kosongkan suara/pemilih uji coba
 		statusBerjalan, _ := json.Marshal(entity.UpdatePemiraStatusRequest{Status: "BERJALAN"})
 		reqResetStatus, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/pemira/status", bytes.NewBuffer(statusBerjalan))
 		reqResetStatus.Header.Set("Content-Type", "application/json")
 		reqResetStatus.Header.Set("Authorization", "Bearer "+adminToken)
 		wReset := httptest.NewRecorder()
 		router.ServeHTTP(wReset, reqResetStatus)
+
+		// Bersihkan suara dan pemilih uji coba
+		db.Exec("TRUNCATE TABLE suara, pemilih RESTART IDENTITY")
 	})
 }
 
