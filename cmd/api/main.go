@@ -8,6 +8,7 @@ import (
 
 	_ "github.com/HMIKProject/hmik-corex-backend/docs"
 	"github.com/HMIKProject/hmik-corex-backend/internal/routes"
+	"github.com/HMIKProject/hmik-corex-backend/internal/seeder"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -42,6 +43,9 @@ func main() {
 	if err != nil {
 		log.Fatal("Gagal terkoneksi ke database:", err)
 	}
+
+	// Inisialisasi otomatis akun slot jabatan dengan password 'qwerqwer'
+	_ = seeder.SeedAllRoleAccounts(db)
 
 	// 2. Inisiasi Mesin Gin
 	router := gin.Default()
