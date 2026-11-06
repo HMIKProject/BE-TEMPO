@@ -55,14 +55,13 @@ func main() {
 			if strings.HasSuffix(origin, ".netlify.app") || 
 			   strings.HasSuffix(origin, ".pages.dev") || 
 			   strings.HasSuffix(origin, ".workers.dev") || 
-			   strings.HasSuffix(origin, ".gowebdigital.agency") || 
-			   origin == "https://gowebdigital.agency" {
+			   strings.Contains(origin, "gowebdigital.agency") {
 				return true
 			}
 			return false
 		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With", "Cache-Control"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
