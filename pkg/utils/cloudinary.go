@@ -5,6 +5,7 @@ import (
 	"errors"
 	"mime/multipart"
 	"os"
+	"strings"
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
@@ -14,6 +15,9 @@ import (
 func UploadImageToCloudinary(file multipart.File, fileName string, folderName string) (string, error) {
 	// 1. Ambil URL rahasia dari environment (.env)
 	cldUrl := os.Getenv("CLOUDINARY_URL")
+	cldUrl = strings.TrimSpace(cldUrl)
+	cldUrl = strings.TrimPrefix(cldUrl, "CLOUDINARY_URL=")
+	cldUrl = strings.Trim(cldUrl, `"'`)
 	if cldUrl == "" {
 		return "", errors.New("konfigurasi CLOUDINARY_URL belum diatur di sistem atau file .env")
 	}
