@@ -17,6 +17,9 @@ func SendOTPEmail(emailTujuan, nim, otpCode string) error {
 	appEnv := strings.ToLower(os.Getenv("APP_ENV"))
 	smtpHost := os.Getenv("SMTP_HOST")
 	smtpUser := os.Getenv("SMTP_USER")
+	if smtpUser == "" {
+		smtpUser = os.Getenv("SMTP_EMAIL")
+	}
 
 	// 1. PRODUCTION / SMTP MODE (Aktif jika SMTP_HOST & SMTP_USER terisi dan APP_ENV bukan "development")
 	if smtpHost != "" && smtpUser != "" && appEnv != "development" {
@@ -46,6 +49,9 @@ func sendSMTPEmail(toEmail, nim, otpCode string) error {
 		smtpPort = "587"
 	}
 	smtpUser := os.Getenv("SMTP_USER")
+	if smtpUser == "" {
+		smtpUser = os.Getenv("SMTP_EMAIL")
+	}
 	smtpPass := strings.ReplaceAll(os.Getenv("SMTP_PASSWORD"), " ", "")
 	senderName := os.Getenv("SMTP_SENDER_NAME")
 	if senderName == "" {
