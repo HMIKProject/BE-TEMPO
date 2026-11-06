@@ -81,6 +81,7 @@ func SeedAllRoleAccounts(db *gorm.DB) error {
 		var existing entity.Pengguna
 		res := db.Where("email = ? OR nama_pengguna = ?", acc.Email, acc.Username).First(&existing)
 		if res.Error == nil {
+			existing.NamaLengkap = acc.Jabatan
 			existing.NamaPengguna = acc.Username
 			existing.Email = acc.Email
 			existing.Sandi = hashStr
@@ -92,6 +93,7 @@ func SeedAllRoleAccounts(db *gorm.DB) error {
 			}
 		} else {
 			newAcc := entity.Pengguna{
+				NamaLengkap:  acc.Jabatan,
 				NamaPengguna: acc.Username,
 				Email:        acc.Email,
 				Sandi:        hashStr,
