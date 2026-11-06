@@ -52,7 +52,11 @@ func main() {
 			if origin == "http://localhost:5173" || origin == "http://localhost:3000" || origin == "https://hmik.kampus.ac.id" {
 				return true
 			}
-			if strings.HasSuffix(origin, ".netlify.app") || strings.HasSuffix(origin, ".pages.dev") || strings.HasSuffix(origin, ".gowebdigital.agency") || origin == "https://gowebdigital.agency" {
+			if strings.HasSuffix(origin, ".netlify.app") || 
+			   strings.HasSuffix(origin, ".pages.dev") || 
+			   strings.HasSuffix(origin, ".workers.dev") || 
+			   strings.HasSuffix(origin, ".gowebdigital.agency") || 
+			   origin == "https://gowebdigital.agency" {
 				return true
 			}
 			return false
