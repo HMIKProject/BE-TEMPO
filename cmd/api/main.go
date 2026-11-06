@@ -74,6 +74,42 @@ func main() {
 	// 4. Mendaftarkan Seluruh Endpoint API
 	routes.SetupRoutes(router, db)
 
+	// Endpoint Diagnostik Versi Live & Seeder On-Demand
+	router.GET("/version", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"app":     "HMIK CoreX Backend",
+			"version": "v9-live-diagnostic",
+			"time":    time.Now().UTC().Format(time.RFC3339),
+		})
+	})
+
+	router.GET("/api/v1/auth/debug-accounts", func(c *gin.Context) {
+		var users []struct {
+			IdPengguna   int64  `json:"id_pengguna"`
+			NamaPengguna string `json:"nama_pengguna"`
+			Email        string `json:"email"`
+			StatusAktif  bool   `json:"status_aktif"`
+		}
+		db.Table("pengguna").Select("id_pengguna, nama_pengguna, email, status_aktif").Order("id_pengguna desc").Limit(35).Scan(&users)
+		c.JSON(200, gin.H{
+			"total_accounts_sample": len(users),
+			"accounts":              users,
+		})
+	})
+
+	router.GET("/api/v1/auth/force-seed", func(c *gin.Context) {
+		err := seeder.SeedAllRoleAccounts(db)
+		if err != nil {
+			c.JSON(500, gin.H{"status": "error", "message": err.Error()})
+			return
+		}
+		c.JSON(200, gin.H{
+			"status":           "success",
+			"message":          "Seeder akun role berhasil dieksekusi secara live!",
+			"default_password": "qwerqwer",
+		})
+	})
+
 	// 5. Menjalankan Server
 	port := os.Getenv("PORT")
 	if port == "" {

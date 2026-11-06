@@ -85,7 +85,11 @@ func SeedAllRoleAccounts(db *gorm.DB) error {
 			existing.Email = acc.Email
 			existing.Sandi = hashStr
 			existing.StatusAktif = true
-			db.Save(&existing)
+			if err := db.Save(&existing).Error; err != nil {
+				log.Printf("❌ [Seeder] Gagal update akun %s: %v", acc.Username, err)
+			} else {
+				log.Printf("✅ [Seeder] Berhasil update akun %s", acc.Username)
+			}
 		} else {
 			newAcc := entity.Pengguna{
 				NamaPengguna: acc.Username,
@@ -93,7 +97,11 @@ func SeedAllRoleAccounts(db *gorm.DB) error {
 				Sandi:        hashStr,
 				StatusAktif:  true,
 			}
-			db.Create(&newAcc)
+			if err := db.Create(&newAcc).Error; err != nil {
+				log.Printf("❌ [Seeder] Gagal insert akun %s: %v", acc.Username, err)
+			} else {
+				log.Printf("✅ [Seeder] Berhasil insert akun %s", acc.Username)
+			}
 		}
 	}
 
@@ -107,6 +115,6 @@ func SeedAllRoleAccounts(db *gorm.DB) error {
 		}
 	}
 
-	log.Println("✅ [Seeder] Seluruh Akun Slot Jabatan HMIK berhasil di-seed (Password: 'qwerqwer')")
+	log.Println("✅ [Seeder] Seluruh Akun Slot Jabatan HMIK selesai diproses (Password: 'qwerqwer')")
 	return nil
 }
