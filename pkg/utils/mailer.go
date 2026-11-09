@@ -49,8 +49,12 @@ func sendSMTPEmail(toEmail, nim, otpCode string) error {
 		smtpPort = "587"
 	}
 	smtpUser := os.Getenv("SMTP_USER")
+	senderEmail := os.Getenv("SMTP_EMAIL")
+	if senderEmail == "" {
+		senderEmail = smtpUser
+	}
 	if smtpUser == "" {
-		smtpUser = os.Getenv("SMTP_EMAIL")
+		smtpUser = senderEmail
 	}
 	smtpPass := strings.ReplaceAll(os.Getenv("SMTP_PASSWORD"), " ", "")
 	senderName := os.Getenv("SMTP_SENDER_NAME")
@@ -62,8 +66,8 @@ func sendSMTPEmail(toEmail, nim, otpCode string) error {
 
 	subject := "Kode Akses Masuk Bilik Suara Pemira HMIK"
 	boundary := fmt.Sprintf("hmik_pemira_%d", time.Now().UnixNano())
-	userDomain := "gmail.com"
-	if parts := strings.Split(smtpUser, "@"); len(parts) > 1 {
+	userDomain := "brevo.com"
+	if parts := strings.Split(senderEmail, "@"); len(parts) > 1 {
 		userDomain = parts[1]
 	}
 	messageID := fmt.Sprintf("<%d.%d@%s>", time.Now().Unix(), time.Now().UnixNano()%1000000, userDomain)
@@ -101,10 +105,10 @@ func sendSMTPEmail(toEmail, nim, otpCode string) error {
 		"Content-Transfer-Encoding: 8bit\r\n\r\n"+
 		"%s\r\n\r\n"+
 		"--%s--\r\n",
-		senderName, smtpUser, toEmail, smtpUser, subject, dateHeader, messageID, boundary, boundary, textBody, boundary, htmlBody, boundary)
+		senderName, senderEmail, toEmail, senderEmail, subject, dateHeader, messageID, boundary, boundary, textBody, boundary, htmlBody, boundary)
 
 	addr := fmt.Sprintf("%s:%s", smtpHost, smtpPort)
-	return smtp.SendMail(addr, auth, smtpUser, []string{toEmail}, []byte(message))
+	return smtp.SendMail(addr, auth, senderEmail, []string{toEmail}, []byte(message))
 }
 
 // buildOTPEmailHTML menghasilkan markup template email responsif bertema HMIK Neo-Brutalisme
