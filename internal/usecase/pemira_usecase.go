@@ -32,6 +32,7 @@ type PemiraUsecase interface {
 	GetElectionChart(ctx context.Context) (*entity.ElectionChartResponse, error)
 	GetVoters(ctx context.Context, search string, status *bool, limit, offset int) (*entity.VoterListResponse, error)
 	ResetVoter(ctx context.Context, id int64) error
+	ResetKotakSuara(ctx context.Context) error
 
 	// 4. Admin Candidate (Paslon) CRUD
 	CreateCandidate(ctx context.Context, req entity.CreatePaslonRequest) (*entity.Paslon, error)
@@ -257,13 +258,16 @@ func (u *pemiraUsecase) CastVote(ctx context.Context, nim string, idPemira int64
 func (u *pemiraUsecase) GetElectionStats(ctx context.Context) (*entity.ElectionStatsResponse, error) {
 	pemira, err := u.pemiraRepo.GetActivePemira(ctx)
 	if err != nil {
-		// Jika belum ada pemira berjalan, kembalikan data 0 tanpa crash
-		return &entity.ElectionStatsResponse{
-			TotalSuaraMasuk:       0,
-			TotalDPT:              0,
-			PersentasePartisipasi: 0,
-			TotalPaslon:           0,
-		}, nil
+		pemira, err = u.pemiraRepo.GetLatestPemira(ctx)
+		if err != nil {
+			// Jika belum ada pemira berjalan atau tersimpan, kembalikan data 0 tanpa crash
+			return &entity.ElectionStatsResponse{
+				TotalSuaraMasuk:       0,
+				TotalDPT:              0,
+				PersentasePartisipasi: 0,
+				TotalPaslon:           0,
+			}, nil
+		}
 	}
 
 	totalSuara, _ := u.pemiraRepo.CountTotalSuara(ctx, pemira.IdPemira)
@@ -286,11 +290,14 @@ func (u *pemiraUsecase) GetElectionStats(ctx context.Context) (*entity.ElectionS
 func (u *pemiraUsecase) GetElectionChart(ctx context.Context) (*entity.ElectionChartResponse, error) {
 	pemira, err := u.pemiraRepo.GetActivePemira(ctx)
 	if err != nil {
-		return &entity.ElectionChartResponse{
-			TotalSuara: 0,
-			IsLive:     false,
-			Candidates: []entity.ElectionChartCandidate{},
-		}, nil
+		pemira, err = u.pemiraRepo.GetLatestPemira(ctx)
+		if err != nil {
+			return &entity.ElectionChartResponse{
+				TotalSuara: 0,
+				IsLive:     false,
+				Candidates: []entity.ElectionChartCandidate{},
+			}, nil
+		}
 	}
 
 	totalSuara, _ := u.pemiraRepo.CountTotalSuara(ctx, pemira.IdPemira)
@@ -356,6 +363,18 @@ func (u *pemiraUsecase) ResetVoter(ctx context.Context, id int64) error {
 		return errors.New("gagal mereset status pemilih")
 	}
 	return nil
+}
+
+func (u *pemiraUsecase) ResetKotakSuara(ctx context.Context) error {
+	pemira, err := u.pemiraRepo.GetActivePemira(ctx)
+	if err != nil {
+		pemira, err = u.pemiraRepo.GetLatestPemira(ctx)
+		if err != nil {
+			return errors.New("tidak ada data pemilihan raya yang ditemukan")
+		}
+	}
+
+	return u.pemiraRepo.ResetKotakSuara(ctx, pemira.IdPemira)
 }
 
 // ==========================================

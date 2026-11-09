@@ -103,6 +103,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 				adminPemiraGroup.GET("/chart", pemiraHandler.GetElectionChart)
 				adminPemiraGroup.GET("/pemilih", pemiraHandler.GetVoters)
 				adminPemiraGroup.POST("/pemilih/:id/reset", pemiraHandler.ResetVoter)
+				adminPemiraGroup.POST("/reset-kotak-suara", pemiraHandler.ResetKotakSuara)
 
 				// Manajemen Paslon (Kandidat) CRUD
 				adminPemiraGroup.POST("/kandidat", pemiraHandler.CreateCandidate)

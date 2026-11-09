@@ -41,6 +41,7 @@ type PemiraRepository interface {
 	CountTotalSuara(ctx context.Context, idPemira int64) (int64, error)
 	CountSuaraPerPaslon(ctx context.Context, idPemira int64) (map[int64]int64, error)
 	CountTotalDPT(ctx context.Context, idPemira int64) (int64, error)
+	ResetKotakSuara(ctx context.Context, idPemira int64) error
 
 	// 5. Pelantikan MPIK & Transisi Manajemen Himpunan
 	GetWinningPaslon(ctx context.Context, idPemira int64) (*entity.Paslon, int64, error)
@@ -255,6 +256,27 @@ func (r *pemiraRepository) CountTotalDPT(ctx context.Context, idPemira int64) (i
 		Where("id_pemira = ?", idPemira).
 		Count(&count).Error
 	return count, err
+}
+
+func (r *pemiraRepository) ResetKotakSuara(ctx context.Context, idPemira int64) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// 1. Hapus seluruh surat suara di kotak suara untuk pemira ini
+		if err := tx.Where("id_pemira = ?", idPemira).Delete(&entity.Suara{}).Error; err != nil {
+			return fmt.Errorf("gagal mengosongkan kotak suara: %w", err)
+		}
+
+		// 2. Reset status hak suara seluruh pemilih pada pemira ini ke false dan bersihkan OTP
+		if err := tx.Model(&entity.Pemilih{}).Where("id_pemira = ?", idPemira).
+			Updates(map[string]interface{}{
+				"status_memilih": false,
+				"kode_otp":       gorm.Expr("NULL"),
+				"otp_expired":    gorm.Expr("NULL"),
+			}).Error; err != nil {
+			return fmt.Errorf("gagal mereset status pemilih: %w", err)
+		}
+
+		return nil
+	})
 }
 
 func (r *pemiraRepository) GetLatestPemira(ctx context.Context) (*entity.Pemira, error) {

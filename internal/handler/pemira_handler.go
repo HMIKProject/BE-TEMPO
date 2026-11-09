@@ -261,6 +261,25 @@ func (h *PemiraHandler) ResetVoter(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Status hak pilih berhasil di-reset menjadi belum memilih", nil))
 }
 
+// ResetKotakSuara godoc
+// @Summary      Kosongkan Kotak Suara & Reset Pemilu (Admin)
+// @Description  Menghapus seluruh surat suara di kotak suara dan mereset status hak pilih seluruh DPT ke 0 (Uji Coba / Persiapan Pemilu)
+// @Tags         Admin - Pemira
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200 {object} utils.JSendResponse "Kotak suara berhasil dikosongkan dan data pemilu di-reset ke 0"
+// @Failure      401 {object} utils.JSendResponse "Akses Ditolak: Token admin tidak valid"
+// @Failure      500 {object} utils.JSendResponse "Gagal mengosongkan kotak suara"
+// @Router       /admin/pemira/reset-kotak-suara [post]
+func (h *PemiraHandler) ResetKotakSuara(c *gin.Context) {
+	if err := h.usecase.ResetKotakSuara(c.Request.Context()); err != nil {
+		c.JSON(http.StatusInternalServerError, utils.BuildErrorResponse(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Kotak suara berhasil dikosongkan dan seluruh data suara di-reset ke 0", nil))
+}
+
 // CreateCandidate godoc
 // @Summary      Tambah Pasangan Calon Baru (Admin)
 // @Description  Mendaftarkan paslon baru beserta visi, misi, dan informasi ketua/wakil
