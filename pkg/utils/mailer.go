@@ -55,12 +55,12 @@ func sendSMTPEmail(toEmail, nim, otpCode string) error {
 	smtpPass := strings.ReplaceAll(os.Getenv("SMTP_PASSWORD"), " ", "")
 	senderName := os.Getenv("SMTP_SENDER_NAME")
 	if senderName == "" {
-		senderName = "KPU HMIK Universitas Pertamina"
+		senderName = "Panitia Pemira HMIK"
 	}
 
 	auth := smtp.PlainAuth("", smtpUser, smtpPass, smtpHost)
 
-	subject := "[PEMIRA HMIK] Kode Verifikasi Masuk Bilik Suara"
+	subject := "Kode Akses Masuk Bilik Suara Pemira HMIK"
 	boundary := fmt.Sprintf("hmik_pemira_%d", time.Now().UnixNano())
 	userDomain := "gmail.com"
 	if parts := strings.Split(smtpUser, "@"); len(parts) > 1 {
@@ -69,13 +69,14 @@ func sendSMTPEmail(toEmail, nim, otpCode string) error {
 	messageID := fmt.Sprintf("<%d.%d@%s>", time.Now().Unix(), time.Now().UnixNano()%1000000, userDomain)
 	dateHeader := time.Now().Format(time.RFC1123Z)
 
-	textBody := fmt.Sprintf("PEMILIHAN RAYA HMIK UNIVERSITAS PERTAMINA\r\n\r\n"+
+	textBody := fmt.Sprintf("PEMILIHAN RAYA HMIK\r\n\r\n"+
 		"Halo Mahasiswa (NIM: %s),\r\n\r\n"+
-		"Berikut kode verifikasi untuk menggunakan hak suara Anda di Bilik Suara Virtual:\r\n"+
+		"Berikut kode akses verifikasi untuk masuk ke Bilik Suara Virtual Pemira:\r\n"+
 		">>> %s <<<\r\n\r\n"+
 		"Kode verifikasi ini hanya berlaku selama 5 menit.\r\n"+
-		"Jangan pernah membagikan kode ini kepada siapa pun.\r\n\r\n"+
-		"© Komisi Pemilihan Umum HMIK - Universitas Pertamina", nim, otpCode)
+		"Jangan bagikan kode ini kepada siapa pun untuk menjaga kerahasiaan suara Anda.\r\n\r\n"+
+		"Pesan ini dikirimkan otomatis kepada pemilih yang terdaftar di DPT Pemira HMIK.\r\n"+
+		"© Panitia Pemilihan Raya HMIK", nim, otpCode)
 
 	htmlBody := buildOTPEmailHTML(nim, otpCode)
 
@@ -85,6 +86,8 @@ func sendSMTPEmail(toEmail, nim, otpCode string) error {
 		"Subject: %s\r\n"+
 		"Date: %s\r\n"+
 		"Message-ID: %s\r\n"+
+		"X-Priority: 3\r\n"+
+		"Importance: normal\r\n"+
 		"Auto-Submitted: auto-generated\r\n"+
 		"X-Auto-Response-Suppress: All\r\n"+
 		"MIME-Version: 1.0\r\n"+
@@ -113,38 +116,42 @@ func buildOTPEmailHTML(nim, otpCode string) string {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kode Verifikasi Pemira HMIK</title>
     <style>
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #F8FAFC; margin: 0; padding: 20px; }
-        .container { max-width: 500px; margin: 0 auto; background-color: #FFFFFF; border: 3px solid #2B2B2B; border-radius: 16px; padding: 32px 24px; box-shadow: 5px 5px 0px #2B2B2B; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #F8FAFC; margin: 0; padding: 20px; color: #1E293B; }
+        .container { max-width: 480px; margin: 0 auto; background-color: #FFFFFF; border: 2px solid #CBD5E1; border-radius: 12px; padding: 32px 24px; }
         .header { text-align: center; margin-bottom: 24px; }
-        .badge { display: inline-block; background-color: #F7D070; color: #2B2B2B; border: 1.5px solid #2B2B2B; border-radius: 20px; padding: 4px 14px; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
-        .title { font-size: 20px; font-weight: 800; color: #2B2B2B; margin: 0 0 8px 0; }
-        .greeting { color: #555555; font-size: 14px; margin: 0; line-height: 1.5; }
-        .otp-box { background-color: #F0F2F1; border: 2.5px solid #2B2B2B; border-radius: 12px; padding: 18px; text-align: center; margin: 24px 0; box-shadow: 3px 3px 0px #2B2B2B; }
-        .otp-number { font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #4059AD; margin: 0; }
-        .warning { font-size: 13px; color: #666666; text-align: center; line-height: 1.5; margin: 16px 0; }
-        .warning strong { color: #E74C3C; }
-        .footer { text-align: center; font-size: 11px; color: #999999; margin-top: 24px; border-top: 1px solid #E5E7EB; padding-top: 14px; line-height: 1.4; }
+        .badge { display: inline-block; background-color: #EEF2FF; color: #4059AD; border: 1px solid #C7D2FE; border-radius: 16px; padding: 4px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 12px; }
+        .title { font-size: 18px; font-weight: 700; color: #0F172A; margin: 0 0 8px 0; }
+        .greeting { color: #475569; font-size: 14px; margin: 0; line-height: 1.5; }
+        .otp-box { background-color: #F1F5F9; border-radius: 8px; padding: 16px; text-align: center; margin: 24px 0; }
+        .otp-number { font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #4059AD; margin: 0; font-family: monospace, sans-serif; }
+        .warning { font-size: 13px; color: #64748B; text-align: center; line-height: 1.5; margin: 16px 0; }
+        .footer { text-align: center; font-size: 11px; color: #94A3B8; margin-top: 24px; border-top: 1px solid #F1F5F9; padding-top: 14px; line-height: 1.5; }
     </style>
 </head>
 <body>
+    <!-- Hidden preheader text for Outlook inbox preview -->
+    <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+        Kode akses bilik suara virtual Pemira HMIK Anda adalah %s. Berlaku selama 5 menit.
+    </div>
+
     <div class="container">
         <div class="header">
-            <div class="badge">PEMILIHAN RAYA HMIK</div>
+            <div class="badge">Pemilihan Raya HMIK</div>
             <h2 class="title">Verifikasi Bilik Suara Virtual</h2>
-            <p class="greeting">Halo Mahasiswa (NIM: %s), berikut kode verifikasi untuk menggunakan hak suara Anda:</p>
+            <p class="greeting">Halo Mahasiswa (NIM: %s), berikut kode verifikasi untuk masuk ke bilik suara:</p>
         </div>
         <div class="otp-box">
             <h1 class="otp-number">%s</h1>
         </div>
         <p class="warning">
-            Kode verifikasi ini hanya berlaku selama <strong>5 menit</strong>.<br>
-            Jangan pernah membagikan kode ini kepada siapa pun demi menjaga kedaulatan dan kerahasiaan hak suara Anda.
+            Kode ini hanya berlaku selama <strong>5 menit</strong>.<br>
+            Demi menjaga kerahasiaan suara Anda, mohon tidak membagikan kode ini kepada siapa pun.
         </p>
         <div class="footer">
-            &copy; Komisi Pemilihan Umum HMIK &bull; Universitas Pertamina<br>
-            Pesan ini dikirimkan secara otomatis oleh sistem, mohon tidak membalas email ini.
+            Email ini dikirimkan otomatis karena NIM Anda terdaftar dalam DPT Pemira HMIK.<br>
+            &copy; Panitia Pemilihan Raya HMIK
         </div>
     </div>
 </body>
-</html>`, nim, otpCode)
+</html>`, otpCode, nim, otpCode)
 }
