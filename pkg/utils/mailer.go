@@ -60,9 +60,13 @@ func sendSMTPEmail(toEmail, nim, otpCode string) error {
 
 	auth := smtp.PlainAuth("", smtpUser, smtpPass, smtpHost)
 
-	subject := fmt.Sprintf("[PEMIRA HMIK] Kode Verifikasi Masuk Bilik Suara: %s", otpCode)
+	subject := "[PEMIRA HMIK] Kode Verifikasi Masuk Bilik Suara"
 	boundary := fmt.Sprintf("hmik_pemira_%d", time.Now().UnixNano())
-	messageID := fmt.Sprintf("<%d.%s@gmail.com>", time.Now().UnixNano(), strings.Split(smtpUser, "@")[0])
+	userDomain := "gmail.com"
+	if parts := strings.Split(smtpUser, "@"); len(parts) > 1 {
+		userDomain = parts[1]
+	}
+	messageID := fmt.Sprintf("<%d.%d@%s>", time.Now().Unix(), time.Now().UnixNano()%1000000, userDomain)
 	dateHeader := time.Now().Format(time.RFC1123Z)
 
 	textBody := fmt.Sprintf("PEMILIHAN RAYA HMIK UNIVERSITAS PERTAMINA\r\n\r\n"+
@@ -77,9 +81,12 @@ func sendSMTPEmail(toEmail, nim, otpCode string) error {
 
 	message := fmt.Sprintf("From: %s <%s>\r\n"+
 		"To: %s\r\n"+
+		"Reply-To: %s\r\n"+
 		"Subject: %s\r\n"+
 		"Date: %s\r\n"+
 		"Message-ID: %s\r\n"+
+		"Auto-Submitted: auto-generated\r\n"+
+		"X-Auto-Response-Suppress: All\r\n"+
 		"MIME-Version: 1.0\r\n"+
 		"Content-Type: multipart/alternative; boundary=\"%s\"\r\n\r\n"+
 		"--%s\r\n"+
@@ -91,7 +98,7 @@ func sendSMTPEmail(toEmail, nim, otpCode string) error {
 		"Content-Transfer-Encoding: 8bit\r\n\r\n"+
 		"%s\r\n\r\n"+
 		"--%s--\r\n",
-		senderName, smtpUser, toEmail, subject, dateHeader, messageID, boundary, boundary, textBody, boundary, htmlBody, boundary)
+		senderName, smtpUser, toEmail, smtpUser, subject, dateHeader, messageID, boundary, boundary, textBody, boundary, htmlBody, boundary)
 
 	addr := fmt.Sprintf("%s:%s", smtpHost, smtpPort)
 	return smtp.SendMail(addr, auth, smtpUser, []string{toEmail}, []byte(message))
