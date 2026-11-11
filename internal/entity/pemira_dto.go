@@ -161,3 +161,21 @@ type PelantikanMPIKResponse struct {
 	KetuaBaru        *Anggota `json:"ketua_baru,omitempty"`
 	WakilBaru        *Anggota `json:"wakil_baru,omitempty"`
 }
+
+// PublicElectionScheduleResponse data jadwal & status bilik suara untuk publik/pemilih
+type PublicElectionScheduleResponse struct {
+	IdPemira       int64     `json:"id_pemira" example:"1"`
+	TahunPeriode   string    `json:"tahun_periode" example:"2026/2027"`
+	Status         string    `json:"status" example:"BERJALAN"`
+	TanggalMulai   time.Time `json:"tanggal_mulai"`
+	TanggalSelesai time.Time `json:"tanggal_selesai"`
+	IsOpen         bool      `json:"is_open" example:"true"`
+	Catatan        string    `json:"catatan" example:"Bilik suara sedang dibuka."`
+}
+
+// CreatePemiraPeriodRequest payload pembukaan periode pemira baru di masa depan
+type CreatePemiraPeriodRequest struct {
+	TahunPeriode   string    `json:"tahun_periode" binding:"required" example:"2027/2028"`
+	TanggalMulai   time.Time `json:"tanggal_mulai" binding:"required"`
+	TanggalSelesai time.Time `json:"tanggal_selesai" binding:"required"`
+}

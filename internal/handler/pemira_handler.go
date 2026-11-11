@@ -465,3 +465,49 @@ func (h *PemiraHandler) PelantikanMPIK(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Pelantikan MPIK berhasil disahkan", res))
 }
 
+// GetPublicSchedule godoc
+// @Summary      Ambil Jadwal & Status Bilik Suara Publik
+// @Description  Mengembalikan informasi jadwal buka/tutup dan status bilik suara untuk ditampilkan di portal pemilih
+// @Tags         Pemira
+// @Produce      json
+// @Success      200 {object} utils.JSendResponse{data=entity.PublicElectionScheduleResponse} "Jadwal pemira publik berhasil diambil"
+// @Failure      500 {object} utils.JSendResponse "Gagal memuat jadwal pemira"
+// @Router       /pemira/jadwal [get]
+func (h *PemiraHandler) GetPublicSchedule(c *gin.Context) {
+	schedule, err := h.usecase.GetPublicSchedule(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.BuildErrorResponse(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Jadwal pemira berhasil diambil", schedule))
+}
+
+// CreateNewPeriod godoc
+// @Summary      Buka Periode Pemira Baru di Masa Depan (Admin)
+// @Description  Membuka periode pemilihan raya baru (misal: 2027/2028) saat periode sebelumnya telah selesai
+// @Tags         Admin - Pemira
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body entity.CreatePemiraPeriodRequest true "Data Periode Baru"
+// @Success      201 {object} utils.JSendResponse{data=entity.Pemira} "Periode pemira baru berhasil dibuat"
+// @Failure      400 {object} utils.JSendResponse "Format request tidak valid atau pemira saat ini masih berjalan"
+// @Failure      401 {object} utils.JSendResponse "Akses Ditolak: Token admin tidak valid"
+// @Router       /admin/pemira/new-period [post]
+func (h *PemiraHandler) CreateNewPeriod(c *gin.Context) {
+	var req entity.CreatePemiraPeriodRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Format request tidak valid: "+err.Error(), nil))
+		return
+	}
+
+	res, err := h.usecase.CreateNewPeriod(c.Request.Context(), req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse(err.Error(), nil))
+		return
+	}
+
+	c.JSON(http.StatusCreated, utils.BuildSuccessResponse("Periode pemilihan raya baru berhasil dibuat", res))
+}
+

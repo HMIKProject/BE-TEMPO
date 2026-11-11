@@ -75,6 +75,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 			}
 
 			pemiraGroup.GET("/kandidat", pemiraHandler.GetActiveCandidates)
+			pemiraGroup.GET("/jadwal", pemiraHandler.GetPublicSchedule)
 			pemiraGroup.POST("/vote", middleware.VoterMiddleware(), pemiraHandler.CastVote)
 		}
 
@@ -117,6 +118,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 
 				// Pelantikan MPIK & Transisi Manajemen Himpunan
 				adminPemiraGroup.POST("/pelantikan-mpik", pemiraHandler.PelantikanMPIK)
+				adminPemiraGroup.POST("/new-period", pemiraHandler.CreateNewPeriod)
 			}
 
 			// Endpoint unggah file gambar admin

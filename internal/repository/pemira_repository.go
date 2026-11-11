@@ -19,6 +19,7 @@ type PemiraRepository interface {
 	GetLatestPemira(ctx context.Context) (*entity.Pemira, error)
 	UpdatePemiraStatus(ctx context.Context, idPemira int64, status string) error
 	UpdatePemiraSchedule(ctx context.Context, idPemira int64, tahunPeriode string, tMulai, tSelesai time.Time) error
+	CreatePemira(ctx context.Context, pemira *entity.Pemira) error
 
 	// 2. Paslon (Kandidat)
 	GetPaslonByPemiraID(ctx context.Context, idPemira int64) ([]entity.Paslon, error)
@@ -48,6 +49,7 @@ type PemiraRepository interface {
 	PromoteKabinet(ctx context.Context, kabinet *entity.Kabinet) error
 	UpsertAnggotaBPH(ctx context.Context, nim, nama, jabatan string, angkatan int, foto string) (*entity.Anggota, error)
 	DemisionerkanPengurusLama(ctx context.Context, exceptNIMs []string) error
+	PurgeVotersAndVotes(ctx context.Context, idPemira int64) error
 }
 
 type pemiraRepository struct {
@@ -305,6 +307,10 @@ func (r *pemiraRepository) UpdatePemiraSchedule(ctx context.Context, idPemira in
 		}).Error
 }
 
+func (r *pemiraRepository) CreatePemira(ctx context.Context, pemira *entity.Pemira) error {
+	return r.db.WithContext(ctx).Create(pemira).Error
+}
+
 func (r *pemiraRepository) CreatePaslon(ctx context.Context, paslon *entity.Paslon) error {
 	return r.db.WithContext(ctx).Create(paslon).Error
 }
@@ -418,4 +424,20 @@ func (r *pemiraRepository) DemisionerkanPengurusLama(ctx context.Context, except
 		query = query.Where("nim NOT IN ?", exceptNIMs)
 	}
 	return query.Update("status", "Demisioner").Error
+}
+
+func (r *pemiraRepository) PurgeVotersAndVotes(ctx context.Context, idPemira int64) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// 1. Hapus seluruh surat suara di kotak suara
+		if err := tx.Where("id_pemira = ?", idPemira).Delete(&entity.Suara{}).Error; err != nil {
+			return fmt.Errorf("gagal membersihkan surat suara pasca-pelantikan: %w", err)
+		}
+
+		// 2. Hapus seluruh data pemilih (NIM, email kampus, dll) demi menjaga privasi
+		if err := tx.Where("id_pemira = ?", idPemira).Delete(&entity.Pemilih{}).Error; err != nil {
+			return fmt.Errorf("gagal membersihkan data pemilih pasca-pelantikan: %w", err)
+		}
+
+		return nil
+	})
 }

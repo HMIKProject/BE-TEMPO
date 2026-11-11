@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"os"
 	"strings"
@@ -43,8 +44,12 @@ type PemiraUsecase interface {
 	GetElectionSettings(ctx context.Context) (*entity.ElectionSettingsResponse, error)
 	UpdateElectionSchedule(ctx context.Context, req entity.UpdatePemiraScheduleRequest) error
 	UpdateElectionStatus(ctx context.Context, req entity.UpdatePemiraStatusRequest) error
+	CreateNewPeriod(ctx context.Context, req entity.CreatePemiraPeriodRequest) (*entity.Pemira, error)
 
-	// 6. Pelantikan MPIK & Transisi Manajemen Himpunan
+	// 6. Public Schedule & Info
+	GetPublicSchedule(ctx context.Context) (*entity.PublicElectionScheduleResponse, error)
+
+	// 7. Pelantikan MPIK & Transisi Manajemen Himpunan
 	PelantikanMPIK(ctx context.Context) (*entity.PelantikanMPIKResponse, error)
 }
 
@@ -531,6 +536,71 @@ func (u *pemiraUsecase) UpdateElectionStatus(ctx context.Context, req entity.Upd
 	return u.pemiraRepo.UpdatePemiraStatus(ctx, pemira.IdPemira, status)
 }
 
+func (u *pemiraUsecase) CreateNewPeriod(ctx context.Context, req entity.CreatePemiraPeriodRequest) (*entity.Pemira, error) {
+	// 1. Cek periode pemira terakhir
+	latest, err := u.pemiraRepo.GetLatestPemira(ctx)
+	if err == nil && latest != nil {
+		if latest.Status == "BERJALAN" {
+			return nil, errors.New("tidak dapat membuka periode baru karena pemilihan raya periode berjalan masih aktif (BERJALAN). Silakan selesaikan pemilihan terlebih dahulu")
+		}
+	}
+
+	if req.TanggalSelesai.Before(req.TanggalMulai) {
+		return nil, errors.New("tanggal selesai pemilihan tidak boleh lebih awal dari tanggal mulai")
+	}
+
+	newPemira := &entity.Pemira{
+		TahunPeriode:   strings.TrimSpace(req.TahunPeriode),
+		TanggalMulai:   req.TanggalMulai,
+		TanggalSelesai: req.TanggalSelesai,
+		Status:         "DRAFT",
+	}
+
+	if err := u.pemiraRepo.CreatePemira(ctx, newPemira); err != nil {
+		return nil, fmt.Errorf("gagal membuat periode pemira baru: %w", err)
+	}
+
+	return newPemira, nil
+}
+
+func (u *pemiraUsecase) GetPublicSchedule(ctx context.Context) (*entity.PublicElectionScheduleResponse, error) {
+	pemira, err := u.pemiraRepo.GetLatestPemira(ctx)
+	if err != nil {
+		return nil, errors.New("informasi jadwal pemilihan raya belum dikonfigurasi")
+	}
+
+	now := time.Now().UTC()
+	isOpen := pemira.Status == "BERJALAN" && (now.Equal(pemira.TanggalMulai.UTC()) || now.After(pemira.TanggalMulai.UTC())) && (now.Equal(pemira.TanggalSelesai.UTC()) || now.Before(pemira.TanggalSelesai.UTC()))
+
+	var catatan string
+	switch pemira.Status {
+	case "DRAFT":
+		catatan = "Bilik suara pemilihan raya belum dibuka oleh KPU. Harap menunggu jadwal resmi pembukaan bilik suara."
+	case "SELESAI":
+		catatan = "Bilik suara pemilihan raya telah resmi ditutup oleh KPU. Terima kasih atas partisipasi seluruh mahasiswa."
+	case "BERJALAN":
+		if now.Before(pemira.TanggalMulai.UTC()) {
+			catatan = fmt.Sprintf("Bilik suara belum dibuka. Pemungutan suara dijadwalkan dibuka pada %s.", pemira.TanggalMulai.Format("02 Jan 2006, 15:04 WIB"))
+		} else if now.After(pemira.TanggalSelesai.UTC()) {
+			catatan = "Bilik suara telah melewati batas akhir waktu pemungutan suara resmi."
+		} else {
+			catatan = "Bilik suara sedang dibuka. Silakan masukkan NIM dan email kampus Anda untuk memilih."
+		}
+	default:
+		catatan = "Status pemilihan raya tidak aktif."
+	}
+
+	return &entity.PublicElectionScheduleResponse{
+		IdPemira:       pemira.IdPemira,
+		TahunPeriode:   pemira.TahunPeriode,
+		Status:         pemira.Status,
+		TanggalMulai:   pemira.TanggalMulai,
+		TanggalSelesai: pemira.TanggalSelesai,
+		IsOpen:         isOpen,
+		Catatan:        catatan,
+	}, nil
+}
+
 // ==========================================
 // 6. PELANTIKAN MPIK & TRANSISI MANAJEMEN HIMPUNAN
 // ==========================================
@@ -586,6 +656,13 @@ func (u *pemiraUsecase) PelantikanMPIK(ctx context.Context) (*entity.PelantikanM
 
 	// 8. Demisionerkan BPH Lama (Ubah status Pengurus lama yang bukan Ketua/Wakil baru menjadi Demisioner)
 	_ = u.pemiraRepo.DemisionerkanPengurusLama(ctx, []string{winner.NimKetua, winner.NimWakil})
+
+	// 9. Auto-Purge Pemilih & Kotak Suara (Perlindungan Privasi Mahasiswa & Kebersihan Basis Data)
+	if err := u.pemiraRepo.PurgeVotersAndVotes(ctx, pemira.IdPemira); err != nil {
+		log.Printf("⚠️ [MPIK WARNING] Gagal auto-purge pemilih/suara: %v", err)
+	} else {
+		log.Printf("🧹 [MPIK SUCCESS] Seluruh data pemilih dan surat suara Pemira ID %d telah dibersihkan bersih", pemira.IdPemira)
+	}
 
 	return &entity.PelantikanMPIKResponse{
 		StatusPelantikan: "APPROVED",
