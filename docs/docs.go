@@ -15,6 +15,661 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin/akun/assign": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Menautkan slot akun kosong ke anggota dari Buku Induk dan menerbitkan Kode Aktivasi 7 hari",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Slot Akun Pinjam Pakai"
+                ],
+                "summary": "Tautkan Slot Akun ke Mahasiswa",
+                "parameters": [
+                    {
+                        "description": "Payload Penautan Slot Akun",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.AssignSlotRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.AssignSlotResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/akun/demisioner-massal": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Memutus serentak seluruh slot pengurus aktif, mereset kata sandi akun secara acak, dan membatalkan seluruh sesi login",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Slot Akun Pinjam Pakai"
+                ],
+                "summary": "Demisioner Massal Akhir Periode",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.DemisionerSummary"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/akun/slots": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengambil seluruh 38 slot akun struktural beserta status keterisian (TERPAKAI/KOSONG), data peminjam, dan status kode aktivasi",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Slot Akun Pinjam Pakai"
+                ],
+                "summary": "Daftar Slot Akun Pinjam Pakai",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/entity.AccountSlotResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/akun/unassign": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Melepas kaitan slot akun dari anggota, mendemisionerkan anggota, mereset password acak, dan membatalkan sesi login",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Slot Akun Pinjam Pakai"
+                ],
+                "summary": "Lepas Tautan Slot Akun",
+                "parameters": [
+                    {
+                        "description": "Payload Pelepasan Tautan Slot Akun",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UnassignSlotRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/akun/{id}/reset-password": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Menerbitkan ulang Kode Aktivasi 7 hari bagi pengurus yang lupa sandi dan membatalkan token login aktif",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Slot Akun Pinjam Pakai"
+                ],
+                "summary": "Reset Sandi Pengurus (Terbit Ulang Kode Aktivasi)",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Pengguna Slot",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.ResetSlotResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/akun/{id}/role": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengubah peran (id_peran) pada slot akun tertentu",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Slot Akun Pinjam Pakai"
+                ],
+                "summary": "Atur Peran / Hak Akses Slot Akun",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Pengguna Slot",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Payload Update Role",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UpdateSlotRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/anggota": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengambil daftar anggota Buku Induk dengan penyaringan nama/NIM, status, angkatan, serta pagination",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Buku Induk Anggota"
+                ],
+                "summary": "Daftar Anggota Buku Induk (BIA)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cari berdasarkan nama atau NIM",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter status (Pengurus, Magang, Demisioner, Semua)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter tahun angkatan",
+                        "name": "angkatan",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Nomor halaman (default 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Jumlah data per halaman (default 50)",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.AnggotaListResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Menambahkan data mahasiswa baru secara manual ke Buku Induk Anggota",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Buku Induk Anggota"
+                ],
+                "summary": "Tambah Anggota Baru",
+                "parameters": [
+                    {
+                        "description": "Payload Tambah Anggota",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.CreateAnggotaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.Anggota"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/anggota/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengambil detail profil lengkap seorang anggota berdasarkan ID primary key",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Buku Induk Anggota"
+                ],
+                "summary": "Detail Anggota Buku Induk",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Anggota",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.Anggota"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Memperbarui data profil, jabatan, status, atau departemen anggota",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Buku Induk Anggota"
+                ],
+                "summary": "Perbarui Data Anggota",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Anggota",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Payload Perbarui Data Anggota",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UpdateAnggotaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.Anggota"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Menghapus data anggota dari Buku Induk (hanya jika anggota tidak memegang slot akun aktif)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Buku Induk Anggota"
+                ],
+                "summary": "Hapus Data Anggota",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Anggota",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/dashboard/stats": {
             "get": {
                 "security": [
@@ -1559,6 +2214,39 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "entity.AccountSlotResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id_pengguna": {
+                    "type": "integer"
+                },
+                "is_first_login": {
+                    "type": "boolean"
+                },
+                "jabatan": {
+                    "type": "string"
+                },
+                "kode_aktivasi": {
+                    "type": "string"
+                },
+                "kode_aktivasi_expired": {
+                    "type": "string"
+                },
+                "nama_pengguna": {
+                    "type": "string"
+                },
+                "peminjam": {
+                    "$ref": "#/definitions/entity.SlotPeminjamInfo"
+                },
+                "status_slot": {
+                    "description": "\"TERPAKAI\" atau \"KOSONG\"",
+                    "type": "string"
+                }
+            }
+        },
         "entity.Anggota": {
             "type": "object",
             "properties": {
@@ -1640,6 +2328,66 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.AnggotaListResponse": {
+            "type": "object",
+            "properties": {
+                "anggota": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Anggota"
+                    }
+                },
+                "total_data": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.AssignSlotRequest": {
+            "type": "object",
+            "required": [
+                "id_anggota",
+                "id_pengguna"
+            ],
+            "properties": {
+                "id_anggota": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "id_pengguna": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "entity.AssignSlotResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id_pengguna": {
+                    "type": "integer"
+                },
+                "jabatan": {
+                    "type": "string"
+                },
+                "kode_aktivasi": {
+                    "type": "string"
+                },
+                "kode_aktivasi_expired": {
+                    "type": "string"
+                },
+                "nama_anggota": {
+                    "type": "string"
+                },
+                "nama_pengguna": {
+                    "type": "string"
+                },
+                "nim_anggota": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.BallotVoterInfo": {
             "type": "object",
             "properties": {
@@ -1703,6 +2451,71 @@ const docTemplate = `{
                 "waktu_tercatat": {
                     "type": "string",
                     "example": "2026-11-04T15:30:00Z"
+                }
+            }
+        },
+        "entity.CreateAnggotaRequest": {
+            "type": "object",
+            "required": [
+                "angkatan",
+                "nama_lengkap",
+                "nim",
+                "program_studi",
+                "status"
+            ],
+            "properties": {
+                "angkatan": {
+                    "type": "integer",
+                    "example": 2023
+                },
+                "cv_url": {
+                    "type": "string",
+                    "example": "https://res.cloudinary.com/.../cv.pdf"
+                },
+                "foto_profil": {
+                    "type": "string",
+                    "example": "https://res.cloudinary.com/.../profile.png"
+                },
+                "id_departemen": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "id_divisi": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "jabatan": {
+                    "type": "string",
+                    "example": "Ketua Divisi Media Kreatif"
+                },
+                "nama_lengkap": {
+                    "type": "string",
+                    "example": "Anton Dicaprio"
+                },
+                "nim": {
+                    "type": "string",
+                    "example": "105223046"
+                },
+                "periode": {
+                    "type": "string",
+                    "example": "2026/2027"
+                },
+                "program_studi": {
+                    "type": "string",
+                    "example": "Ilmu Komputer"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "Pengurus",
+                        "Magang",
+                        "Demisioner"
+                    ],
+                    "example": "Pengurus"
+                },
+                "tautan": {
+                    "type": "string",
+                    "example": "https://www.linkedin.com/in/antondicaprio"
                 }
             }
         },
@@ -1818,6 +2631,20 @@ const docTemplate = `{
                 },
                 "voting_aktif": {
                     "type": "integer"
+                }
+            }
+        },
+        "entity.DemisionerSummary": {
+            "type": "object",
+            "properties": {
+                "total_akun_direset": {
+                    "type": "integer"
+                },
+                "total_anggota_demis": {
+                    "type": "integer"
+                },
+                "waktu_eksekusi": {
+                    "type": "string"
                 }
             }
         },
@@ -2461,6 +3288,23 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.ResetSlotResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id_pengguna": {
+                    "type": "integer"
+                },
+                "kode_aktivasi": {
+                    "type": "string"
+                },
+                "kode_aktivasi_expired": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.SetInitialPasswordRequest": {
             "type": "object",
             "required": [
@@ -2481,6 +3325,29 @@ const docTemplate = `{
                 "setup_token": {
                     "type": "string",
                     "example": "eyJhbGci..."
+                }
+            }
+        },
+        "entity.SlotPeminjamInfo": {
+            "type": "object",
+            "properties": {
+                "angkatan": {
+                    "type": "integer"
+                },
+                "foto_profil": {
+                    "type": "string"
+                },
+                "id_anggota": {
+                    "type": "integer"
+                },
+                "nama_lengkap": {
+                    "type": "string"
+                },
+                "nim": {
+                    "type": "string"
+                },
+                "periode": {
+                    "type": "string"
                 }
             }
         },
@@ -2512,6 +3379,78 @@ const docTemplate = `{
                 },
                 "waktu_memilih": {
                     "type": "string"
+                }
+            }
+        },
+        "entity.UnassignSlotRequest": {
+            "type": "object",
+            "required": [
+                "id_pengguna"
+            ],
+            "properties": {
+                "id_pengguna": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "entity.UpdateAnggotaRequest": {
+            "type": "object",
+            "required": [
+                "angkatan",
+                "nama_lengkap",
+                "program_studi",
+                "status"
+            ],
+            "properties": {
+                "angkatan": {
+                    "type": "integer",
+                    "example": 2023
+                },
+                "cv_url": {
+                    "type": "string",
+                    "example": "https://res.cloudinary.com/.../cv.pdf"
+                },
+                "foto_profil": {
+                    "type": "string",
+                    "example": "https://res.cloudinary.com/.../profile.png"
+                },
+                "id_departemen": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "id_divisi": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "jabatan": {
+                    "type": "string",
+                    "example": "Ketua Divisi Media Kreatif"
+                },
+                "nama_lengkap": {
+                    "type": "string",
+                    "example": "Anton Dicaprio"
+                },
+                "periode": {
+                    "type": "string",
+                    "example": "2026/2027"
+                },
+                "program_studi": {
+                    "type": "string",
+                    "example": "Ilmu Komputer"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "Pengurus",
+                        "Magang",
+                        "Demisioner"
+                    ],
+                    "example": "Pengurus"
+                },
+                "tautan": {
+                    "type": "string",
+                    "example": "https://www.linkedin.com/in/antondicaprio"
                 }
             }
         },
@@ -2598,6 +3537,18 @@ const docTemplate = `{
                         "SELESAI"
                     ],
                     "example": "BERJALAN"
+                }
+            }
+        },
+        "entity.UpdateSlotRoleRequest": {
+            "type": "object",
+            "required": [
+                "id_peran"
+            ],
+            "properties": {
+                "id_peran": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },

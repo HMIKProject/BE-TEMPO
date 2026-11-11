@@ -45,6 +45,15 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	authUsecase := usecase.NewAuthUsecase(penggunaRepo)
 	authHandler := handler.NewAuthHandler(authUsecase)
 
+	// Admin Buku Induk Anggota (BIA)
+	adminBIAUsecase := usecase.NewAdminBIAUsecase(anggotaRepo)
+	adminBIAHandler := handler.NewAdminBIAHandler(adminBIAUsecase)
+
+	// Admin Slot Akun Pinjam Pakai
+	slotRepo := repository.NewSlotRepository(db)
+	adminSlotUsecase := usecase.NewAdminSlotUsecase(slotRepo)
+	adminSlotHandler := handler.NewAdminSlotHandler(adminSlotUsecase)
+
 	// Pemira (E-Voting)
 	pemiraRepo := repository.NewPemiraRepository(db)
 	pemiraUsecase := usecase.NewPemiraUsecase(pemiraRepo)
@@ -124,6 +133,24 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 
 			// Endpoint unggah file gambar admin
 			adminGroup.POST("/upload", uploadHandler.UploadImage)
+
+			// Buku Induk Anggota (BIA)
+			adminGroup.GET("/anggota", adminBIAHandler.GetAnggotaList)
+			adminGroup.GET("/anggota/:id", adminBIAHandler.GetAnggotaByID)
+			adminGroup.POST("/anggota", adminBIAHandler.CreateAnggota)
+			adminGroup.PUT("/anggota/:id", adminBIAHandler.UpdateAnggota)
+			adminGroup.DELETE("/anggota/:id", adminBIAHandler.DeleteAnggota)
+
+			// Slot Akun Pinjam Pakai
+			akunGroup := adminGroup.Group("/akun")
+			{
+				akunGroup.GET("/slots", adminSlotHandler.GetAccountSlots)
+				akunGroup.POST("/assign", adminSlotHandler.AssignSlot)
+				akunGroup.POST("/unassign", adminSlotHandler.UnassignSlot)
+				akunGroup.POST("/demisioner-massal", adminSlotHandler.DemisionerMassal)
+				akunGroup.POST("/:id/reset-password", adminSlotHandler.ResetSlotPassword)
+				akunGroup.PUT("/:id/role", adminSlotHandler.UpdateSlotRole)
+			}
 		}
 
 		// Rute upload terproteksi JWT (Backward Compatibility)

@@ -1,5 +1,27 @@
 basePath: /api/v1
 definitions:
+  entity.AccountSlotResponse:
+    properties:
+      email:
+        type: string
+      id_pengguna:
+        type: integer
+      is_first_login:
+        type: boolean
+      jabatan:
+        type: string
+      kode_aktivasi:
+        type: string
+      kode_aktivasi_expired:
+        type: string
+      nama_pengguna:
+        type: string
+      peminjam:
+        $ref: '#/definitions/entity.SlotPeminjamInfo'
+      status_slot:
+        description: '"TERPAKAI" atau "KOSONG"'
+        type: string
+    type: object
   entity.Anggota:
     properties:
       angkatan:
@@ -56,6 +78,46 @@ definitions:
       tautan:
         type: string
     type: object
+  entity.AnggotaListResponse:
+    properties:
+      anggota:
+        items:
+          $ref: '#/definitions/entity.Anggota'
+        type: array
+      total_data:
+        type: integer
+    type: object
+  entity.AssignSlotRequest:
+    properties:
+      id_anggota:
+        example: 5
+        type: integer
+      id_pengguna:
+        example: 1
+        type: integer
+    required:
+    - id_anggota
+    - id_pengguna
+    type: object
+  entity.AssignSlotResponse:
+    properties:
+      email:
+        type: string
+      id_pengguna:
+        type: integer
+      jabatan:
+        type: string
+      kode_aktivasi:
+        type: string
+      kode_aktivasi_expired:
+        type: string
+      nama_anggota:
+        type: string
+      nama_pengguna:
+        type: string
+      nim_anggota:
+        type: string
+    type: object
   entity.BallotVoterInfo:
     properties:
       nim:
@@ -100,6 +162,55 @@ definitions:
       waktu_tercatat:
         example: "2026-11-04T15:30:00Z"
         type: string
+    type: object
+  entity.CreateAnggotaRequest:
+    properties:
+      angkatan:
+        example: 2023
+        type: integer
+      cv_url:
+        example: https://res.cloudinary.com/.../cv.pdf
+        type: string
+      foto_profil:
+        example: https://res.cloudinary.com/.../profile.png
+        type: string
+      id_departemen:
+        example: 1
+        type: integer
+      id_divisi:
+        example: 2
+        type: integer
+      jabatan:
+        example: Ketua Divisi Media Kreatif
+        type: string
+      nama_lengkap:
+        example: Anton Dicaprio
+        type: string
+      nim:
+        example: "105223046"
+        type: string
+      periode:
+        example: 2026/2027
+        type: string
+      program_studi:
+        example: Ilmu Komputer
+        type: string
+      status:
+        enum:
+        - Pengurus
+        - Magang
+        - Demisioner
+        example: Pengurus
+        type: string
+      tautan:
+        example: https://www.linkedin.com/in/antondicaprio
+        type: string
+    required:
+    - angkatan
+    - nama_lengkap
+    - nim
+    - program_studi
+    - status
     type: object
   entity.CreatePaslonRequest:
     properties:
@@ -180,6 +291,15 @@ definitions:
         $ref: '#/definitions/entity.VotingStatItem'
       voting_aktif:
         type: integer
+    type: object
+  entity.DemisionerSummary:
+    properties:
+      total_akun_direset:
+        type: integer
+      total_anggota_demis:
+        type: integer
+      waktu_eksekusi:
+        type: string
     type: object
   entity.Departemen:
     properties:
@@ -617,6 +737,17 @@ definitions:
     required:
     - nim
     type: object
+  entity.ResetSlotResponse:
+    properties:
+      email:
+        type: string
+      id_pengguna:
+        type: integer
+      kode_aktivasi:
+        type: string
+      kode_aktivasi_expired:
+        type: string
+    type: object
   entity.SetInitialPasswordRequest:
     properties:
       konfirmasi_sandi:
@@ -633,6 +764,21 @@ definitions:
     - konfirmasi_sandi
     - password_baru
     - setup_token
+    type: object
+  entity.SlotPeminjamInfo:
+    properties:
+      angkatan:
+        type: integer
+      foto_profil:
+        type: string
+      id_anggota:
+        type: integer
+      nama_lengkap:
+        type: string
+      nim:
+        type: string
+      periode:
+        type: string
     type: object
   entity.StatItem:
     properties:
@@ -653,6 +799,59 @@ definitions:
         type: integer
       waktu_memilih:
         type: string
+    type: object
+  entity.UnassignSlotRequest:
+    properties:
+      id_pengguna:
+        example: 1
+        type: integer
+    required:
+    - id_pengguna
+    type: object
+  entity.UpdateAnggotaRequest:
+    properties:
+      angkatan:
+        example: 2023
+        type: integer
+      cv_url:
+        example: https://res.cloudinary.com/.../cv.pdf
+        type: string
+      foto_profil:
+        example: https://res.cloudinary.com/.../profile.png
+        type: string
+      id_departemen:
+        example: 1
+        type: integer
+      id_divisi:
+        example: 2
+        type: integer
+      jabatan:
+        example: Ketua Divisi Media Kreatif
+        type: string
+      nama_lengkap:
+        example: Anton Dicaprio
+        type: string
+      periode:
+        example: 2026/2027
+        type: string
+      program_studi:
+        example: Ilmu Komputer
+        type: string
+      status:
+        enum:
+        - Pengurus
+        - Magang
+        - Demisioner
+        example: Pengurus
+        type: string
+      tautan:
+        example: https://www.linkedin.com/in/antondicaprio
+        type: string
+    required:
+    - angkatan
+    - nama_lengkap
+    - program_studi
+    - status
     type: object
   entity.UpdatePaslonRequest:
     properties:
@@ -716,6 +915,14 @@ definitions:
         type: string
     required:
     - status
+    type: object
+  entity.UpdateSlotRoleRequest:
+    properties:
+      id_peran:
+        example: 1
+        type: integer
+    required:
+    - id_peran
     type: object
   entity.VerifyOTPRequest:
     properties:
@@ -791,6 +998,408 @@ info:
   title: HMIK CoreX API
   version: "1.0"
 paths:
+  /admin/akun/{id}/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Menerbitkan ulang Kode Aktivasi 7 hari bagi pengurus yang lupa
+        sandi dan membatalkan token login aktif
+      parameters:
+      - description: ID Pengguna Slot
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.ResetSlotResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Reset Sandi Pengurus (Terbit Ulang Kode Aktivasi)
+      tags:
+      - Admin - Slot Akun Pinjam Pakai
+  /admin/akun/{id}/role:
+    put:
+      consumes:
+      - application/json
+      description: Mengubah peran (id_peran) pada slot akun tertentu
+      parameters:
+      - description: ID Pengguna Slot
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Payload Update Role
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdateSlotRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Atur Peran / Hak Akses Slot Akun
+      tags:
+      - Admin - Slot Akun Pinjam Pakai
+  /admin/akun/assign:
+    post:
+      consumes:
+      - application/json
+      description: Menautkan slot akun kosong ke anggota dari Buku Induk dan menerbitkan
+        Kode Aktivasi 7 hari
+      parameters:
+      - description: Payload Penautan Slot Akun
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.AssignSlotRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.AssignSlotResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Tautkan Slot Akun ke Mahasiswa
+      tags:
+      - Admin - Slot Akun Pinjam Pakai
+  /admin/akun/demisioner-massal:
+    post:
+      consumes:
+      - application/json
+      description: Memutus serentak seluruh slot pengurus aktif, mereset kata sandi
+        akun secara acak, dan membatalkan seluruh sesi login
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.DemisionerSummary'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Demisioner Massal Akhir Periode
+      tags:
+      - Admin - Slot Akun Pinjam Pakai
+  /admin/akun/slots:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil seluruh 38 slot akun struktural beserta status keterisian
+        (TERPAKAI/KOSONG), data peminjam, dan status kode aktivasi
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entity.AccountSlotResponse'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Daftar Slot Akun Pinjam Pakai
+      tags:
+      - Admin - Slot Akun Pinjam Pakai
+  /admin/akun/unassign:
+    post:
+      consumes:
+      - application/json
+      description: Melepas kaitan slot akun dari anggota, mendemisionerkan anggota,
+        mereset password acak, dan membatalkan sesi login
+      parameters:
+      - description: Payload Pelepasan Tautan Slot Akun
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UnassignSlotRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Lepas Tautan Slot Akun
+      tags:
+      - Admin - Slot Akun Pinjam Pakai
+  /admin/anggota:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil daftar anggota Buku Induk dengan penyaringan nama/NIM,
+        status, angkatan, serta pagination
+      parameters:
+      - description: Cari berdasarkan nama atau NIM
+        in: query
+        name: search
+        type: string
+      - description: Filter status (Pengurus, Magang, Demisioner, Semua)
+        in: query
+        name: status
+        type: string
+      - description: Filter tahun angkatan
+        in: query
+        name: angkatan
+        type: integer
+      - description: Nomor halaman (default 1)
+        in: query
+        name: page
+        type: integer
+      - description: Jumlah data per halaman (default 50)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.AnggotaListResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Daftar Anggota Buku Induk (BIA)
+      tags:
+      - Admin - Buku Induk Anggota
+    post:
+      consumes:
+      - application/json
+      description: Menambahkan data mahasiswa baru secara manual ke Buku Induk Anggota
+      parameters:
+      - description: Payload Tambah Anggota
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CreateAnggotaRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Anggota'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Tambah Anggota Baru
+      tags:
+      - Admin - Buku Induk Anggota
+  /admin/anggota/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Menghapus data anggota dari Buku Induk (hanya jika anggota tidak
+        memegang slot akun aktif)
+      parameters:
+      - description: ID Anggota
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Hapus Data Anggota
+      tags:
+      - Admin - Buku Induk Anggota
+    get:
+      consumes:
+      - application/json
+      description: Mengambil detail profil lengkap seorang anggota berdasarkan ID
+        primary key
+      parameters:
+      - description: ID Anggota
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Anggota'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Detail Anggota Buku Induk
+      tags:
+      - Admin - Buku Induk Anggota
+    put:
+      consumes:
+      - application/json
+      description: Memperbarui data profil, jabatan, status, atau departemen anggota
+      parameters:
+      - description: ID Anggota
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Payload Perbarui Data Anggota
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdateAnggotaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Anggota'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Perbarui Data Anggota
+      tags:
+      - Admin - Buku Induk Anggota
   /admin/dashboard/stats:
     get:
       consumes:
