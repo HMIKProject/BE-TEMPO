@@ -62,6 +62,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 		authGroup := v1.Group("/auth")
 		{
 			authGroup.POST("/login", authHandler.Login)
+			authGroup.POST("/set-initial-password", authHandler.SetInitialPassword)
 		}
 
 		// Pemira (E-Voting) Voter Routes

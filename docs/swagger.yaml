@@ -1,5 +1,61 @@
 basePath: /api/v1
 definitions:
+  entity.Anggota:
+    properties:
+      angkatan:
+        type: integer
+      cv_url:
+        type: string
+      departemen:
+        $ref: '#/definitions/entity.Departemen'
+      dibuat_pada:
+        type: string
+      diubah_pada:
+        type: string
+      divisi:
+        $ref: '#/definitions/entity.DivisiDepartemen'
+      files:
+        type: string
+      fotoProfil:
+        type: string
+      idAnggota:
+        type: integer
+      idDepartemen:
+        description: Relasi One-to-Many (Opsional, karena BPH mungkin tidak ada di
+          departemen spesifik)
+        type: integer
+      idDivisi:
+        type: integer
+      idPengguna:
+        description: Nullable untuk Demisioner
+        type: integer
+      jabatan:
+        type: string
+      keahlianAnggota:
+        description: Relasi One-to-Many ke Tabel Perantara (Pivot)
+        items:
+          $ref: '#/definitions/entity.KeahlianAnggota'
+        type: array
+      minatRisetAnggota:
+        items:
+          $ref: '#/definitions/entity.MinatRisetAnggota'
+        type: array
+      namaLengkap:
+        type: string
+      nim:
+        type: string
+      pengguna:
+        $ref: '#/definitions/entity.Pengguna'
+      periode:
+        type: string
+      programStudi:
+        type: string
+      status:
+        description: Pengurus, Magang, Demisioner
+        type: string
+      tautan:
+        type: string
+    type: object
   entity.BallotVoterInfo:
     properties:
       nim:
@@ -45,6 +101,57 @@ definitions:
         example: "2026-11-04T15:30:00Z"
         type: string
     type: object
+  entity.CreatePaslonRequest:
+    properties:
+      foto_paslon:
+        example: https://...
+        type: string
+      misi:
+        example: 1. Kolaborasi riset
+        type: string
+      nama_kabinet:
+        example: Kabinet Bersama
+        type: string
+      nama_ketua:
+        example: Calon Ketua
+        type: string
+      nama_wakil:
+        example: Calon Wakil
+        type: string
+      nim_ketua:
+        example: "105223001"
+        type: string
+      nim_wakil:
+        example: "105223002"
+        type: string
+      nomor_urut:
+        example: 3
+        type: integer
+      visi:
+        example: Mewujudkan HMIK unggul
+        type: string
+    required:
+    - nama_kabinet
+    - nama_ketua
+    - nama_wakil
+    - nim_ketua
+    - nim_wakil
+    - nomor_urut
+    type: object
+  entity.CreatePemiraPeriodRequest:
+    properties:
+      tahun_periode:
+        example: 2027/2028
+        type: string
+      tanggal_mulai:
+        type: string
+      tanggal_selesai:
+        type: string
+    required:
+    - tahun_periode
+    - tanggal_mulai
+    - tanggal_selesai
+    type: object
   entity.DashboardStatsResponse:
     properties:
       card_total_anggota_aktif:
@@ -73,6 +180,62 @@ definitions:
         $ref: '#/definitions/entity.VotingStatItem'
       voting_aktif:
         type: integer
+    type: object
+  entity.Departemen:
+    properties:
+      anggota:
+        items:
+          $ref: '#/definitions/entity.Anggota'
+        type: array
+      deskripsi:
+        type: string
+      dibuat_pada:
+        type: string
+      diperbarui_pada:
+        type: string
+      divisi:
+        description: Relasi One-to-Many
+        items:
+          $ref: '#/definitions/entity.DivisiDepartemen'
+        type: array
+      id_departemen:
+        type: integer
+      logo:
+        type: string
+      nama_departemen:
+        type: string
+      program_kerja:
+        items:
+          $ref: '#/definitions/entity.ProgramKerja'
+        type: array
+      status_aktif:
+        type: boolean
+    type: object
+  entity.DivisiDepartemen:
+    properties:
+      anggota:
+        items:
+          $ref: '#/definitions/entity.Anggota'
+        type: array
+      deskripsi:
+        type: string
+      dibuat_pada:
+        type: string
+      diperbarui_pada:
+        type: string
+      id_departemen:
+        type: integer
+      id_divisi:
+        type: integer
+      nama_divisi:
+        type: string
+      program_kerja:
+        description: Relasi One-to-Many
+        items:
+          $ref: '#/definitions/entity.ProgramKerja'
+        type: array
+      status_aktif:
+        type: boolean
     type: object
   entity.ElectionChartCandidate:
     properties:
@@ -108,6 +271,33 @@ definitions:
         example: 327
         type: integer
     type: object
+  entity.ElectionSettingsResponse:
+    properties:
+      id_pemira:
+        example: 1
+        type: integer
+      mpik_status:
+        example: PENDING
+        type: string
+      status:
+        example: BERJALAN
+        type: string
+      tahun_periode:
+        example: 2026/2027
+        type: string
+      tanggal_mulai:
+        type: string
+      tanggal_selesai:
+        type: string
+      total_paslon:
+        example: 2
+        type: integer
+      total_suara:
+        example: 327
+        type: integer
+      winning_paslon:
+        $ref: '#/definitions/entity.Paslon'
+    type: object
   entity.ElectionStatsResponse:
     properties:
       persentase_partisipasi:
@@ -123,14 +313,63 @@ definitions:
         example: 327
         type: integer
     type: object
+  entity.Kabinet:
+    properties:
+      dibuat_pada:
+        type: string
+      diperbarui_pada:
+        type: string
+      id_kabinet:
+        type: integer
+      is_aktif:
+        type: boolean
+      logo_kabinet:
+        type: string
+      misi:
+        type: string
+      nama_kabinet:
+        type: string
+      tahun_mulai:
+        type: integer
+      tahun_selesai:
+        type: integer
+      tanggal_demis:
+        type: string
+      tanggal_mulai:
+        type: string
+      visi:
+        type: string
+    type: object
+  entity.Keahlian:
+    properties:
+      deskripsi:
+        type: string
+      idKeahlian:
+        type: integer
+      namaKeahlian:
+        type: string
+    type: object
+  entity.KeahlianAnggota:
+    properties:
+      anggota:
+        $ref: '#/definitions/entity.Anggota'
+      idAnggota:
+        type: integer
+      idKeahlian:
+        type: integer
+      keahlian:
+        $ref: '#/definitions/entity.Keahlian'
+      tingkatPenguasaan:
+        type: integer
+    type: object
   entity.LoginRequest:
     properties:
       identifier:
         description: Bisa berupa Email atau Username
-        example: hmik.human.01@hmik.com
+        example: hmik.humas.01@hmik.com
         type: string
       password:
-        example: Human102230462026
+        example: qwerqwer
         type: string
     required:
     - identifier
@@ -138,15 +377,47 @@ definitions:
     type: object
   entity.LoginResponse:
     properties:
+      email:
+        example: hmik.humas.01@hmik.com
+        type: string
       id_pengguna:
         example: 1
         type: integer
+      jabatan:
+        example: Ketua Departemen Hubungan External
+        type: string
       nama_pengguna:
-        example: Kepala Divisi
+        example: hmik.humas.01
+        type: string
+      require_password_change:
+        example: false
+        type: boolean
+      setup_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
       token:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
+    type: object
+  entity.MinatRiset:
+    properties:
+      deskripsi:
+        type: string
+      idMinat:
+        type: integer
+      namaMinat:
+        type: string
+    type: object
+  entity.MinatRisetAnggota:
+    properties:
+      anggota:
+        $ref: '#/definitions/entity.Anggota'
+      idAnggota:
+        type: integer
+      idMinat:
+        type: integer
+      minatRiset:
+        $ref: '#/definitions/entity.MinatRiset'
     type: object
   entity.Paslon:
     properties:
@@ -177,6 +448,22 @@ definitions:
       visi:
         type: string
     type: object
+  entity.PelantikanMPIKResponse:
+    properties:
+      kabinet_baru:
+        $ref: '#/definitions/entity.Kabinet'
+      ketua_baru:
+        $ref: '#/definitions/entity.Anggota'
+      pesan:
+        example: Pelantikan berhasil! Kabinet dan BPH baru telah aktif di Manajemen
+          Himpunan.
+        type: string
+      status_pelantikan:
+        example: APPROVED
+        type: string
+      wakil_baru:
+        $ref: '#/definitions/entity.Anggota'
+    type: object
   entity.Pemilih:
     properties:
       dibuat_pada:
@@ -193,6 +480,107 @@ definitions:
         type: string
       status_memilih:
         type: boolean
+    type: object
+  entity.Pemira:
+    properties:
+      dibuat_pada:
+        type: string
+      diperbarui_pada:
+        type: string
+      id_pemira:
+        type: integer
+      paslon:
+        description: Relasi
+        items:
+          $ref: '#/definitions/entity.Paslon'
+        type: array
+      pemilih:
+        items:
+          $ref: '#/definitions/entity.Pemilih'
+        type: array
+      status:
+        type: string
+      suara:
+        items:
+          $ref: '#/definitions/entity.Suara'
+        type: array
+      tahun_periode:
+        type: string
+      tanggal_mulai:
+        type: string
+      tanggal_selesai:
+        type: string
+    type: object
+  entity.Pengguna:
+    properties:
+      dibuat_pada:
+        type: string
+      diperbarui_pada:
+        type: string
+      email:
+        type: string
+      foto_pengguna:
+        type: string
+      id_pengguna:
+        type: integer
+      id_peran:
+        description: Nullable sementara
+        type: integer
+      is_first_login:
+        type: boolean
+      nama_lengkap:
+        type: string
+      nama_pengguna:
+        type: string
+      status_aktif:
+        type: boolean
+      token_version:
+        type: integer
+    type: object
+  entity.ProgramKerja:
+    properties:
+      deskripsi:
+        type: string
+      dibuat_pada:
+        type: string
+      diperbarui_pada:
+        type: string
+      foto:
+        type: string
+      id_departemen:
+        type: integer
+      id_divisi:
+        type: integer
+      id_proker:
+        type: integer
+      is_unggulan:
+        type: boolean
+      nama_proker:
+        type: string
+      status:
+        type: string
+    type: object
+  entity.PublicElectionScheduleResponse:
+    properties:
+      catatan:
+        example: Bilik suara sedang dibuka.
+        type: string
+      id_pemira:
+        example: 1
+        type: integer
+      is_open:
+        example: true
+        type: boolean
+      status:
+        example: BERJALAN
+        type: string
+      tahun_periode:
+        example: 2026/2027
+        type: string
+      tanggal_mulai:
+        type: string
+      tanggal_selesai:
+        type: string
     type: object
   entity.RequestOTPRequest:
     properties:
@@ -229,6 +617,23 @@ definitions:
     required:
     - nim
     type: object
+  entity.SetInitialPasswordRequest:
+    properties:
+      konfirmasi_sandi:
+        example: PasswordPribadi123!
+        type: string
+      password_baru:
+        example: PasswordPribadi123!
+        minLength: 8
+        type: string
+      setup_token:
+        example: eyJhbGci...
+        type: string
+    required:
+    - konfirmasi_sandi
+    - password_baru
+    - setup_token
+    type: object
   entity.StatItem:
     properties:
       keterangan:
@@ -237,6 +642,80 @@ definitions:
         type: integer
       total:
         type: integer
+    type: object
+  entity.Suara:
+    properties:
+      id_paslon:
+        type: integer
+      id_pemira:
+        type: integer
+      id_suara:
+        type: integer
+      waktu_memilih:
+        type: string
+    type: object
+  entity.UpdatePaslonRequest:
+    properties:
+      foto_paslon:
+        example: https://...
+        type: string
+      misi:
+        example: 1. Kolaborasi riset
+        type: string
+      nama_kabinet:
+        example: Kabinet Bersama
+        type: string
+      nama_ketua:
+        example: Calon Ketua
+        type: string
+      nama_wakil:
+        example: Calon Wakil
+        type: string
+      nim_ketua:
+        example: "105223001"
+        type: string
+      nim_wakil:
+        example: "105223002"
+        type: string
+      nomor_urut:
+        example: 3
+        type: integer
+      visi:
+        example: Mewujudkan HMIK unggul
+        type: string
+    required:
+    - nama_kabinet
+    - nama_ketua
+    - nama_wakil
+    - nim_ketua
+    - nim_wakil
+    - nomor_urut
+    type: object
+  entity.UpdatePemiraScheduleRequest:
+    properties:
+      tahun_periode:
+        example: 2026/2027
+        type: string
+      tanggal_mulai:
+        type: string
+      tanggal_selesai:
+        type: string
+    required:
+    - tahun_periode
+    - tanggal_mulai
+    - tanggal_selesai
+    type: object
+  entity.UpdatePemiraStatusRequest:
+    properties:
+      status:
+        enum:
+        - DRAFT
+        - BERJALAN
+        - SELESAI
+        example: BERJALAN
+        type: string
+    required:
+    - status
     type: object
   entity.VerifyOTPRequest:
     properties:
@@ -372,6 +851,181 @@ paths:
       summary: Ambil Data Grafik Perolehan Suara Pemilu (Admin)
       tags:
       - Admin - Pemira
+  /admin/pemira/kandidat:
+    post:
+      consumes:
+      - application/json
+      description: Mendaftarkan paslon baru beserta visi, misi, dan informasi ketua/wakil
+      parameters:
+      - description: Data Paslon Baru
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CreatePaslonRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Pasangan calon berhasil ditambahkan
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Paslon'
+              type: object
+        "400":
+          description: Format request tidak valid atau data gagal disimpan
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "401":
+          description: 'Akses Ditolak: Token admin tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Tambah Pasangan Calon Baru (Admin)
+      tags:
+      - Admin - Pemira
+  /admin/pemira/kandidat/{id}:
+    delete:
+      description: 'Menghapus data paslon (Dilindungi: jika suara sudah masuk, penghapusan
+        ditolak demi LUBER JURDIL)'
+      parameters:
+      - description: ID Paslon
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pasangan calon berhasil dihapus
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "400":
+          description: ID tidak valid atau suara sudah masuk sehingga dilarang dihapus
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "401":
+          description: 'Akses Ditolak: Token admin tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Hapus Pasangan Calon (Admin)
+      tags:
+      - Admin - Pemira
+    put:
+      consumes:
+      - application/json
+      description: Memperbarui data paslon yang sudah ada berdasarkan ID
+      parameters:
+      - description: ID Paslon
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data Paslon Diperbarui
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdatePaslonRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data pasangan calon berhasil diperbarui
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Paslon'
+              type: object
+        "400":
+          description: ID tidak valid atau update gagal
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "401":
+          description: 'Akses Ditolak: Token admin tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Perbarui Pasangan Calon (Admin)
+      tags:
+      - Admin - Pemira
+  /admin/pemira/new-period:
+    post:
+      consumes:
+      - application/json
+      description: 'Membuka periode pemilihan raya baru (misal: 2027/2028) saat periode
+        sebelumnya telah selesai'
+      parameters:
+      - description: Data Periode Baru
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CreatePemiraPeriodRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Periode pemira baru berhasil dibuat
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Pemira'
+              type: object
+        "400":
+          description: Format request tidak valid atau pemira saat ini masih berjalan
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "401":
+          description: 'Akses Ditolak: Token admin tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Buka Periode Pemira Baru di Masa Depan (Admin)
+      tags:
+      - Admin - Pemira
+  /admin/pemira/pelantikan-mpik:
+    post:
+      description: Mengesahkan paslon pemenang pemira, membentuk kabinet aktif baru,
+        dan memperbarui BPH di manajemen himpunan
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pelantikan MPIK berhasil disahkan
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.PelantikanMPIKResponse'
+              type: object
+        "400":
+          description: Pemira belum selesai atau data pemenang tidak lengkap
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "401":
+          description: 'Akses Ditolak: Token admin tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Pengesahan & Pelantikan MPIK (Admin)
+      tags:
+      - Admin - Pemira
   /admin/pemira/pemilih:
     get:
       description: Mengembalikan daftar pemilih tetap dengan pagination, filter pencarian
@@ -452,6 +1106,92 @@ paths:
       summary: Reset Status Hak Pilih Pemilih (Admin)
       tags:
       - Admin - Pemira
+  /admin/pemira/reset-kotak-suara:
+    post:
+      description: Menghapus seluruh surat suara di kotak suara dan mereset status
+        hak pilih seluruh DPT ke 0 (Uji Coba / Persiapan Pemilu)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Kotak suara berhasil dikosongkan dan data pemilu di-reset ke
+            0
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "401":
+          description: 'Akses Ditolak: Token admin tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Gagal mengosongkan kotak suara
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Kosongkan Kotak Suara & Reset Pemilu (Admin)
+      tags:
+      - Admin - Pemira
+  /admin/pemira/settings:
+    get:
+      description: Mengembalikan konfigurasi status, periode waktu, jadwal, serta
+        status MPIK
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pengaturan pemira berhasil diambil
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.ElectionSettingsResponse'
+              type: object
+        "401":
+          description: 'Akses Ditolak: Token admin tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Gagal memuat pengaturan pemira
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Ambil Pengaturan & Parameter Acara Pemira (Admin)
+      tags:
+      - Admin - Pemira
+    put:
+      consumes:
+      - application/json
+      description: Memperbarui tanggal mulai, tanggal selesai, dan tahun periode pemilihan
+        raya
+      parameters:
+      - description: Data Jadwal Baru
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdatePemiraScheduleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Jadwal pemilihan raya berhasil diperbarui
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "400":
+          description: Format jadwal tidak valid
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "401":
+          description: 'Akses Ditolak: Token admin tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Perbarui Jadwal Acara Pemira (Admin)
+      tags:
+      - Admin - Pemira
   /admin/pemira/stats:
     get:
       description: 'Mengembalikan agregat 4 kartu metrik: Suara Masuk, Total DPT,
@@ -481,14 +1221,46 @@ paths:
       summary: Ambil Ringkasan Metrik Pemilu (Admin)
       tags:
       - Admin - Pemira
+  /admin/pemira/status:
+    post:
+      consumes:
+      - application/json
+      description: Mengubah status pelaksanaan pemilihan raya (DRAFT, BERJALAN, SELESAI)
+      parameters:
+      - description: Status Baru
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdatePemiraStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status pemilihan raya berhasil diubah
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "400":
+          description: Status tidak valid
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "401":
+          description: 'Akses Ditolak: Token admin tidak valid'
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Ubah Status Pemira / Saklar Pemicu (Admin)
+      tags:
+      - Admin - Pemira
   /auth/login:
     post:
       consumes:
       - application/json
-      description: Endpoint untuk mendapatkan JWT Token menggunakan email/username
-        dan password
+      description: Endpoint terpadu untuk login biasa atau aktivasi akun baru menggunakan
+        Kode Aktivasi pada kolom sandi
       parameters:
-      - description: Kredensial Login
+      - description: Kredensial Login atau Kode Aktivasi
         in: body
         name: request
         required: true
@@ -506,11 +1278,51 @@ paths:
                 data:
                   $ref: '#/definitions/entity.LoginResponse'
               type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
         "401":
           description: Unauthorized
           schema:
             $ref: '#/definitions/utils.JSendResponse'
-      summary: Login Pengurus HMIK
+      summary: Login Pengurus HMIK & Deteksi Aktivasi
+      tags:
+      - Auth
+  /auth/set-initial-password:
+    post:
+      consumes:
+      - application/json
+      description: Endpoint untuk pengurus baru menetapkan kata sandi pribadi mandiri
+        dari modal popup di halaman login
+      parameters:
+      - description: Payload Sandi Baru dan Tiket Aktivasi
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.SetInitialPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.LoginResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      summary: Aktivasi Akun & Pengaturan Kata Sandi Baru
       tags:
       - Auth
   /company-profile/team:
@@ -771,6 +1583,29 @@ paths:
           schema:
             $ref: '#/definitions/utils.JSendResponse'
       summary: Verifikasi Kode OTP & Terbitkan Ballot Token
+      tags:
+      - Pemira
+  /pemira/jadwal:
+    get:
+      description: Mengembalikan informasi jadwal buka/tutup dan status bilik suara
+        untuk ditampilkan di portal pemilih
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Jadwal pemira publik berhasil diambil
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.PublicElectionScheduleResponse'
+              type: object
+        "500":
+          description: Gagal memuat jadwal pemira
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      summary: Ambil Jadwal & Status Bilik Suara Publik
       tags:
       - Pemira
   /pemira/kandidat:

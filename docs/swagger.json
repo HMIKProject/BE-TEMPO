@@ -109,6 +109,295 @@
                 }
             }
         },
+        "/admin/pemira/kandidat": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mendaftarkan paslon baru beserta visi, misi, dan informasi ketua/wakil",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Pemira"
+                ],
+                "summary": "Tambah Pasangan Calon Baru (Admin)",
+                "parameters": [
+                    {
+                        "description": "Data Paslon Baru",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.CreatePaslonRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Pasangan calon berhasil ditambahkan",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.Paslon"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Format request tidak valid atau data gagal disimpan",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token admin tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/pemira/kandidat/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Memperbarui data paslon yang sudah ada berdasarkan ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Pemira"
+                ],
+                "summary": "Perbarui Pasangan Calon (Admin)",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Paslon",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Data Paslon Diperbarui",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UpdatePaslonRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data pasangan calon berhasil diperbarui",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.Paslon"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "ID tidak valid atau update gagal",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token admin tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Menghapus data paslon (Dilindungi: jika suara sudah masuk, penghapusan ditolak demi LUBER JURDIL)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Pemira"
+                ],
+                "summary": "Hapus Pasangan Calon (Admin)",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Paslon",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pasangan calon berhasil dihapus",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "ID tidak valid atau suara sudah masuk sehingga dilarang dihapus",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token admin tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/pemira/new-period": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Membuka periode pemilihan raya baru (misal: 2027/2028) saat periode sebelumnya telah selesai",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Pemira"
+                ],
+                "summary": "Buka Periode Pemira Baru di Masa Depan (Admin)",
+                "parameters": [
+                    {
+                        "description": "Data Periode Baru",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.CreatePemiraPeriodRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Periode pemira baru berhasil dibuat",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.Pemira"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Format request tidak valid atau pemira saat ini masih berjalan",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token admin tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/pemira/pelantikan-mpik": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengesahkan paslon pemenang pemira, membentuk kabinet aktif baru, dan memperbarui BPH di manajemen himpunan",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Pemira"
+                ],
+                "summary": "Pengesahan \u0026 Pelantikan MPIK (Admin)",
+                "responses": {
+                    "200": {
+                        "description": "Pelantikan MPIK berhasil disahkan",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.PelantikanMPIKResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Pemira belum selesai atau data pemenang tidak lengkap",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token admin tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/pemira/pemilih": {
             "get": {
                 "security": [
@@ -236,6 +525,141 @@
                 }
             }
         },
+        "/admin/pemira/reset-kotak-suara": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Menghapus seluruh surat suara di kotak suara dan mereset status hak pilih seluruh DPT ke 0 (Uji Coba / Persiapan Pemilu)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Pemira"
+                ],
+                "summary": "Kosongkan Kotak Suara \u0026 Reset Pemilu (Admin)",
+                "responses": {
+                    "200": {
+                        "description": "Kotak suara berhasil dikosongkan dan data pemilu di-reset ke 0",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token admin tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal mengosongkan kotak suara",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/pemira/settings": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengembalikan konfigurasi status, periode waktu, jadwal, serta status MPIK",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Pemira"
+                ],
+                "summary": "Ambil Pengaturan \u0026 Parameter Acara Pemira (Admin)",
+                "responses": {
+                    "200": {
+                        "description": "Pengaturan pemira berhasil diambil",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.ElectionSettingsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token admin tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal memuat pengaturan pemira",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Memperbarui tanggal mulai, tanggal selesai, dan tahun periode pemilihan raya",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Pemira"
+                ],
+                "summary": "Perbarui Jadwal Acara Pemira (Admin)",
+                "parameters": [
+                    {
+                        "description": "Data Jadwal Baru",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UpdatePemiraScheduleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Jadwal pemilihan raya berhasil diperbarui",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Format jadwal tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token admin tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/pemira/stats": {
             "get": {
                 "security": [
@@ -285,9 +709,60 @@
                 }
             }
         },
+        "/admin/pemira/status": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengubah status pelaksanaan pemilihan raya (DRAFT, BERJALAN, SELESAI)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Pemira"
+                ],
+                "summary": "Ubah Status Pemira / Saklar Pemicu (Admin)",
+                "parameters": [
+                    {
+                        "description": "Status Baru",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UpdatePemiraStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status pemilihan raya berhasil diubah",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Status tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Akses Ditolak: Token admin tidak valid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
-                "description": "Endpoint untuk mendapatkan JWT Token menggunakan email/username dan password",
+                "description": "Endpoint terpadu untuk login biasa atau aktivasi akun baru menggunakan Kode Aktivasi pada kolom sandi",
                 "consumes": [
                     "application/json"
                 ],
@@ -297,10 +772,10 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Login Pengurus HMIK",
+                "summary": "Login Pengurus HMIK \u0026 Deteksi Aktivasi",
                 "parameters": [
                     {
-                        "description": "Kredensial Login",
+                        "description": "Kredensial Login atau Kode Aktivasi",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -326,6 +801,70 @@
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/set-initial-password": {
+            "post": {
+                "description": "Endpoint untuk pengurus baru menetapkan kata sandi pribadi mandiri dari modal popup di halaman login",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Aktivasi Akun \u0026 Pengaturan Kata Sandi Baru",
+                "parameters": [
+                    {
+                        "description": "Payload Sandi Baru dan Tiket Aktivasi",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.SetInitialPasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.LoginResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
                         }
                     },
                     "401": {
@@ -759,6 +1298,44 @@
                 }
             }
         },
+        "/pemira/jadwal": {
+            "get": {
+                "description": "Mengembalikan informasi jadwal buka/tutup dan status bilik suara untuk ditampilkan di portal pemilih",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pemira"
+                ],
+                "summary": "Ambil Jadwal \u0026 Status Bilik Suara Publik",
+                "responses": {
+                    "200": {
+                        "description": "Jadwal pemira publik berhasil diambil",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.PublicElectionScheduleResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Gagal memuat jadwal pemira",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/pemira/kandidat": {
             "get": {
                 "description": "Mengambil seluruh kandidat pasangan calon ketua \u0026 wakil ketua pada periode pemira aktif",
@@ -975,6 +1552,87 @@
         }
     },
     "definitions": {
+        "entity.Anggota": {
+            "type": "object",
+            "properties": {
+                "angkatan": {
+                    "type": "integer"
+                },
+                "cv_url": {
+                    "type": "string"
+                },
+                "departemen": {
+                    "$ref": "#/definitions/entity.Departemen"
+                },
+                "dibuat_pada": {
+                    "type": "string"
+                },
+                "diubah_pada": {
+                    "type": "string"
+                },
+                "divisi": {
+                    "$ref": "#/definitions/entity.DivisiDepartemen"
+                },
+                "files": {
+                    "type": "string"
+                },
+                "fotoProfil": {
+                    "type": "string"
+                },
+                "idAnggota": {
+                    "type": "integer"
+                },
+                "idDepartemen": {
+                    "description": "Relasi One-to-Many (Opsional, karena BPH mungkin tidak ada di departemen spesifik)",
+                    "type": "integer"
+                },
+                "idDivisi": {
+                    "type": "integer"
+                },
+                "idPengguna": {
+                    "description": "Nullable untuk Demisioner",
+                    "type": "integer"
+                },
+                "jabatan": {
+                    "type": "string"
+                },
+                "keahlianAnggota": {
+                    "description": "Relasi One-to-Many ke Tabel Perantara (Pivot)",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.KeahlianAnggota"
+                    }
+                },
+                "minatRisetAnggota": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.MinatRisetAnggota"
+                    }
+                },
+                "namaLengkap": {
+                    "type": "string"
+                },
+                "nim": {
+                    "type": "string"
+                },
+                "pengguna": {
+                    "$ref": "#/definitions/entity.Pengguna"
+                },
+                "periode": {
+                    "type": "string"
+                },
+                "programStudi": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Pengurus, Magang, Demisioner",
+                    "type": "string"
+                },
+                "tautan": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.BallotVoterInfo": {
             "type": "object",
             "properties": {
@@ -1041,6 +1699,75 @@
                 }
             }
         },
+        "entity.CreatePaslonRequest": {
+            "type": "object",
+            "required": [
+                "nama_kabinet",
+                "nama_ketua",
+                "nama_wakil",
+                "nim_ketua",
+                "nim_wakil",
+                "nomor_urut"
+            ],
+            "properties": {
+                "foto_paslon": {
+                    "type": "string",
+                    "example": "https://..."
+                },
+                "misi": {
+                    "type": "string",
+                    "example": "1. Kolaborasi riset"
+                },
+                "nama_kabinet": {
+                    "type": "string",
+                    "example": "Kabinet Bersama"
+                },
+                "nama_ketua": {
+                    "type": "string",
+                    "example": "Calon Ketua"
+                },
+                "nama_wakil": {
+                    "type": "string",
+                    "example": "Calon Wakil"
+                },
+                "nim_ketua": {
+                    "type": "string",
+                    "example": "105223001"
+                },
+                "nim_wakil": {
+                    "type": "string",
+                    "example": "105223002"
+                },
+                "nomor_urut": {
+                    "type": "integer",
+                    "example": 3
+                },
+                "visi": {
+                    "type": "string",
+                    "example": "Mewujudkan HMIK unggul"
+                }
+            }
+        },
+        "entity.CreatePemiraPeriodRequest": {
+            "type": "object",
+            "required": [
+                "tahun_periode",
+                "tanggal_mulai",
+                "tanggal_selesai"
+            ],
+            "properties": {
+                "tahun_periode": {
+                    "type": "string",
+                    "example": "2027/2028"
+                },
+                "tanggal_mulai": {
+                    "type": "string"
+                },
+                "tanggal_selesai": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.DashboardStatsResponse": {
             "type": "object",
             "properties": {
@@ -1084,6 +1811,90 @@
                 },
                 "voting_aktif": {
                     "type": "integer"
+                }
+            }
+        },
+        "entity.Departemen": {
+            "type": "object",
+            "properties": {
+                "anggota": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Anggota"
+                    }
+                },
+                "deskripsi": {
+                    "type": "string"
+                },
+                "dibuat_pada": {
+                    "type": "string"
+                },
+                "diperbarui_pada": {
+                    "type": "string"
+                },
+                "divisi": {
+                    "description": "Relasi One-to-Many",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.DivisiDepartemen"
+                    }
+                },
+                "id_departemen": {
+                    "type": "integer"
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "nama_departemen": {
+                    "type": "string"
+                },
+                "program_kerja": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.ProgramKerja"
+                    }
+                },
+                "status_aktif": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "entity.DivisiDepartemen": {
+            "type": "object",
+            "properties": {
+                "anggota": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Anggota"
+                    }
+                },
+                "deskripsi": {
+                    "type": "string"
+                },
+                "dibuat_pada": {
+                    "type": "string"
+                },
+                "diperbarui_pada": {
+                    "type": "string"
+                },
+                "id_departemen": {
+                    "type": "integer"
+                },
+                "id_divisi": {
+                    "type": "integer"
+                },
+                "nama_divisi": {
+                    "type": "string"
+                },
+                "program_kerja": {
+                    "description": "Relasi One-to-Many",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.ProgramKerja"
+                    }
+                },
+                "status_aktif": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1135,6 +1946,44 @@
                 }
             }
         },
+        "entity.ElectionSettingsResponse": {
+            "type": "object",
+            "properties": {
+                "id_pemira": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "mpik_status": {
+                    "type": "string",
+                    "example": "PENDING"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "BERJALAN"
+                },
+                "tahun_periode": {
+                    "type": "string",
+                    "example": "2026/2027"
+                },
+                "tanggal_mulai": {
+                    "type": "string"
+                },
+                "tanggal_selesai": {
+                    "type": "string"
+                },
+                "total_paslon": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "total_suara": {
+                    "type": "integer",
+                    "example": 327
+                },
+                "winning_paslon": {
+                    "$ref": "#/definitions/entity.Paslon"
+                }
+            }
+        },
         "entity.ElectionStatsResponse": {
             "type": "object",
             "properties": {
@@ -1156,6 +2005,81 @@
                 }
             }
         },
+        "entity.Kabinet": {
+            "type": "object",
+            "properties": {
+                "dibuat_pada": {
+                    "type": "string"
+                },
+                "diperbarui_pada": {
+                    "type": "string"
+                },
+                "id_kabinet": {
+                    "type": "integer"
+                },
+                "is_aktif": {
+                    "type": "boolean"
+                },
+                "logo_kabinet": {
+                    "type": "string"
+                },
+                "misi": {
+                    "type": "string"
+                },
+                "nama_kabinet": {
+                    "type": "string"
+                },
+                "tahun_mulai": {
+                    "type": "integer"
+                },
+                "tahun_selesai": {
+                    "type": "integer"
+                },
+                "tanggal_demis": {
+                    "type": "string"
+                },
+                "tanggal_mulai": {
+                    "type": "string"
+                },
+                "visi": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Keahlian": {
+            "type": "object",
+            "properties": {
+                "deskripsi": {
+                    "type": "string"
+                },
+                "idKeahlian": {
+                    "type": "integer"
+                },
+                "namaKeahlian": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.KeahlianAnggota": {
+            "type": "object",
+            "properties": {
+                "anggota": {
+                    "$ref": "#/definitions/entity.Anggota"
+                },
+                "idAnggota": {
+                    "type": "integer"
+                },
+                "idKeahlian": {
+                    "type": "integer"
+                },
+                "keahlian": {
+                    "$ref": "#/definitions/entity.Keahlian"
+                },
+                "tingkatPenguasaan": {
+                    "type": "integer"
+                }
+            }
+        },
         "entity.LoginRequest": {
             "type": "object",
             "required": [
@@ -1166,28 +2090,75 @@
                 "identifier": {
                     "description": "Bisa berupa Email atau Username",
                     "type": "string",
-                    "example": "hmik.human.01@hmik.com"
+                    "example": "hmik.humas.01@hmik.com"
                 },
                 "password": {
                     "type": "string",
-                    "example": "Human102230462026"
+                    "example": "qwerqwer"
                 }
             }
         },
         "entity.LoginResponse": {
             "type": "object",
             "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "hmik.humas.01@hmik.com"
+                },
                 "id_pengguna": {
                     "type": "integer",
                     "example": 1
                 },
+                "jabatan": {
+                    "type": "string",
+                    "example": "Ketua Departemen Hubungan External"
+                },
                 "nama_pengguna": {
                     "type": "string",
-                    "example": "Kepala Divisi"
+                    "example": "hmik.humas.01"
+                },
+                "require_password_change": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "setup_token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                 },
                 "token": {
                     "type": "string",
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+            }
+        },
+        "entity.MinatRiset": {
+            "type": "object",
+            "properties": {
+                "deskripsi": {
+                    "type": "string"
+                },
+                "idMinat": {
+                    "type": "integer"
+                },
+                "namaMinat": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.MinatRisetAnggota": {
+            "type": "object",
+            "properties": {
+                "anggota": {
+                    "$ref": "#/definitions/entity.Anggota"
+                },
+                "idAnggota": {
+                    "type": "integer"
+                },
+                "idMinat": {
+                    "type": "integer"
+                },
+                "minatRiset": {
+                    "$ref": "#/definitions/entity.MinatRiset"
                 }
             }
         },
@@ -1235,6 +2206,28 @@
                 }
             }
         },
+        "entity.PelantikanMPIKResponse": {
+            "type": "object",
+            "properties": {
+                "kabinet_baru": {
+                    "$ref": "#/definitions/entity.Kabinet"
+                },
+                "ketua_baru": {
+                    "$ref": "#/definitions/entity.Anggota"
+                },
+                "pesan": {
+                    "type": "string",
+                    "example": "Pelantikan berhasil! Kabinet dan BPH baru telah aktif di Manajemen Himpunan."
+                },
+                "status_pelantikan": {
+                    "type": "string",
+                    "example": "APPROVED"
+                },
+                "wakil_baru": {
+                    "$ref": "#/definitions/entity.Anggota"
+                }
+            }
+        },
         "entity.Pemilih": {
             "type": "object",
             "properties": {
@@ -1258,6 +2251,156 @@
                 },
                 "status_memilih": {
                     "type": "boolean"
+                }
+            }
+        },
+        "entity.Pemira": {
+            "type": "object",
+            "properties": {
+                "dibuat_pada": {
+                    "type": "string"
+                },
+                "diperbarui_pada": {
+                    "type": "string"
+                },
+                "id_pemira": {
+                    "type": "integer"
+                },
+                "paslon": {
+                    "description": "Relasi",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Paslon"
+                    }
+                },
+                "pemilih": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Pemilih"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "suara": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Suara"
+                    }
+                },
+                "tahun_periode": {
+                    "type": "string"
+                },
+                "tanggal_mulai": {
+                    "type": "string"
+                },
+                "tanggal_selesai": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Pengguna": {
+            "type": "object",
+            "properties": {
+                "dibuat_pada": {
+                    "type": "string"
+                },
+                "diperbarui_pada": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "foto_pengguna": {
+                    "type": "string"
+                },
+                "id_pengguna": {
+                    "type": "integer"
+                },
+                "id_peran": {
+                    "description": "Nullable sementara",
+                    "type": "integer"
+                },
+                "is_first_login": {
+                    "type": "boolean"
+                },
+                "nama_lengkap": {
+                    "type": "string"
+                },
+                "nama_pengguna": {
+                    "type": "string"
+                },
+                "status_aktif": {
+                    "type": "boolean"
+                },
+                "token_version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.ProgramKerja": {
+            "type": "object",
+            "properties": {
+                "deskripsi": {
+                    "type": "string"
+                },
+                "dibuat_pada": {
+                    "type": "string"
+                },
+                "diperbarui_pada": {
+                    "type": "string"
+                },
+                "foto": {
+                    "type": "string"
+                },
+                "id_departemen": {
+                    "type": "integer"
+                },
+                "id_divisi": {
+                    "type": "integer"
+                },
+                "id_proker": {
+                    "type": "integer"
+                },
+                "is_unggulan": {
+                    "type": "boolean"
+                },
+                "nama_proker": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.PublicElectionScheduleResponse": {
+            "type": "object",
+            "properties": {
+                "catatan": {
+                    "type": "string",
+                    "example": "Bilik suara sedang dibuka."
+                },
+                "id_pemira": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "is_open": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "status": {
+                    "type": "string",
+                    "example": "BERJALAN"
+                },
+                "tahun_periode": {
+                    "type": "string",
+                    "example": "2026/2027"
+                },
+                "tanggal_mulai": {
+                    "type": "string"
+                },
+                "tanggal_selesai": {
+                    "type": "string"
                 }
             }
         },
@@ -1311,6 +2454,29 @@
                 }
             }
         },
+        "entity.SetInitialPasswordRequest": {
+            "type": "object",
+            "required": [
+                "konfirmasi_sandi",
+                "password_baru",
+                "setup_token"
+            ],
+            "properties": {
+                "konfirmasi_sandi": {
+                    "type": "string",
+                    "example": "PasswordPribadi123!"
+                },
+                "password_baru": {
+                    "type": "string",
+                    "minLength": 8,
+                    "example": "PasswordPribadi123!"
+                },
+                "setup_token": {
+                    "type": "string",
+                    "example": "eyJhbGci..."
+                }
+            }
+        },
         "entity.StatItem": {
             "type": "object",
             "properties": {
@@ -1322,6 +2488,109 @@
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "entity.Suara": {
+            "type": "object",
+            "properties": {
+                "id_paslon": {
+                    "type": "integer"
+                },
+                "id_pemira": {
+                    "type": "integer"
+                },
+                "id_suara": {
+                    "type": "integer"
+                },
+                "waktu_memilih": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.UpdatePaslonRequest": {
+            "type": "object",
+            "required": [
+                "nama_kabinet",
+                "nama_ketua",
+                "nama_wakil",
+                "nim_ketua",
+                "nim_wakil",
+                "nomor_urut"
+            ],
+            "properties": {
+                "foto_paslon": {
+                    "type": "string",
+                    "example": "https://..."
+                },
+                "misi": {
+                    "type": "string",
+                    "example": "1. Kolaborasi riset"
+                },
+                "nama_kabinet": {
+                    "type": "string",
+                    "example": "Kabinet Bersama"
+                },
+                "nama_ketua": {
+                    "type": "string",
+                    "example": "Calon Ketua"
+                },
+                "nama_wakil": {
+                    "type": "string",
+                    "example": "Calon Wakil"
+                },
+                "nim_ketua": {
+                    "type": "string",
+                    "example": "105223001"
+                },
+                "nim_wakil": {
+                    "type": "string",
+                    "example": "105223002"
+                },
+                "nomor_urut": {
+                    "type": "integer",
+                    "example": 3
+                },
+                "visi": {
+                    "type": "string",
+                    "example": "Mewujudkan HMIK unggul"
+                }
+            }
+        },
+        "entity.UpdatePemiraScheduleRequest": {
+            "type": "object",
+            "required": [
+                "tahun_periode",
+                "tanggal_mulai",
+                "tanggal_selesai"
+            ],
+            "properties": {
+                "tahun_periode": {
+                    "type": "string",
+                    "example": "2026/2027"
+                },
+                "tanggal_mulai": {
+                    "type": "string"
+                },
+                "tanggal_selesai": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.UpdatePemiraStatusRequest": {
+            "type": "object",
+            "required": [
+                "status"
+            ],
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "DRAFT",
+                        "BERJALAN",
+                        "SELESAI"
+                    ],
+                    "example": "BERJALAN"
                 }
             }
         },

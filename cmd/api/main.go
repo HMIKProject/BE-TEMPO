@@ -7,6 +7,7 @@ import (
 	"time"
 
 	_ "github.com/HMIKProject/hmik-corex-backend/docs"
+	"github.com/HMIKProject/hmik-corex-backend/internal/entity"
 	"github.com/HMIKProject/hmik-corex-backend/internal/routes"
 	"github.com/HMIKProject/hmik-corex-backend/internal/seeder"
 	"github.com/gin-contrib/cors"
@@ -43,6 +44,14 @@ func main() {
 	if err != nil {
 		log.Fatal("Gagal terkoneksi ke database:", err)
 	}
+
+	// Memastikan kolom-kolom baru (token_version, kode_aktivasi, status_aktif, dll.) selalu termigrasi
+	_ = db.AutoMigrate(
+		&entity.Pengguna{},
+		&entity.Anggota{},
+		&entity.Departemen{},
+		&entity.DivisiDepartemen{},
+	)
 
 	// Inisialisasi otomatis akun slot jabatan dengan password 'qwerqwer'
 	_ = seeder.SeedAllRoleAccounts(db)

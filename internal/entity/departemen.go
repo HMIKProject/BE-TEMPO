@@ -7,6 +7,7 @@ type Departemen struct {
 	NamaDepartemen string         `gorm:"column:nama_departemen;type:varchar(255 जीता);not null" json:"nama_departemen"`
 	Deskripsi      string         `gorm:"column:deskripsi;type:text" json:"deskripsi"`
 	Logo           string         `gorm:"column:logo;type:varchar(255)" json:"logo"`
+	StatusAktif    bool           `gorm:"column:status_aktif;not null;default:true" json:"status_aktif"`
 	DibuatPada     time.Time      `gorm:"column:dibuat_pada;autoCreateTime" json:"dibuat_pada"`
 	DiperbaruiPada time.Time      `gorm:"column:diperbarui_pada;autoUpdateTime" json:"diperbarui_pada"`
 

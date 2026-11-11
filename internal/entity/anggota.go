@@ -13,10 +13,12 @@ type Anggota struct {
 	Angkatan     int       `gorm:"column:angkatan;not null"`
 	Jabatan      string    `gorm:"column:jabatan;type:varchar(100)"`
 	Status       string    `gorm:"column:status;type:varchar(50);not null;default:'Pengurus'"` // Pengurus, Magang, Demisioner
-	Tautan       string    `gorm:"column:tautan;type:varchar(255)"`
-	Files        string    `gorm:"column:files;type:varchar(255)"`
-	DibuatPada   time.Time `gorm:"column:dibuat_pada;autoCreateTime"`
-	DiubahPada   time.Time `gorm:"column:diubah_pada;autoUpdateTime"`
+	Tautan       string    `gorm:"column:tautan;type:varchar(255)" json:"tautan,omitempty"`
+	Files        string    `gorm:"column:files;type:varchar(255)" json:"files,omitempty"`
+	Periode      string    `gorm:"column:periode;type:varchar(20)" json:"periode,omitempty"`
+	CvUrl        string    `gorm:"column:cv_url;type:varchar(255)" json:"cv_url,omitempty"`
+	DibuatPada   time.Time `gorm:"column:dibuat_pada;autoCreateTime" json:"dibuat_pada"`
+	DiubahPada   time.Time `gorm:"column:diubah_pada;autoUpdateTime" json:"diubah_pada"`
 
 	// Relasi One-to-Many (Opsional, karena BPH mungkin tidak ada di departemen spesifik)
 	IdDepartemen *int64      `gorm:"column:id_departemen"`

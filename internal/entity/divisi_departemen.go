@@ -7,6 +7,7 @@ type DivisiDepartemen struct {
 	IdDepartemen   int64          `gorm:"column:id_departemen;not null" json:"id_departemen"`
 	NamaDivisi     string         `gorm:"column:nama_divisi;type:varchar(255);not null" json:"nama_divisi"`
 	Deskripsi      string         `gorm:"column:deskripsi;type:text" json:"deskripsi"`
+	StatusAktif    bool           `gorm:"column:status_aktif;not null;default:true" json:"status_aktif"`
 	DibuatPada     time.Time      `gorm:"column:dibuat_pada;autoCreateTime" json:"dibuat_pada"`
 	DiperbaruiPada time.Time      `gorm:"column:diperbarui_pada;autoUpdateTime" json:"diperbarui_pada"`
 
