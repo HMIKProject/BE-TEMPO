@@ -37,7 +37,8 @@ jobs:
         with:
           context: .
           push: true
+          provenance: false
+          sbom: false
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v10
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v11
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
