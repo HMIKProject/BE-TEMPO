@@ -722,6 +722,371 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/departemen": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mendaftarkan departemen baru ke dalam bagan himpunan (Khusus BPH)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Struktur Organisasi"
+                ],
+                "summary": "Tambah Departemen Baru",
+                "parameters": [
+                    {
+                        "description": "Data Departemen Baru",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.CreateDeptRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.Departemen"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/departemen/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengubah nama, deskripsi, logo, atau status aktif departemen (Khusus BPH)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Struktur Organisasi"
+                ],
+                "summary": "Perbarui Data Departemen",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Departemen",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Data Perubahan Departemen",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UpdateDeptRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.Departemen"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Menonaktifkan departemen (status_aktif = false) agar riwayat tidak terputus (Khusus BPH)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Struktur Organisasi"
+                ],
+                "summary": "Arsipkan Departemen (Soft Delete)",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Departemen",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/divisi": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mendaftarkan divisi baru di bawah departemen tertentu (Khusus BPH)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Struktur Organisasi"
+                ],
+                "summary": "Tambah Divisi Baru",
+                "parameters": [
+                    {
+                        "description": "Data Divisi Baru",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.CreateDivisiRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.DivisiDepartemen"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/divisi/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengubah nama divisi, deskripsi, atau status aktif divisi (Khusus BPH)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Struktur Organisasi"
+                ],
+                "summary": "Perbarui Data Divisi",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Divisi",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Data Perubahan Divisi",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UpdateDivisiRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.DivisiDepartemen"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/organisasi": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengambil bagan struktur organisasi HMIK termasuk data kabinet aktif, jajaran BPH, dan departemen beserta divisi \u0026 kepala departemen",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Struktur Organisasi"
+                ],
+                "summary": "Susunan Struktur Organisasi Lengkap (BPH, Departemen, Divisi)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.JSendResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.StrukturOrganisasiResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.JSendResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/pemira/chart": {
             "get": {
                 "security": [
@@ -2388,6 +2753,38 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.BPHMemberInfo": {
+            "type": "object",
+            "properties": {
+                "angkatan": {
+                    "type": "integer"
+                },
+                "foto_profil": {
+                    "type": "string"
+                },
+                "id_anggota": {
+                    "type": "integer"
+                },
+                "jabatan": {
+                    "type": "string"
+                },
+                "nama_lengkap": {
+                    "type": "string"
+                },
+                "nim": {
+                    "type": "string"
+                },
+                "periode": {
+                    "type": "string"
+                },
+                "program_studi": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.BallotVoterInfo": {
             "type": "object",
             "properties": {
@@ -2516,6 +2913,47 @@ const docTemplate = `{
                 "tautan": {
                     "type": "string",
                     "example": "https://www.linkedin.com/in/antondicaprio"
+                }
+            }
+        },
+        "entity.CreateDeptRequest": {
+            "type": "object",
+            "required": [
+                "nama_departemen"
+            ],
+            "properties": {
+                "deskripsi": {
+                    "type": "string",
+                    "example": "Departemen yang membawahi bidang teknologi dan inovasi"
+                },
+                "logo": {
+                    "type": "string",
+                    "example": "https://res.cloudinary.com/.../logo.png"
+                },
+                "nama_departemen": {
+                    "type": "string",
+                    "example": "Riset dan Teknologi"
+                }
+            }
+        },
+        "entity.CreateDivisiRequest": {
+            "type": "object",
+            "required": [
+                "id_departemen",
+                "nama_divisi"
+            ],
+            "properties": {
+                "deskripsi": {
+                    "type": "string",
+                    "example": "Divisi penelitian dan eksplorasi ilmiah"
+                },
+                "id_departemen": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "nama_divisi": {
+                    "type": "string",
+                    "example": "Riset \u0026 Inovasi"
                 }
             }
         },
@@ -2690,6 +3128,29 @@ const docTemplate = `{
                 },
                 "status_aktif": {
                     "type": "boolean"
+                }
+            }
+        },
+        "entity.DeptKadepInfo": {
+            "type": "object",
+            "properties": {
+                "angkatan": {
+                    "type": "integer"
+                },
+                "foto_profil": {
+                    "type": "string"
+                },
+                "id_anggota": {
+                    "type": "integer"
+                },
+                "jabatan": {
+                    "type": "string"
+                },
+                "nama_lengkap": {
+                    "type": "string"
+                },
+                "nim": {
+                    "type": "string"
                 }
             }
         },
@@ -2993,6 +3454,41 @@ const docTemplate = `{
                 },
                 "minatRiset": {
                     "$ref": "#/definitions/entity.MinatRiset"
+                }
+            }
+        },
+        "entity.OrganisasiDeptItem": {
+            "type": "object",
+            "properties": {
+                "deskripsi": {
+                    "type": "string"
+                },
+                "divisi": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.DivisiDepartemen"
+                    }
+                },
+                "id_departemen": {
+                    "type": "integer"
+                },
+                "kadep": {
+                    "$ref": "#/definitions/entity.DeptKadepInfo"
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "nama_departemen": {
+                    "type": "string"
+                },
+                "status_aktif": {
+                    "type": "boolean"
+                },
+                "total_anggota": {
+                    "type": "integer"
+                },
+                "total_divisi": {
+                    "type": "integer"
                 }
             }
         },
@@ -3365,6 +3861,26 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.StrukturOrganisasiResponse": {
+            "type": "object",
+            "properties": {
+                "bph": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.BPHMemberInfo"
+                    }
+                },
+                "departemen": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.OrganisasiDeptItem"
+                    }
+                },
+                "kabinet": {
+                    "$ref": "#/definitions/entity.Kabinet"
+                }
+            }
+        },
         "entity.Suara": {
             "type": "object",
             "properties": {
@@ -3451,6 +3967,50 @@ const docTemplate = `{
                 "tautan": {
                     "type": "string",
                     "example": "https://www.linkedin.com/in/antondicaprio"
+                }
+            }
+        },
+        "entity.UpdateDeptRequest": {
+            "type": "object",
+            "required": [
+                "nama_departemen"
+            ],
+            "properties": {
+                "deskripsi": {
+                    "type": "string",
+                    "example": "Departemen yang membawahi bidang teknologi dan inovasi"
+                },
+                "logo": {
+                    "type": "string",
+                    "example": "https://res.cloudinary.com/.../logo.png"
+                },
+                "nama_departemen": {
+                    "type": "string",
+                    "example": "Riset dan Teknologi"
+                },
+                "status_aktif": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "entity.UpdateDivisiRequest": {
+            "type": "object",
+            "required": [
+                "nama_divisi"
+            ],
+            "properties": {
+                "deskripsi": {
+                    "type": "string",
+                    "example": "Divisi penelitian dan eksplorasi ilmiah"
+                },
+                "nama_divisi": {
+                    "type": "string",
+                    "example": "Riset \u0026 Inovasi"
+                },
+                "status_aktif": {
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },

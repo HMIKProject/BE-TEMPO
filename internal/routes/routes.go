@@ -54,6 +54,11 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	adminSlotUsecase := usecase.NewAdminSlotUsecase(slotRepo)
 	adminSlotHandler := handler.NewAdminSlotHandler(adminSlotUsecase)
 
+	// Admin Struktur Organisasi & Departemen
+	organisasiRepo := repository.NewOrganisasiRepository(db)
+	adminOrganisasiUsecase := usecase.NewAdminOrganisasiUsecase(organisasiRepo)
+	adminOrganisasiHandler := handler.NewAdminOrganisasiHandler(adminOrganisasiUsecase)
+
 	// Pemira (E-Voting)
 	pemiraRepo := repository.NewPemiraRepository(db)
 	pemiraUsecase := usecase.NewPemiraUsecase(pemiraRepo)
@@ -151,6 +156,14 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 				akunGroup.POST("/:id/reset-password", adminSlotHandler.ResetSlotPassword)
 				akunGroup.PUT("/:id/role", adminSlotHandler.UpdateSlotRole)
 			}
+
+			// Struktur Organisasi & Departemen
+			adminGroup.GET("/organisasi", adminOrganisasiHandler.GetStrukturOrganisasi)
+			adminGroup.POST("/departemen", adminOrganisasiHandler.CreateDepartemen)
+			adminGroup.PUT("/departemen/:id", adminOrganisasiHandler.UpdateDepartemen)
+			adminGroup.DELETE("/departemen/:id", adminOrganisasiHandler.ArchiveDepartemen)
+			adminGroup.POST("/divisi", adminOrganisasiHandler.CreateDivisi)
+			adminGroup.PUT("/divisi/:id", adminOrganisasiHandler.UpdateDivisi)
 		}
 
 		// Rute upload terproteksi JWT (Backward Compatibility)

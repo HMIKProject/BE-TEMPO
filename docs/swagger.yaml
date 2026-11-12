@@ -118,6 +118,27 @@ definitions:
       nim_anggota:
         type: string
     type: object
+  entity.BPHMemberInfo:
+    properties:
+      angkatan:
+        type: integer
+      foto_profil:
+        type: string
+      id_anggota:
+        type: integer
+      jabatan:
+        type: string
+      nama_lengkap:
+        type: string
+      nim:
+        type: string
+      periode:
+        type: string
+      program_studi:
+        type: string
+      status:
+        type: string
+    type: object
   entity.BallotVoterInfo:
     properties:
       nim:
@@ -211,6 +232,35 @@ definitions:
     - nim
     - program_studi
     - status
+    type: object
+  entity.CreateDeptRequest:
+    properties:
+      deskripsi:
+        example: Departemen yang membawahi bidang teknologi dan inovasi
+        type: string
+      logo:
+        example: https://res.cloudinary.com/.../logo.png
+        type: string
+      nama_departemen:
+        example: Riset dan Teknologi
+        type: string
+    required:
+    - nama_departemen
+    type: object
+  entity.CreateDivisiRequest:
+    properties:
+      deskripsi:
+        example: Divisi penelitian dan eksplorasi ilmiah
+        type: string
+      id_departemen:
+        example: 1
+        type: integer
+      nama_divisi:
+        example: Riset & Inovasi
+        type: string
+    required:
+    - id_departemen
+    - nama_divisi
     type: object
   entity.CreatePaslonRequest:
     properties:
@@ -330,6 +380,21 @@ definitions:
         type: array
       status_aktif:
         type: boolean
+    type: object
+  entity.DeptKadepInfo:
+    properties:
+      angkatan:
+        type: integer
+      foto_profil:
+        type: string
+      id_anggota:
+        type: integer
+      jabatan:
+        type: string
+      nama_lengkap:
+        type: string
+      nim:
+        type: string
     type: object
   entity.DivisiDepartemen:
     properties:
@@ -538,6 +603,29 @@ definitions:
         type: integer
       minatRiset:
         $ref: '#/definitions/entity.MinatRiset'
+    type: object
+  entity.OrganisasiDeptItem:
+    properties:
+      deskripsi:
+        type: string
+      divisi:
+        items:
+          $ref: '#/definitions/entity.DivisiDepartemen'
+        type: array
+      id_departemen:
+        type: integer
+      kadep:
+        $ref: '#/definitions/entity.DeptKadepInfo'
+      logo:
+        type: string
+      nama_departemen:
+        type: string
+      status_aktif:
+        type: boolean
+      total_anggota:
+        type: integer
+      total_divisi:
+        type: integer
     type: object
   entity.Paslon:
     properties:
@@ -789,6 +877,19 @@ definitions:
       total:
         type: integer
     type: object
+  entity.StrukturOrganisasiResponse:
+    properties:
+      bph:
+        items:
+          $ref: '#/definitions/entity.BPHMemberInfo'
+        type: array
+      departemen:
+        items:
+          $ref: '#/definitions/entity.OrganisasiDeptItem'
+        type: array
+      kabinet:
+        $ref: '#/definitions/entity.Kabinet'
+    type: object
   entity.Suara:
     properties:
       id_paslon:
@@ -852,6 +953,37 @@ definitions:
     - nama_lengkap
     - program_studi
     - status
+    type: object
+  entity.UpdateDeptRequest:
+    properties:
+      deskripsi:
+        example: Departemen yang membawahi bidang teknologi dan inovasi
+        type: string
+      logo:
+        example: https://res.cloudinary.com/.../logo.png
+        type: string
+      nama_departemen:
+        example: Riset dan Teknologi
+        type: string
+      status_aktif:
+        example: true
+        type: boolean
+    required:
+    - nama_departemen
+    type: object
+  entity.UpdateDivisiRequest:
+    properties:
+      deskripsi:
+        example: Divisi penelitian dan eksplorasi ilmiah
+        type: string
+      nama_divisi:
+        example: Riset & Inovasi
+        type: string
+      status_aktif:
+        example: true
+        type: boolean
+    required:
+    - nama_divisi
     type: object
   entity.UpdatePaslonRequest:
     properties:
@@ -1431,6 +1563,228 @@ paths:
       summary: Ambil seluruh ringkasan kartu Dashboard Admin Halaman Utama
       tags:
       - Dashboard Admin - Halaman Utama
+  /admin/departemen:
+    post:
+      consumes:
+      - application/json
+      description: Mendaftarkan departemen baru ke dalam bagan himpunan (Khusus BPH)
+      parameters:
+      - description: Data Departemen Baru
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CreateDeptRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Departemen'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Tambah Departemen Baru
+      tags:
+      - Admin - Struktur Organisasi
+  /admin/departemen/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Menonaktifkan departemen (status_aktif = false) agar riwayat tidak
+        terputus (Khusus BPH)
+      parameters:
+      - description: ID Departemen
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Arsipkan Departemen (Soft Delete)
+      tags:
+      - Admin - Struktur Organisasi
+    put:
+      consumes:
+      - application/json
+      description: Mengubah nama, deskripsi, logo, atau status aktif departemen (Khusus
+        BPH)
+      parameters:
+      - description: ID Departemen
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data Perubahan Departemen
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdateDeptRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Departemen'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Perbarui Data Departemen
+      tags:
+      - Admin - Struktur Organisasi
+  /admin/divisi:
+    post:
+      consumes:
+      - application/json
+      description: Mendaftarkan divisi baru di bawah departemen tertentu (Khusus BPH)
+      parameters:
+      - description: Data Divisi Baru
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CreateDivisiRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.DivisiDepartemen'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Tambah Divisi Baru
+      tags:
+      - Admin - Struktur Organisasi
+  /admin/divisi/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Mengubah nama divisi, deskripsi, atau status aktif divisi (Khusus
+        BPH)
+      parameters:
+      - description: ID Divisi
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data Perubahan Divisi
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdateDivisiRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.DivisiDepartemen'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Perbarui Data Divisi
+      tags:
+      - Admin - Struktur Organisasi
+  /admin/organisasi:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil bagan struktur organisasi HMIK termasuk data kabinet
+        aktif, jajaran BPH, dan departemen beserta divisi & kepala departemen
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSendResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.StrukturOrganisasiResponse'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.JSendResponse'
+      security:
+      - BearerAuth: []
+      summary: Susunan Struktur Organisasi Lengkap (BPH, Departemen, Divisi)
+      tags:
+      - Admin - Struktur Organisasi
   /admin/pemira/chart:
     get:
       description: Mengembalikan data perolehan suara per paslon secara realtime untuk

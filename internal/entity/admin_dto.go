@@ -118,3 +118,77 @@ type UpdateSlotRoleRequest struct {
 	IdPeran int64 `json:"id_peran" binding:"required" example:"1"`
 }
 
+// --- DTO STRUKTUR ORGANISASI & DEPARTEMEN ---
+
+// BPHMemberInfo data ringkas pengurus inti BPH (Kahim, Wakahim, Sekre, Benda)
+type BPHMemberInfo struct {
+	IdAnggota    int64  `json:"id_anggota"`
+	NamaLengkap  string `json:"nama_lengkap"`
+	Nim          string `json:"nim"`
+	Jabatan      string `json:"jabatan"`
+	FotoProfil   string `json:"foto_profil"`
+	Angkatan     int    `json:"angkatan"`
+	ProgramStudi string `json:"program_studi"`
+	Status       string `json:"status"`
+	Periode      string `json:"periode"`
+}
+
+// DeptKadepInfo data kepala departemen
+type DeptKadepInfo struct {
+	IdAnggota   int64  `json:"id_anggota"`
+	NamaLengkap string `json:"nama_lengkap"`
+	Nim         string `json:"nim"`
+	Jabatan     string `json:"jabatan"`
+	FotoProfil  string `json:"foto_profil"`
+	Angkatan    int    `json:"angkatan"`
+}
+
+// OrganisasiDeptItem representasi departemen dalam struktur organisasi
+type OrganisasiDeptItem struct {
+	IdDepartemen   int64              `json:"id_departemen"`
+	NamaDepartemen string             `json:"nama_departemen"`
+	Deskripsi      string             `json:"deskripsi"`
+	Logo           string             `json:"logo"`
+	StatusAktif    bool               `json:"status_aktif"`
+	Kadep          *DeptKadepInfo     `json:"kadep,omitempty"`
+	Divisi         []DivisiDepartemen `json:"divisi"`
+	TotalAnggota   int64              `json:"total_anggota"`
+	TotalDivisi    int64              `json:"total_divisi"`
+}
+
+// StrukturOrganisasiResponse pembungkus susunan organisasi lengkap
+type StrukturOrganisasiResponse struct {
+	Kabinet    *Kabinet             `json:"kabinet,omitempty"`
+	BPH        []BPHMemberInfo      `json:"bph"`
+	Departemen []OrganisasiDeptItem `json:"departemen"`
+}
+
+// CreateDeptRequest payload tambah departemen baru
+type CreateDeptRequest struct {
+	NamaDepartemen string `json:"nama_departemen" binding:"required" example:"Riset dan Teknologi"`
+	Deskripsi      string `json:"deskripsi" example:"Departemen yang membawahi bidang teknologi dan inovasi"`
+	Logo           string `json:"logo" example:"https://res.cloudinary.com/.../logo.png"`
+}
+
+// UpdateDeptRequest payload perbarui departemen
+type UpdateDeptRequest struct {
+	NamaDepartemen string `json:"nama_departemen" binding:"required" example:"Riset dan Teknologi"`
+	Deskripsi      string `json:"deskripsi" example:"Departemen yang membawahi bidang teknologi dan inovasi"`
+	Logo           string `json:"logo" example:"https://res.cloudinary.com/.../logo.png"`
+	StatusAktif    *bool  `json:"status_aktif" example:"true"`
+}
+
+// CreateDivisiRequest payload tambah divisi baru
+type CreateDivisiRequest struct {
+	IdDepartemen int64  `json:"id_departemen" binding:"required" example:"1"`
+	NamaDivisi   string `json:"nama_divisi" binding:"required" example:"Riset & Inovasi"`
+	Deskripsi    string `json:"deskripsi" example:"Divisi penelitian dan eksplorasi ilmiah"`
+}
+
+// UpdateDivisiRequest payload perbarui divisi
+type UpdateDivisiRequest struct {
+	NamaDivisi  string `json:"nama_divisi" binding:"required" example:"Riset & Inovasi"`
+	Deskripsi   string `json:"deskripsi" example:"Divisi penelitian dan eksplorasi ilmiah"`
+	StatusAktif *bool  `json:"status_aktif" example:"true"`
+}
+
