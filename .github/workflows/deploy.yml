@@ -39,6 +39,7 @@ jobs:
           push: true
           provenance: false
           sbom: false
+          outputs: type=image,oci-mediatypes=false
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v11
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
