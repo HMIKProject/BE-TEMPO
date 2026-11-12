@@ -2636,40 +2636,40 @@ const docTemplate = `{
                 "files": {
                     "type": "string"
                 },
-                "fotoProfil": {
+                "foto_profil": {
                     "type": "string"
                 },
-                "idAnggota": {
+                "id_anggota": {
                     "type": "integer"
                 },
-                "idDepartemen": {
+                "id_departemen": {
                     "description": "Relasi One-to-Many (Opsional, karena BPH mungkin tidak ada di departemen spesifik)",
                     "type": "integer"
                 },
-                "idDivisi": {
+                "id_divisi": {
                     "type": "integer"
                 },
-                "idPengguna": {
+                "id_pengguna": {
                     "description": "Nullable untuk Demisioner",
                     "type": "integer"
                 },
                 "jabatan": {
                     "type": "string"
                 },
-                "keahlianAnggota": {
+                "keahlian": {
                     "description": "Relasi One-to-Many ke Tabel Perantara (Pivot)",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/entity.KeahlianAnggota"
                     }
                 },
-                "minatRisetAnggota": {
+                "minat_riset": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/entity.MinatRisetAnggota"
                     }
                 },
-                "namaLengkap": {
+                "nama_lengkap": {
                     "type": "string"
                 },
                 "nim": {
@@ -2681,7 +2681,7 @@ const docTemplate = `{
                 "periode": {
                     "type": "string"
                 },
-                "programStudi": {
+                "program_studi": {
                     "type": "string"
                 },
                 "status": {
@@ -3358,9 +3358,6 @@ const docTemplate = `{
         "entity.KeahlianAnggota": {
             "type": "object",
             "properties": {
-                "anggota": {
-                    "$ref": "#/definitions/entity.Anggota"
-                },
                 "idAnggota": {
                     "type": "integer"
                 },
@@ -3443,16 +3440,13 @@ const docTemplate = `{
         "entity.MinatRisetAnggota": {
             "type": "object",
             "properties": {
-                "anggota": {
-                    "$ref": "#/definitions/entity.Anggota"
-                },
                 "idAnggota": {
                     "type": "integer"
                 },
                 "idMinat": {
                     "type": "integer"
                 },
-                "minatRiset": {
+                "minat_riset": {
                     "$ref": "#/definitions/entity.MinatRiset"
                 }
             }

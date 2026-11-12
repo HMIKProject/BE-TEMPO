@@ -38,31 +38,31 @@ definitions:
         $ref: '#/definitions/entity.DivisiDepartemen'
       files:
         type: string
-      fotoProfil:
+      foto_profil:
         type: string
-      idAnggota:
+      id_anggota:
         type: integer
-      idDepartemen:
+      id_departemen:
         description: Relasi One-to-Many (Opsional, karena BPH mungkin tidak ada di
           departemen spesifik)
         type: integer
-      idDivisi:
+      id_divisi:
         type: integer
-      idPengguna:
+      id_pengguna:
         description: Nullable untuk Demisioner
         type: integer
       jabatan:
         type: string
-      keahlianAnggota:
+      keahlian:
         description: Relasi One-to-Many ke Tabel Perantara (Pivot)
         items:
           $ref: '#/definitions/entity.KeahlianAnggota'
         type: array
-      minatRisetAnggota:
+      minat_riset:
         items:
           $ref: '#/definitions/entity.MinatRisetAnggota'
         type: array
-      namaLengkap:
+      nama_lengkap:
         type: string
       nim:
         type: string
@@ -70,7 +70,7 @@ definitions:
         $ref: '#/definitions/entity.Pengguna'
       periode:
         type: string
-      programStudi:
+      program_studi:
         type: string
       status:
         description: Pengurus, Magang, Demisioner
@@ -536,8 +536,6 @@ definitions:
     type: object
   entity.KeahlianAnggota:
     properties:
-      anggota:
-        $ref: '#/definitions/entity.Anggota'
       idAnggota:
         type: integer
       idKeahlian:
@@ -595,13 +593,11 @@ definitions:
     type: object
   entity.MinatRisetAnggota:
     properties:
-      anggota:
-        $ref: '#/definitions/entity.Anggota'
       idAnggota:
         type: integer
       idMinat:
         type: integer
-      minatRiset:
+      minat_riset:
         $ref: '#/definitions/entity.MinatRiset'
     type: object
   entity.OrganisasiDeptItem:
