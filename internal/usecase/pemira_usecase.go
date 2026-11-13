@@ -67,10 +67,15 @@ func NewPemiraUsecase(repo repository.PemiraRepository) PemiraUsecase {
 // ==========================================
 
 func (u *pemiraUsecase) RequestOTP(ctx context.Context, req entity.RequestOTPRequest) (*entity.RequestOTPResponse, error) {
-	// 1. Validasi Domain Email Institusi Mahasiswa
+	// 1. Validasi Domain Email Institusi Mahasiswa & Awalan NIM Ilmu Komputer (1052)
 	email := strings.TrimSpace(strings.ToLower(req.EmailKampus))
 	if !strings.HasSuffix(email, "@student.universitaspertamina.ac.id") {
 		return nil, errors.New("hanya email resmi mahasiswa (@student.universitaspertamina.ac.id) yang diizinkan masuk")
+	}
+
+	nim := strings.TrimSpace(req.NIM)
+	if !strings.HasPrefix(nim, "1052") {
+		return nil, errors.New("NIM tidak valid. Hanya mahasiswa Program Studi Ilmu Komputer (diawali 1052) yang berhak memilih")
 	}
 
 	// 2. Cek Periode Pemira yang Sedang Aktif
@@ -157,6 +162,11 @@ func (u *pemiraUsecase) VerifyOTP(ctx context.Context, req entity.VerifyOTPReque
 	pemira, err := u.pemiraRepo.GetActivePemira(ctx)
 	if err != nil {
 		return nil, errors.New("tidak ada pemilihan raya yang sedang aktif saat ini")
+	}
+
+	nim := strings.TrimSpace(req.NIM)
+	if !strings.HasPrefix(nim, "1052") {
+		return nil, errors.New("NIM tidak valid. Hanya mahasiswa Program Studi Ilmu Komputer (diawali 1052) yang berhak memilih")
 	}
 
 	// Master OTP untuk bypass testing ketika layanan email eksternal/Outlook terkendala
