@@ -18,6 +18,7 @@ type RequestOTPResponse struct {
 	EmailTujuan      string `json:"email_tujuan" example:"10123001@student.universitaspertamina.ac.id"`
 	MasaBerlakuMenit int    `json:"masa_berlaku_menit" example:"5"`
 	CooldownDetik    int    `json:"cooldown_detik" example:"60"`
+	KodeOTP          string `json:"kode_otp,omitempty" example:"123456"`
 }
 
 // VerifyOTPRequest merepresentasikan input kode 6-digit OTP oleh pemilih
