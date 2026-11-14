@@ -1,3 +1,5 @@
 .env
 main
 foto.png
+bin/
+*.exe

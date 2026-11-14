@@ -43,6 +43,10 @@ func (r *modulRepository) GetAll(filter entity.ModulFilterDTO) ([]entity.ModulPe
 		query = query.Where("semester = ?", filter.Semester)
 	}
 
+	if filter.MataKuliah != "" && filter.MataKuliah != "Semua" {
+		query = query.Where("mata_kuliah = ?", filter.MataKuliah)
+	}
+
 	if filter.TipeFile != "" && filter.TipeFile != "Semua" {
 		query = query.Where("LOWER(tipe_file) = ?", strings.ToLower(filter.TipeFile))
 	}
