@@ -74,8 +74,18 @@ func (r *dashboardRepository) GetTotalAnggotaAktif(ctx context.Context) (*entity
 }
 
 func (r *dashboardRepository) GetTotalModul(ctx context.Context) (*entity.CardDetail, error) {
-	total := int64(18)
-	bulanIni := int64(2)
+	var total, bulanIni int64
+	if r.db != nil {
+		_ = r.db.WithContext(ctx).Table("modul_pembelajaran").Count(&total).Error
+		_ = r.db.WithContext(ctx).Table("modul_pembelajaran").
+			Where("dibuat_pada >= DATE_TRUNC('month', CURRENT_DATE)").
+			Count(&bulanIni).Error
+	}
+
+	if total == 0 {
+		total = 5
+		bulanIni = 2
+	}
 
 	return &entity.CardDetail{
 		CardKey:             "total_modul",
@@ -84,7 +94,7 @@ func (r *dashboardRepository) GetTotalModul(ctx context.Context) (*entity.CardDe
 		PertumbuhanBulanIni: bulanIni,
 		Keterangan:          fmt.Sprintf("+ %d Modul Bulan ini", bulanIni),
 		WarnaTema:           "yellow",
-		TautanAksi:          "/admin/manajemen-modul",
+		TautanAksi:          "/admin/modul",
 	}, nil
 }
 

@@ -64,6 +64,11 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	pemiraUsecase := usecase.NewPemiraUsecase(pemiraRepo)
 	pemiraHandler := handler.NewPemiraHandler(pemiraUsecase)
 
+	// Modul Pembelajaran (Learning / Academy UP - BP-03)
+	modulRepo := repository.NewModulRepository(db)
+	modulUsecase := usecase.NewModulUsecase(modulRepo)
+	modulHandler := handler.NewModulHandler(modulUsecase)
+
 	// --- Mendaftarkan Routes ---
 
 	// Endpoint khusus untuk memunculkan halaman website Swagger UI
@@ -102,6 +107,10 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 
 		// Endpoint untuk Program Kerja (Global, filterable by status/is_unggulan)
 		v1.GET("/program-kerja", prokerHandler.GetAllProgramKerja)
+
+		// Endpoint untuk Modul Pembelajaran (Publik - BP-03)
+		v1.GET("/learning/modul", modulHandler.GetAll)
+		v1.GET("/learning/modul/:id", modulHandler.GetByID)
 
 		// Jalur Rute Admin yang Dilindungi Middleware Token JWT (Standar Obsidian)
 		adminGroup := v1.Group("/admin")
@@ -164,6 +173,17 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 			adminGroup.DELETE("/departemen/:id", adminOrganisasiHandler.ArchiveDepartemen)
 			adminGroup.POST("/divisi", adminOrganisasiHandler.CreateDivisi)
 			adminGroup.PUT("/divisi/:id", adminOrganisasiHandler.UpdateDivisi)
+
+			// Modul Pembelajaran (Admin CMS CRUD & Upload - BP-03)
+			modulGroup := adminGroup.Group("/modul")
+			{
+				modulGroup.GET("", modulHandler.GetAll)
+				modulGroup.GET("/:id", modulHandler.GetByID)
+				modulGroup.POST("", modulHandler.Create)
+				modulGroup.PUT("/:id", modulHandler.Update)
+				modulGroup.DELETE("/:id", modulHandler.Delete)
+				modulGroup.POST("/upload", modulHandler.UploadFile)
+			}
 		}
 
 		// Rute upload terproteksi JWT (Backward Compatibility)

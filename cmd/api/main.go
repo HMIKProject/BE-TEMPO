@@ -51,10 +51,12 @@ func main() {
 		&entity.Anggota{},
 		&entity.Departemen{},
 		&entity.DivisiDepartemen{},
+		&entity.ModulPembelajaran{},
 	)
 
 	// Inisialisasi otomatis akun slot jabatan dengan password 'qwerqwer'
 	_ = seeder.SeedAllRoleAccounts(db)
+	_ = seeder.SeedSampleModul(db)
 
 	// 2. Inisiasi Mesin Gin
 	router := gin.Default()
@@ -79,6 +81,9 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+
+	// Static file serving untuk berkas unggahan lokal (uploads/modul, dll.)
+	router.Static("/uploads", "./uploads")
 
 	// 4. Mendaftarkan Seluruh Endpoint API
 	routes.SetupRoutes(router, db)
