@@ -7,9 +7,9 @@ type ModulPembelajaran struct {
 	IDModul        int64     `json:"id_modul" gorm:"column:id_modul;primaryKey;autoIncrement"`
 	Judul          string    `json:"judul" gorm:"column:judul;type:varchar(255);not null"`
 	Deskripsi      string    `json:"deskripsi" gorm:"column:deskripsi;type:text"`
-	Kategori       string    `json:"kategori" gorm:"column:kategori;type:varchar(100);not null;default:'Akademik'"` // Akademik, Riset dan Teknologi, dll.
-	Semester       string    `json:"semester" gorm:"column:semester;type:varchar(50);default:'Semester 1'"`        // Semester 1 s/d 8
-	MataKuliah     string    `json:"mata_kuliah" gorm:"column:mata_kuliah;type:varchar(150)"`
+	Kategori       string    `json:"kategori" gorm:"column:kategori;type:varchar(100);default:''"`
+	Semester       string    `json:"semester" gorm:"column:semester;type:varchar(50);not null;default:'Semester 1'"` // Semester 1 s/d 8
+	MataKuliah     string    `json:"mata_kuliah" gorm:"column:mata_kuliah;type:varchar(150);not null;default:'Umum'"`
 	TipeFile       string    `json:"tipe_file" gorm:"column:tipe_file;type:varchar(20);not null;default:'pdf'"`    // pdf, pptx, zip, mp4
 	UkuranFile     string    `json:"ukuran_file" gorm:"column:ukuran_file;type:varchar(50);default:'0 KB'"`
 	UkuranBytes    int64     `json:"ukuran_bytes" gorm:"column:ukuran_bytes;default:0"`

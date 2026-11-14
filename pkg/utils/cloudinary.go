@@ -41,3 +41,31 @@ func UploadImageToCloudinary(file multipart.File, fileName string, folderName st
 	// 4. Kembalikan URL gambar yang sudah aman (HTTPS)
 	return uploadResult.SecureURL, nil
 }
+
+// UploadFileToCloudinary menerima berkas dokumen, presentasi, arsip, atau video (multipart.File)
+// dan mengunggahnya ke Cloudinary dengan parameter ResourceType: "auto" ke folder dinamis
+func UploadFileToCloudinary(file multipart.File, fileName string, folderName string) (string, error) {
+	cldUrl := os.Getenv("CLOUDINARY_URL")
+	cldUrl = strings.TrimSpace(cldUrl)
+	cldUrl = strings.TrimPrefix(cldUrl, "CLOUDINARY_URL=")
+	cldUrl = strings.Trim(cldUrl, `"'`)
+	if cldUrl == "" {
+		return "", errors.New("konfigurasi CLOUDINARY_URL belum diatur di sistem atau file .env")
+	}
+
+	cld, err := cloudinary.NewFromURL(cldUrl)
+	if err != nil {
+		return "", err
+	}
+
+	ctx := context.Background()
+	uploadResult, err := cld.Upload.Upload(ctx, file, uploader.UploadParams{
+		Folder:       folderName,
+		ResourceType: "auto",
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return uploadResult.SecureURL, nil
+}

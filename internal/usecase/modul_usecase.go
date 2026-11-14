@@ -49,11 +49,11 @@ func (u *modulUsecase) Create(modul *entity.ModulPembelajaran) error {
 		return errors.New("ukuran file melebihi batas maksimal 50 MB")
 	}
 
-	if modul.Kategori == "" {
-		modul.Kategori = "Akademik"
-	}
 	if modul.Semester == "" {
 		modul.Semester = "Semester 1"
+	}
+	if modul.MataKuliah == "" {
+		modul.MataKuliah = "Umum"
 	}
 
 	// Normalisasi TipeFile

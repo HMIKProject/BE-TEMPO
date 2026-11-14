@@ -134,7 +134,7 @@ func (h *ModulHandler) UploadFile(c *gin.Context) {
 		return
 	}
 
-	// Ekstensi yang diizinkan: pdf, pptx, ppt, zip, rar, mp4
+	// Ekstensi yang diizinkan: pdf, pptx, ppt, zip, rar, mp4, docx, doc
 	ext := strings.ToLower(filepath.Ext(file.Filename))
 	allowed := map[string]bool{
 		".pdf":  true,
@@ -148,25 +148,44 @@ func (h *ModulHandler) UploadFile(c *gin.Context) {
 	}
 
 	if !allowed[ext] {
-		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Format file tidak didukung. Harap gunakan PDF, PPTX, ZIP, atau MP4", []string{"ekstensi tidak diizinkan"}))
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Format file tidak didukung. Harap gunakan PDF, PPTX, DOCX, ZIP, atau MP4", []string{"ekstensi tidak diizinkan"}))
 		return
 	}
 
-	// Direktori upload
-	uploadDir := "uploads/modul"
-	if err := os.MkdirAll(uploadDir, 0755); err != nil {
-		c.JSON(http.StatusInternalServerError, utils.BuildErrorResponse("Gagal menyiapkan direktori penyimpanan"))
-		return
+	// Baca parameter semester dan mata kuliah untuk menentukan target folder
+	semester := c.DefaultPostForm("semester", "Semester 1")
+	mataKuliah := c.DefaultPostForm("mata_kuliah", "Umum")
+	cleanSemester := strings.ReplaceAll(strings.ToLower(semester), " ", "_")
+	cleanMatkul := strings.ReplaceAll(strings.ToLower(mataKuliah), " ", "_")
+	cloudFolder := fmt.Sprintf("hmik/learning/%s/%s", cleanSemester, cleanMatkul)
+
+	var fileURL string
+	var uploadErr error
+
+	// 1. Coba upload langsung ke Cloud Storage (Cloudinary)
+	srcFile, err := file.Open()
+	if err == nil {
+		defer srcFile.Close()
+		fileURL, uploadErr = utils.UploadFileToCloudinary(srcFile, file.Filename, cloudFolder)
 	}
 
-	// Buat nama berkas unik
-	timestamp := time.Now().UnixNano()
-	safeFilename := fmt.Sprintf("%d_%s", timestamp, strings.ReplaceAll(file.Filename, " ", "_"))
-	dst := filepath.Join(uploadDir, safeFilename)
+	// 2. Fallback ke penyimpanan lokal jika Cloudinary offline atau tidak terkonfigurasi
+	if uploadErr != nil || fileURL == "" {
+		uploadDir := filepath.Join("uploads", "modul", cleanSemester, cleanMatkul)
+		if err := os.MkdirAll(uploadDir, 0755); err != nil {
+			c.JSON(http.StatusInternalServerError, utils.BuildErrorResponse("Gagal menyiapkan direktori penyimpanan"))
+			return
+		}
 
-	if err := c.SaveUploadedFile(file, dst); err != nil {
-		c.JSON(http.StatusInternalServerError, utils.BuildErrorResponse("Gagal menyimpan berkas ke server"))
-		return
+		timestamp := time.Now().UnixNano()
+		safeFilename := fmt.Sprintf("%d_%s", timestamp, strings.ReplaceAll(file.Filename, " ", "_"))
+		dst := filepath.Join(uploadDir, safeFilename)
+
+		if err := c.SaveUploadedFile(file, dst); err != nil {
+			c.JSON(http.StatusInternalServerError, utils.BuildErrorResponse("Gagal menyimpan berkas ke server"))
+			return
+		}
+		fileURL = "/" + dst
 	}
 
 	// Format ukuran berkas (contoh: 4.2 MB)
@@ -176,8 +195,6 @@ func (h *ModulHandler) UploadFile(c *gin.Context) {
 	} else {
 		formattedSize = fmt.Sprintf("%.1f MB", float64(file.Size)/(1024.0*1024.0))
 	}
-
-	fileURL := "/" + dst
 
 	cleanExt := strings.TrimPrefix(ext, ".")
 
