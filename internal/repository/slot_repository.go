@@ -51,8 +51,8 @@ func (r *slotRepository) FindAllSlots() ([]entity.AccountSlotResponse, error) {
 	// Petakan id_pengguna -> anggota
 	borrowerMap := make(map[int64]entity.Anggota)
 	for _, a := range anggotaList {
-		if a.IdPengguna != nil {
-			borrowerMap[*a.IdPengguna] = a
+		if a.PenggunaID != nil {
+			borrowerMap[*a.PenggunaID] = a
 		}
 	}
 
@@ -116,10 +116,10 @@ func (r *slotRepository) FindSlotByAnggotaID(idAnggota int64) (*entity.Pengguna,
 	if err != nil {
 		return nil, err
 	}
-	if a.IdPengguna == nil {
+	if a.PenggunaID == nil {
 		return nil, nil
 	}
-	return r.FindSlotByID(*a.IdPengguna)
+	return r.FindSlotByID(*a.PenggunaID)
 }
 
 // AssignSlot menautkan slot kosong ke anggota dan memasang kode aktivasi 7 hari
@@ -139,7 +139,7 @@ func (r *slotRepository) AssignSlot(idPengguna int64, idAnggota int64, kodeAktiv
 		if err := tx.First(&targetAnggota, idAnggota).Error; err != nil {
 			return errors.New("data anggota tidak ditemukan")
 		}
-		if targetAnggota.IdPengguna != nil {
+		if targetAnggota.PenggunaID != nil {
 			return errors.New("anggota tersebut sudah terdaftar memegang slot akun lain")
 		}
 

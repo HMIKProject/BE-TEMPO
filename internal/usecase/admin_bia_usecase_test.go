@@ -140,7 +140,7 @@ func TestAdminBIAUsecase_CRUD(t *testing.T) {
 
 	// 5. Test DeleteAnggota with active slot assigned (must fail)
 	slotID := int64(10)
-	updated.IdPengguna = &slotID
+	updated.PenggunaID = &slotID
 	repo.Update(updated)
 
 	err = uc.DeleteAnggota(created.IdAnggota)
@@ -149,7 +149,7 @@ func TestAdminBIAUsecase_CRUD(t *testing.T) {
 	}
 
 	// 6. Test DeleteAnggota after unassigning slot (must succeed)
-	updated.IdPengguna = nil
+	updated.PenggunaID = nil
 	repo.Update(updated)
 
 	err = uc.DeleteAnggota(created.IdAnggota)

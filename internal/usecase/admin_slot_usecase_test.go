@@ -103,7 +103,7 @@ func (m *mockSlotRepo) AssignSlot(idPengguna int64, idAnggota int64, kodeAktivas
 	}
 
 	m.borrowers[idPengguna] = idAnggota
-	a.IdPengguna = &idPengguna
+	a.PenggunaID = &idPengguna
 	a.Status = "Pengurus"
 
 	p.KodeAktivasi = &kodeAktivasi
@@ -120,7 +120,7 @@ func (m *mockSlotRepo) UnassignSlot(idPengguna int64, randomPasswordHash string)
 	}
 	if aID, ok := m.borrowers[idPengguna]; ok {
 		if a, ok := m.anggotas[aID]; ok {
-			a.IdPengguna = nil
+			a.PenggunaID = nil
 			a.Status = "Demisioner"
 		}
 		delete(m.borrowers, idPengguna)
@@ -140,7 +140,7 @@ func (m *mockSlotRepo) DemisionerMassal(randomPasswordHash string) (int64, int64
 
 	for sID, aID := range m.borrowers {
 		if a, ok := m.anggotas[aID]; ok {
-			a.IdPengguna = nil
+			a.PenggunaID = nil
 			a.Status = "Demisioner"
 		}
 		delete(m.borrowers, sID)
@@ -261,8 +261,8 @@ func TestAdminSlotUsecase(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Gagal unassign slot: %v", err)
 	}
-	if ang1.Status != "Demisioner" || ang1.IdPengguna != nil {
-		t.Errorf("Anggota belum didemisionerkan dengan benar: status=%s, idPengguna=%v", ang1.Status, ang1.IdPengguna)
+	if ang1.Status != "Demisioner" || ang1.PenggunaID != nil {
+		t.Errorf("Anggota belum didemisionerkan dengan benar: status=%s, idPengguna=%v", ang1.Status, ang1.PenggunaID)
 	}
 
 	// 6. Test DemisionerMassal

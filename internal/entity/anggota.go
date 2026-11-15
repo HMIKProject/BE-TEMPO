@@ -4,8 +4,8 @@ import "time"
 
 type Anggota struct {
 	IdAnggota    int64     `gorm:"primaryKey;column:id_anggota;autoIncrement" json:"id_anggota"`
-	IdPengguna   *int64    `gorm:"column:id_pengguna" json:"id_pengguna,omitempty"` // Nullable untuk Demisioner
-	Pengguna     *Pengguna `gorm:"foreignKey:IdPengguna;references:IdPengguna" json:"pengguna,omitempty"`
+	PenggunaID   *int64    `gorm:"column:id_pengguna" json:"id_pengguna,omitempty"` // Nullable untuk Demisioner
+	Pengguna     *Pengguna `gorm:"foreignKey:PenggunaID;references:IdPengguna" json:"pengguna,omitempty"`
 	Nim          string    `gorm:"column:nim;type:varchar(20);unique;not null" json:"nim"`
 	NamaLengkap  string    `gorm:"column:nama_lengkap;type:varchar(100);not null" json:"nama_lengkap"`
 	FotoProfil   string    `gorm:"column:foto_profil;type:varchar(255)" json:"foto_profil,omitempty"`
@@ -21,11 +21,11 @@ type Anggota struct {
 	DiubahPada   time.Time `gorm:"column:diubah_pada;autoUpdateTime" json:"diubah_pada"`
 
 	// Relasi One-to-Many (Opsional, karena BPH mungkin tidak ada di departemen spesifik)
-	IdDepartemen *int64      `gorm:"column:id_departemen" json:"id_departemen,omitempty"`
-	Departemen   *Departemen `gorm:"foreignKey:IdDepartemen;references:IdDepartemen" json:"departemen,omitempty"`
+	DepartemenID *int64      `gorm:"column:id_departemen" json:"id_departemen,omitempty"`
+	Departemen   *Departemen `gorm:"foreignKey:DepartemenID;references:IdDepartemen" json:"departemen,omitempty"`
 
-	IdDivisi     *int64            `gorm:"column:id_divisi" json:"id_divisi,omitempty"`
-	Divisi       *DivisiDepartemen `gorm:"foreignKey:IdDivisi;references:IdDivisi" json:"divisi,omitempty"`
+	DivisiID     *int64            `gorm:"column:id_divisi" json:"id_divisi,omitempty"`
+	Divisi       *DivisiDepartemen `gorm:"foreignKey:DivisiID;references:IdDivisi" json:"divisi,omitempty"`
 
 	// Relasi One-to-Many ke Tabel Perantara (Pivot)
 	KeahlianAnggota   []KeahlianAnggota   `gorm:"foreignKey:IdAnggota" json:"keahlian,omitempty"`

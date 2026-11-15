@@ -4,6 +4,5 @@ package entity
 type MinatRisetAnggota struct {
 	IdAnggota  int64      `gorm:"primaryKey;column:id_anggota"`
 	IdMinat    int64      `gorm:"primaryKey;column:id_minat"`
-	Anggota    Anggota    `gorm:"foreignKey:IdAnggota;references:IdAnggota" json:"-"`
 	MinatRiset MinatRiset `gorm:"foreignKey:IdMinat;references:IdMinat" json:"minat_riset,omitempty"`
 }

@@ -76,8 +76,8 @@ func (u *adminBIAUsecase) CreateAnggota(req entity.CreateAnggotaRequest) (*entit
 		Status:       status,
 		Tautan:       req.Tautan,
 		CvUrl:        req.CvUrl,
-		IdDepartemen: req.IdDepartemen,
-		IdDivisi:     req.IdDivisi,
+		DepartemenID: req.IdDepartemen,
+		DivisiID:     req.IdDivisi,
 		Periode:      req.Periode,
 	}
 
@@ -106,8 +106,8 @@ func (u *adminBIAUsecase) UpdateAnggota(id int64, req entity.UpdateAnggotaReques
 	anggota.Status = req.Status
 	anggota.Tautan = req.Tautan
 	anggota.CvUrl = req.CvUrl
-	anggota.IdDepartemen = req.IdDepartemen
-	anggota.IdDivisi = req.IdDivisi
+	anggota.DepartemenID = req.IdDepartemen
+	anggota.DivisiID = req.IdDivisi
 	anggota.Periode = req.Periode
 
 	if err := u.anggotaRepo.Update(anggota); err != nil {
@@ -125,7 +125,7 @@ func (u *adminBIAUsecase) DeleteAnggota(id int64) error {
 	}
 
 	// Proteksi integritas: jika sedang memegang slot akun aktif, tidak boleh langsung dihapus
-	if anggota.IdPengguna != nil {
+	if anggota.PenggunaID != nil {
 		return errors.New("tidak dapat menghapus anggota yang sedang memegang slot akun aktif; silakan lepas tautan slot akun terlebih dahulu")
 	}
 

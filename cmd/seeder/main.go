@@ -250,15 +250,15 @@ func main() {
 		}
 
 		anggota := entity.Anggota{
-			IdPengguna:   &pengguna.IdPengguna,
+			PenggunaID:   &pengguna.IdPengguna,
 			Nim:          data.Nim,
 			NamaLengkap:  data.NamaLengkap,
 			FotoProfil:   fotoProfil,
 			ProgramStudi: data.ProgramStudi,
 			Angkatan:     data.Angkatan,
 			Jabatan:      data.Jabatan,
-			IdDepartemen: idDepartemen,
-			IdDivisi:     idDivisi,
+			DepartemenID: idDepartemen,
+			DivisiID:     idDivisi,
 			Status:       "Pengurus",
 		}
 		db.Create(&anggota)
