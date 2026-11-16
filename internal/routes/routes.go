@@ -111,6 +111,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 		// Endpoint untuk Modul Pembelajaran (Publik - BP-03)
 		v1.GET("/learning/modul", modulHandler.GetAll)
 		v1.GET("/learning/modul/:id", modulHandler.GetByID)
+		v1.GET("/learning/modul/:id/download", modulHandler.Download)
 
 		// Jalur Rute Admin yang Dilindungi Middleware Token JWT (Standar Obsidian)
 		adminGroup := v1.Group("/admin")
@@ -179,6 +180,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 			{
 				modulGroup.GET("", modulHandler.GetAll)
 				modulGroup.GET("/:id", modulHandler.GetByID)
+				modulGroup.GET("/:id/download", modulHandler.Download)
 				modulGroup.POST("", modulHandler.Create)
 				modulGroup.PUT("/:id", modulHandler.Update)
 				modulGroup.DELETE("/:id", modulHandler.Delete)

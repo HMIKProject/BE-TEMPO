@@ -119,6 +119,50 @@ func (h *ModulHandler) Delete(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Modul pembelajaran berhasil dihapus", gin.H{"id_modul": id}))
 }
 
+// Download menangani unduhan berkas modul langsung dengan header Content-Disposition: attachment
+func (h *ModulHandler) Download(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("ID modul tidak valid", []string{"id harus angka"}))
+		return
+	}
+
+	modul, err := h.modulUsecase.GetByID(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, utils.BuildFailResponse("Modul tidak ditemukan", []string{err.Error()}))
+		return
+	}
+
+	if modul.FileURL == "" {
+		c.JSON(http.StatusNotFound, utils.BuildFailResponse("Tautan berkas materi perkuliahan tidak tersedia", []string{"berkas belum diunggah"}))
+		return
+	}
+
+	// 1. Jika URL Cloudinary, arahkan ke URL dengan flag fl_attachment
+	if strings.Contains(modul.FileURL, "res.cloudinary.com") && strings.Contains(modul.FileURL, "/upload/") {
+		safeTitle := strings.ReplaceAll(modul.Judul, " ", "_")
+		safeTitle = strings.ReplaceAll(safeTitle, "/", "_")
+		downloadURL := strings.Replace(modul.FileURL, "/upload/", fmt.Sprintf("/upload/fl_attachment:%s/", safeTitle), 1)
+		c.Redirect(http.StatusFound, downloadURL)
+		return
+	}
+
+	// 2. Jika file lokal di server
+	if strings.HasPrefix(modul.FileURL, "/") {
+		localPath := strings.TrimPrefix(modul.FileURL, "/")
+		if _, err := os.Stat(localPath); err == nil {
+			safeFilename := fmt.Sprintf("%s.%s", modul.Judul, modul.TipeFile)
+			c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", safeFilename))
+			c.File(localPath)
+			return
+		}
+	}
+
+	// 3. Fallback direct redirect
+	c.Redirect(http.StatusFound, modul.FileURL)
+}
+
 // UploadFile menangani pengunggahan berkas dokumen/multimedia modul pembelajaran
 func (h *ModulHandler) UploadFile(c *gin.Context) {
 	file, err := c.FormFile("file")
