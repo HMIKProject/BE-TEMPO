@@ -163,6 +163,27 @@ func (h *ModulHandler) Download(c *gin.Context) {
 	c.Redirect(http.StatusFound, modul.FileURL)
 }
 
+// RenameFolder menangani pembaruan nama direktori folder mata kuliah dalam satu semester
+func (h *ModulHandler) RenameFolder(c *gin.Context) {
+	var req struct {
+		Semester      string `json:"semester" binding:"required"`
+		OldMataKuliah string `json:"old_mata_kuliah" binding:"required"`
+		NewMataKuliah string `json:"new_mata_kuliah" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Format JSON tidak valid", []string{err.Error()}))
+		return
+	}
+
+	if err := h.modulUsecase.RenameFolder(req.Semester, req.OldMataKuliah, req.NewMataKuliah); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Gagal mengubah nama folder", []string{err.Error()}))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Direktori folder berhasil diperbarui", req))
+}
+
 // UploadFile menangani pengunggahan berkas dokumen/multimedia modul pembelajaran
 func (h *ModulHandler) UploadFile(c *gin.Context) {
 	file, err := c.FormFile("file")

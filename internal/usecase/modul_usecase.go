@@ -14,6 +14,7 @@ type ModulUsecase interface {
 	Create(modul *entity.ModulPembelajaran) error
 	Update(id int64, req *entity.ModulPembelajaran) error
 	Delete(id int64) error
+	RenameFolder(semester, oldMataKuliah, newMataKuliah string) error
 }
 
 type modulUsecase struct {
@@ -105,4 +106,14 @@ func (u *modulUsecase) Delete(id int64) error {
 		return errors.New("modul tidak ditemukan")
 	}
 	return u.modulRepo.Delete(id)
+}
+
+func (u *modulUsecase) RenameFolder(semester, oldMataKuliah, newMataKuliah string) error {
+	sem := strings.TrimSpace(semester)
+	oldM := strings.TrimSpace(oldMataKuliah)
+	newM := strings.TrimSpace(newMataKuliah)
+	if sem == "" || oldM == "" || newM == "" {
+		return errors.New("semester, nama folder lama, dan nama folder baru wajib diisi")
+	}
+	return u.modulRepo.RenameFolder(sem, oldM, newM)
 }

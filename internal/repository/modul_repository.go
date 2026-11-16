@@ -14,6 +14,7 @@ type ModulRepository interface {
 	Update(modul *entity.ModulPembelajaran) error
 	Delete(id int64) error
 	CountAll() (int64, error)
+	RenameFolder(semester, oldMataKuliah, newMataKuliah string) error
 }
 
 type modulRepository struct {
@@ -96,4 +97,10 @@ func (r *modulRepository) CountAll() (int64, error) {
 	var total int64
 	err := r.db.Model(&entity.ModulPembelajaran{}).Count(&total).Error
 	return total, err
+}
+
+func (r *modulRepository) RenameFolder(semester, oldMataKuliah, newMataKuliah string) error {
+	return r.db.Model(&entity.ModulPembelajaran{}).
+		Where("semester = ? AND mata_kuliah = ?", semester, oldMataKuliah).
+		Update("mata_kuliah", newMataKuliah).Error
 }

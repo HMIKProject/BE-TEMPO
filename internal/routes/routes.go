@@ -181,6 +181,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 				modulGroup.GET("", modulHandler.GetAll)
 				modulGroup.GET("/:id", modulHandler.GetByID)
 				modulGroup.GET("/:id/download", modulHandler.Download)
+				modulGroup.PUT("/folder", modulHandler.RenameFolder)
 				modulGroup.POST("", modulHandler.Create)
 				modulGroup.PUT("/:id", modulHandler.Update)
 				modulGroup.DELETE("/:id", modulHandler.Delete)
