@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/HMIKProject/hmik-corex-backend/internal/entity"
 	"github.com/HMIKProject/hmik-corex-backend/internal/usecase"
 	"github.com/HMIKProject/hmik-corex-backend/pkg/utils"
 	"github.com/gin-gonic/gin"
@@ -49,4 +50,78 @@ func (h *ProgramKerjaHandler) GetAllProgramKerja(c *gin.Context) {
 
 	response := utils.BuildSuccessResponse("Data program kerja berhasil diambil", prokers)
 	c.JSON(http.StatusOK, response)
+}
+
+// GetByID mengambil detail program kerja
+func (h *ProgramKerjaHandler) GetByID(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("ID program kerja tidak valid", []string{"id harus angka"}))
+		return
+	}
+
+	proker, err := h.usecase.GetProgramKerjaByID(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, utils.BuildFailResponse("Program kerja tidak ditemukan", []string{err.Error()}))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Berhasil mengambil detail program kerja", proker))
+}
+
+// Create menambahkan program kerja baru (Admin CMS)
+func (h *ProgramKerjaHandler) Create(c *gin.Context) {
+	var req entity.ProgramKerja
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Format JSON tidak valid", []string{err.Error()}))
+		return
+	}
+
+	if err := h.usecase.CreateProgramKerja(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Gagal menambahkan program kerja", []string{err.Error()}))
+		return
+	}
+
+	c.JSON(http.StatusCreated, utils.BuildSuccessResponse("Program kerja berhasil ditambahkan", req))
+}
+
+// Update memperbarui program kerja (Admin CMS)
+func (h *ProgramKerjaHandler) Update(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("ID program kerja tidak valid", []string{"id harus angka"}))
+		return
+	}
+
+	var req entity.ProgramKerja
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Format JSON tidak valid", []string{err.Error()}))
+		return
+	}
+
+	if err := h.usecase.UpdateProgramKerja(id, &req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Gagal memperbarui program kerja", []string{err.Error()}))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Program kerja berhasil diperbarui", gin.H{"id_proker": id}))
+}
+
+// Delete menghapus program kerja (Admin CMS)
+func (h *ProgramKerjaHandler) Delete(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("ID program kerja tidak valid", []string{"id harus angka"}))
+		return
+	}
+
+	if err := h.usecase.DeleteProgramKerja(id); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("Gagal menghapus program kerja", []string{err.Error()}))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Program kerja berhasil dihapus", gin.H{"id_proker": id}))
 }

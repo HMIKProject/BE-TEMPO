@@ -175,6 +175,16 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 			adminGroup.POST("/divisi", adminOrganisasiHandler.CreateDivisi)
 			adminGroup.PUT("/divisi/:id", adminOrganisasiHandler.UpdateDivisi)
 
+			// Program Kerja Departemen & Divisi (Admin CMS)
+			prokerGroup := adminGroup.Group("/program-kerja")
+			{
+				prokerGroup.GET("", prokerHandler.GetAllProgramKerja)
+				prokerGroup.GET("/:id", prokerHandler.GetByID)
+				prokerGroup.POST("", prokerHandler.Create)
+				prokerGroup.PUT("/:id", prokerHandler.Update)
+				prokerGroup.DELETE("/:id", prokerHandler.Delete)
+			}
+
 			// Modul Pembelajaran (Admin CMS CRUD & Upload - BP-03)
 			modulGroup := adminGroup.Group("/modul")
 			{
