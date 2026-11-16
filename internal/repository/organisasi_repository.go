@@ -80,14 +80,16 @@ func (r *organisasiRepository) GetStrukturOrganisasi() (*entity.StrukturOrganisa
 		var divisiList []entity.DivisiDepartemen
 		_ = r.db.Where("id_departemen = ?", d.IdDepartemen).Order("id_divisi ASC").Find(&divisiList).Error
 
-		// Cari Kepala Departemen (Kadep)
-		var kadepAnggota entity.Anggota
+		// Cari Kepala Departemen (Kadep) jika ada
+		var kadepList []entity.Anggota
 		errKadep := r.db.Where("id_departemen = ? AND status = ? AND (jabatan ILIKE ? OR jabatan ILIKE ?)",
 			d.IdDepartemen, "Pengurus", "%ketua departemen%", "%kadep%").
-			First(&kadepAnggota).Error
+			Limit(1).
+			Find(&kadepList).Error
 
 		var kadepInfo *entity.DeptKadepInfo
-		if errKadep == nil && kadepAnggota.IdAnggota > 0 {
+		if errKadep == nil && len(kadepList) > 0 {
+			kadepAnggota := kadepList[0]
 			kadepInfo = &entity.DeptKadepInfo{
 				IdAnggota:   kadepAnggota.IdAnggota,
 				NamaLengkap: kadepAnggota.NamaLengkap,
