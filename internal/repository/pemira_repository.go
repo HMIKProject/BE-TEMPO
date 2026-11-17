@@ -464,7 +464,10 @@ func (r *pemiraRepository) DemisionerkanPengurusLama(ctx context.Context, except
 	if len(exceptNIMs) > 0 {
 		updateQuery = updateQuery.Where("nim NOT IN ?", exceptNIMs)
 	}
-	return updateQuery.Update("status", "Demisioner").Error
+	return updateQuery.Updates(map[string]interface{}{
+		"status":      "Demisioner",
+		"id_pengguna": nil,
+	}).Error
 }
 
 func (r *pemiraRepository) PurgeVotersAndVotes(ctx context.Context, idPemira int64) error {

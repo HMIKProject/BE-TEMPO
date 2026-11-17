@@ -107,16 +107,6 @@ func SeedAllRoleAccounts(db *gorm.DB) error {
 		}
 	}
 
-	// Tautkan anggota ke akun slot masing-masing jika jabatan cocok
-	for _, acc := range accounts {
-		if acc.Jabatan != "" && !strings.Contains(acc.Jabatan, "Admin") && !strings.Contains(acc.Jabatan, "Slot") {
-			var p entity.Pengguna
-			if err := db.Where("nama_pengguna = ?", acc.Username).First(&p).Error; err == nil {
-				db.Model(&entity.Anggota{}).Where("jabatan = ?", acc.Jabatan).Update("id_pengguna", p.IdPengguna)
-			}
-		}
-	}
-
 	log.Println("✅ [Seeder] Seluruh Akun Slot Jabatan HMIK selesai diproses (Password: 'qwerqwer')")
 	return nil
 }
