@@ -70,7 +70,7 @@ func main() {
 			if strings.HasSuffix(origin, ".netlify.app") || 
 			   strings.HasSuffix(origin, ".pages.dev") || 
 			   strings.HasSuffix(origin, ".workers.dev") || 
-			   strings.HasSuffix(origin, "hmikup.id") || 
+			   strings.Contains(origin, "hmikup.id") || 
 			   strings.Contains(origin, "gowebdigital.agency") {
 				return true
 			}
@@ -93,7 +93,7 @@ func main() {
 	router.GET("/version", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"app":     "HMIK CoreX Backend",
-			"version": "v11-live-diagnostic",
+			"version": "v13-live-diagnostic",
 			"time":    time.Now().UTC().Format(time.RFC3339),
 		})
 	})
