@@ -328,8 +328,12 @@ func (u *authUsecase) StudentRequestOTP(ctx context.Context, req entity.StudentR
 		}
 	}
 
-	// Kirim OTP via SMTP ke email kampus mahasiswa (Outlook)
-	_ = utils.SendOTPEmailWithPurpose(email, nim, otp, "learning")
+	// Kirim OTP via SMTP ke email kampus mahasiswa (Outlook) secara asinkron agar response instan
+	go func(targetEmail, targetNim, targetOtp string) {
+		if err := utils.SendOTPEmailWithPurpose(targetEmail, targetNim, targetOtp, "learning"); err != nil {
+			log.Printf("⚠️ Gagal mengirim OTP email ke %s: %v", targetEmail, err)
+		}
+	}(email, nim, otp)
 
 	log.Printf("📩 [STUDENT OTP] NIM: %s | Email: %s | Kode OTP: %s", nim, email, otp)
 
