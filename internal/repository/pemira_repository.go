@@ -422,13 +422,49 @@ func (r *pemiraRepository) UpsertAnggotaBPH(ctx context.Context, nim, nama, jaba
 }
 
 func (r *pemiraRepository) DemisionerkanPengurusLama(ctx context.Context, exceptNIMs []string) error {
-	query := r.db.WithContext(ctx).Model(&entity.Anggota{}).
+	findQuery := r.db.WithContext(ctx).Model(&entity.Anggota{}).
 		Where("jabatan IN ?", []string{"Ketua Himpunan", "Wakil Ketua Himpunan"}).
 		Where("status = ?", "Pengurus")
 	if len(exceptNIMs) > 0 {
-		query = query.Where("nim NOT IN ?", exceptNIMs)
+		findQuery = findQuery.Where("nim NOT IN ?", exceptNIMs)
 	}
-	return query.Update("status", "Demisioner").Error
+
+	var oldPengurus []entity.Anggota
+	if err := findQuery.Preload("Departemen").Preload("Divisi").Find(&oldPengurus).Error; err == nil {
+		for _, a := range oldPengurus {
+			deptName := ""
+			if a.Departemen != nil {
+				deptName = a.Departemen.NamaDepartemen
+			}
+			divName := ""
+			if a.Divisi != nil {
+				divName = a.Divisi.NamaDivisi
+			}
+			var count int64
+			r.db.Model(&entity.RiwayatJabatan{}).
+				Where("id_anggota = ? AND periode = ? AND jabatan = ?", a.IdAnggota, a.Periode, a.Jabatan).
+				Count(&count)
+			if count == 0 {
+				_ = r.db.Create(&entity.RiwayatJabatan{
+					IdAnggota:      a.IdAnggota,
+					Nim:            a.Nim,
+					Periode:        a.Periode,
+					Jabatan:        a.Jabatan,
+					NamaDepartemen: deptName,
+					NamaDivisi:     divName,
+					Status:         "Demisioner",
+				}).Error
+			}
+		}
+	}
+
+	updateQuery := r.db.WithContext(ctx).Model(&entity.Anggota{}).
+		Where("jabatan IN ?", []string{"Ketua Himpunan", "Wakil Ketua Himpunan"}).
+		Where("status = ?", "Pengurus")
+	if len(exceptNIMs) > 0 {
+		updateQuery = updateQuery.Where("nim NOT IN ?", exceptNIMs)
+	}
+	return updateQuery.Update("status", "Demisioner").Error
 }
 
 func (r *pemiraRepository) PurgeVotersAndVotes(ctx context.Context, idPemira int64) error {

@@ -168,6 +168,34 @@ func (r *slotRepository) AssignSlot(idPengguna int64, idAnggota int64, kodeAktiv
 // UnassignSlot melepas kaitan anggota dari slot, mendemisionerkan anggota, dan mereset password acak
 func (r *slotRepository) UnassignSlot(idPengguna int64, randomPasswordHash string) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
+		// Catat riwayat jabatan sebelum unassign
+		var currentAnggota entity.Anggota
+		if err := tx.Preload("Departemen").Preload("Divisi").Where("id_pengguna = ?", idPengguna).First(&currentAnggota).Error; err == nil {
+			deptName := ""
+			if currentAnggota.Departemen != nil {
+				deptName = currentAnggota.Departemen.NamaDepartemen
+			}
+			divName := ""
+			if currentAnggota.Divisi != nil {
+				divName = currentAnggota.Divisi.NamaDivisi
+			}
+			var count int64
+			tx.Model(&entity.RiwayatJabatan{}).
+				Where("id_anggota = ? AND periode = ? AND jabatan = ?", currentAnggota.IdAnggota, currentAnggota.Periode, currentAnggota.Jabatan).
+				Count(&count)
+			if count == 0 {
+				_ = tx.Create(&entity.RiwayatJabatan{
+					IdAnggota:      currentAnggota.IdAnggota,
+					Nim:            currentAnggota.Nim,
+					Periode:        currentAnggota.Periode,
+					Jabatan:        currentAnggota.Jabatan,
+					NamaDepartemen: deptName,
+					NamaDivisi:     divName,
+					Status:         "Demisioner",
+				}).Error
+			}
+		}
+
 		// 1. Lepas foreign key pada anggota peminjam dan ubah status ke Demisioner
 		if err := tx.Model(&entity.Anggota{}).
 			Where("id_pengguna = ?", idPengguna).
@@ -201,6 +229,36 @@ func (r *slotRepository) DemisionerMassal(randomPasswordHash string) (int64, int
 	var totalAnggotaDemis int64
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
+		// Catat riwayat jabatan untuk anggota aktif sebelum didemisionerkan
+		var pengurusList []entity.Anggota
+		if err := tx.Preload("Departemen").Preload("Divisi").Where("id_pengguna IS NOT NULL").Find(&pengurusList).Error; err == nil {
+			for _, a := range pengurusList {
+				deptName := ""
+				if a.Departemen != nil {
+					deptName = a.Departemen.NamaDepartemen
+				}
+				divName := ""
+				if a.Divisi != nil {
+					divName = a.Divisi.NamaDivisi
+				}
+				var count int64
+				tx.Model(&entity.RiwayatJabatan{}).
+					Where("id_anggota = ? AND periode = ? AND jabatan = ?", a.IdAnggota, a.Periode, a.Jabatan).
+					Count(&count)
+				if count == 0 {
+					_ = tx.Create(&entity.RiwayatJabatan{
+						IdAnggota:      a.IdAnggota,
+						Nim:            a.Nim,
+						Periode:        a.Periode,
+						Jabatan:        a.Jabatan,
+						NamaDepartemen: deptName,
+						NamaDivisi:     divName,
+						Status:         "Demisioner",
+					}).Error
+				}
+			}
+		}
+
 		// 1. Update anggota yang sedang memegang slot menjadi Demisioner dan unbind id_pengguna
 		resAnggota := tx.Model(&entity.Anggota{}).
 			Where("id_pengguna IS NOT NULL").

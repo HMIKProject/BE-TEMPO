@@ -52,6 +52,9 @@ func (u *adminBIAUsecase) CreateAnggota(req entity.CreateAnggotaRequest) (*entit
 	// 1. Cek apakah NIM sudah terdaftar
 	existing, _ := u.anggotaRepo.FindByNIM(req.Nim)
 	if existing != nil {
+		if existing.Status == "Demisioner" {
+			return nil, errors.New("NIM " + req.Nim + " sudah tercatat di sistem sebagai anggota Demisioner (" + existing.NamaLengkap + "). Silakan cari di daftar anggota lalu edit datanya untuk mengaktifkan kembali pada periode baru.")
+		}
 		return nil, errors.New("NIM " + req.Nim + " sudah terdaftar dalam Buku Induk Anggota")
 	}
 
@@ -94,6 +97,32 @@ func (u *adminBIAUsecase) UpdateAnggota(id int64, req entity.UpdateAnggotaReques
 	anggota, err := u.anggotaRepo.FindByID(id)
 	if err != nil {
 		return nil, errors.New("data anggota tidak ditemukan")
+	}
+
+	// Rekam riwayat jabatan jika terjadi transisi kepengurusan (periode/jabatan berubah atau demisioner aktif kembali)
+	isPeriodChange := anggota.Periode != "" && req.Periode != "" && anggota.Periode != req.Periode
+	isJabatanChange := anggota.Jabatan != "" && req.Jabatan != "" && anggota.Jabatan != req.Jabatan
+	isReactivation := anggota.Status == "Demisioner" && req.Status == "Pengurus"
+
+	if isPeriodChange || isJabatanChange || isReactivation {
+		deptName := ""
+		if anggota.Departemen != nil {
+			deptName = anggota.Departemen.NamaDepartemen
+		}
+		divName := ""
+		if anggota.Divisi != nil {
+			divName = anggota.Divisi.NamaDivisi
+		}
+		riwayat := &entity.RiwayatJabatan{
+			IdAnggota:      anggota.IdAnggota,
+			Nim:            anggota.Nim,
+			Periode:        anggota.Periode,
+			Jabatan:        anggota.Jabatan,
+			NamaDepartemen: deptName,
+			NamaDivisi:     divName,
+			Status:         "Demisioner",
+		}
+		_ = u.anggotaRepo.AddRiwayatJabatan(riwayat)
 	}
 
 	anggota.NamaLengkap = req.NamaLengkap

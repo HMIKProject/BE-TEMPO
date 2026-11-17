@@ -14,6 +14,7 @@ type AnggotaRepository interface {
 	Create(anggota *entity.Anggota) error
 	Update(anggota *entity.Anggota) error
 	Delete(id int64) error
+	AddRiwayatJabatan(riwayat *entity.RiwayatJabatan) error
 }
 
 type anggotaRepository struct {
@@ -36,6 +37,7 @@ func (r *anggotaRepository) FindAll() ([]entity.Anggota, error) {
 		Preload("Divisi").
 		Preload("KeahlianAnggota.Keahlian").
 		Preload("MinatRisetAnggota.MinatRiset").
+		Preload("RiwayatJabatan").
 		Find(&anggotas).Error
 		
 	return anggotas, err
@@ -88,6 +90,7 @@ func (r *anggotaRepository) FindWithFilter(filter entity.AnggotaFilter) ([]entit
 		Preload("Divisi").
 		Preload("KeahlianAnggota.Keahlian").
 		Preload("MinatRisetAnggota.MinatRiset").
+		Preload("RiwayatJabatan").
 		Order("angkatan DESC, nama_lengkap ASC").
 		Offset(offset).
 		Limit(limit).
@@ -105,6 +108,7 @@ func (r *anggotaRepository) FindByID(id int64) (*entity.Anggota, error) {
 		Preload("Divisi").
 		Preload("KeahlianAnggota.Keahlian").
 		Preload("MinatRisetAnggota.MinatRiset").
+		Preload("RiwayatJabatan").
 		First(&anggota, id).Error
 	if err != nil {
 		return nil, err
@@ -115,7 +119,11 @@ func (r *anggotaRepository) FindByID(id int64) (*entity.Anggota, error) {
 // FindByNIM mencari anggota berdasarkan NIM unik
 func (r *anggotaRepository) FindByNIM(nim string) (*entity.Anggota, error) {
 	var anggota entity.Anggota
-	err := r.db.Where("nim = ?", nim).First(&anggota).Error
+	err := r.db.Where("nim = ?", nim).
+		Preload("Departemen").
+		Preload("Divisi").
+		Preload("RiwayatJabatan").
+		First(&anggota).Error
 	if err != nil {
 		return nil, err
 	}
@@ -137,3 +145,14 @@ func (r *anggotaRepository) Delete(id int64) error {
 	return r.db.Delete(&entity.Anggota{}, id).Error
 }
 
+// AddRiwayatJabatan mencatat riwayat masa jabatan anggota
+func (r *anggotaRepository) AddRiwayatJabatan(riwayat *entity.RiwayatJabatan) error {
+	var count int64
+	r.db.Model(&entity.RiwayatJabatan{}).
+		Where("id_anggota = ? AND periode = ? AND jabatan = ?", riwayat.IdAnggota, riwayat.Periode, riwayat.Jabatan).
+		Count(&count)
+	if count > 0 {
+		return nil
+	}
+	return r.db.Create(riwayat).Error
+}

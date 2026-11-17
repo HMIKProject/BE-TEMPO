@@ -2,6 +2,22 @@ package entity
 
 import "time"
 
+type RiwayatJabatan struct {
+	IdRiwayat      int64     `gorm:"primaryKey;column:id_riwayat;autoIncrement" json:"id_riwayat"`
+	IdAnggota      int64     `gorm:"column:id_anggota;not null" json:"id_anggota"`
+	Nim            string    `gorm:"column:nim;not null" json:"nim"`
+	Periode        string    `gorm:"column:periode;not null" json:"periode"`
+	Jabatan        string    `gorm:"column:jabatan;not null" json:"jabatan"`
+	NamaDepartemen string    `gorm:"column:nama_departemen" json:"nama_departemen,omitempty"`
+	NamaDivisi     string    `gorm:"column:nama_divisi" json:"nama_divisi,omitempty"`
+	Status         string    `gorm:"column:status;not null;default:'Demisioner'" json:"status"`
+	DibuatPada     time.Time `gorm:"column:dibuat_pada;autoCreateTime" json:"dibuat_pada"`
+}
+
+func (RiwayatJabatan) TableName() string {
+	return "riwayat_jabatan"
+}
+
 type Anggota struct {
 	IdAnggota    int64     `gorm:"primaryKey;column:id_anggota;autoIncrement" json:"id_anggota"`
 	PenggunaID   *int64    `gorm:"column:id_pengguna" json:"id_pengguna,omitempty"` // Nullable untuk Demisioner
@@ -24,10 +40,13 @@ type Anggota struct {
 	DepartemenID *int64      `gorm:"column:id_departemen" json:"id_departemen,omitempty"`
 	Departemen   *Departemen `gorm:"foreignKey:DepartemenID;references:IdDepartemen" json:"departemen,omitempty"`
 
-	DivisiID     *int64            `gorm:"column:id_divisi" json:"id_divisi,omitempty"`
-	Divisi       *DivisiDepartemen `gorm:"foreignKey:DivisiID;references:IdDivisi" json:"divisi,omitempty"`
+	DivisiID *int64            `gorm:"column:id_divisi" json:"id_divisi,omitempty"`
+	Divisi   *DivisiDepartemen `gorm:"foreignKey:DivisiID;references:IdDivisi" json:"divisi,omitempty"`
 
 	// Relasi One-to-Many ke Tabel Perantara (Pivot)
 	KeahlianAnggota   []KeahlianAnggota   `gorm:"foreignKey:IdAnggota" json:"keahlian,omitempty"`
 	MinatRisetAnggota []MinatRisetAnggota `gorm:"foreignKey:IdAnggota" json:"minat_riset,omitempty"`
+
+	// Riwayat Jabatan Rekam Jejak
+	RiwayatJabatan []RiwayatJabatan `gorm:"foreignKey:IdAnggota" json:"riwayat_jabatan,omitempty"`
 }

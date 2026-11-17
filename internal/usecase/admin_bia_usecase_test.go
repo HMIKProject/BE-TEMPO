@@ -84,6 +84,10 @@ func (m *mockAnggotaRepo) Delete(id int64) error {
 	return nil
 }
 
+func (m *mockAnggotaRepo) AddRiwayatJabatan(riwayat *entity.RiwayatJabatan) error {
+	return nil
+}
+
 func TestAdminBIAUsecase_CRUD(t *testing.T) {
 	repo := newMockAnggotaRepo()
 	uc := usecase.NewAdminBIAUsecase(repo)

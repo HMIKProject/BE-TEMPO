@@ -71,7 +71,25 @@ func TestPemiraE2E_FullLifecycle(t *testing.T) {
 	testEmail := "105223099@student.universitaspertamina.ac.id"
 
 	// Pastikan pemira aktif untuk test bilik suara
-	db.Exec("UPDATE pemira SET status = 'BERJALAN', tanggal_mulai = NOW() - INTERVAL '1 day', tanggal_selesai = NOW() + INTERVAL '2 day' WHERE id_pemira = 1")
+	db.Exec("UPDATE pemira SET status = 'BERJALAN', tanggal_mulai = NOW() - INTERVAL '1 day', tanggal_selesai = NOW() + INTERVAL '2 day' WHERE id_pemira = (SELECT id_pemira FROM pemira ORDER BY id_pemira DESC LIMIT 1)")
+	var latestPemira entity.Pemira
+	db.Where("status = ?", "BERJALAN").Order("id_pemira DESC").First(&latestPemira)
+
+	// Pastikan paslon tersedia untuk voting
+	var countPaslon int64
+	db.Model(&entity.Paslon{}).Where("id_pemira = ?", latestPemira.IdPemira).Count(&countPaslon)
+	if countPaslon == 0 {
+		db.Create(&entity.Paslon{
+			IdPemira:    latestPemira.IdPemira,
+			NomorUrut:   1,
+			NimKetua:    "105223011",
+			NamaKetua:   "Calon Ketua",
+			NimWakil:    "105223012",
+			NamaWakil:   "Calon Wakil",
+			NamaKabinet: "Kabinet Test",
+			FotoPaslon:  "https://example.com/paslon.png",
+		})
+	}
 
 	// Reset status voter di DB sebelum test
 	db.Exec("UPDATE pemilih SET status_memilih = false, kode_otp = NULL, otp_expired = NULL WHERE nim = ?", testNIM)
@@ -413,19 +431,29 @@ func TestAdminPemiraCRUD_And_PelantikanMPIK(t *testing.T) {
 
 	// 4. Strict Deletion Protection (LUBER JURDIL)
 	t.Run("4. Proteksi Penghapusan Paslon Berjalan Benar", func(t *testing.T) {
-		// Masukkan suara sah untuk paslon yang ada agar proteksi penghapusan paslon teruji
-		var samplePaslon entity.Paslon
-		if err := db.First(&samplePaslon).Error; err == nil {
-			db.Exec("INSERT INTO suara (id_pemira, id_paslon, waktu_memilih) VALUES (?, ?, NOW())", samplePaslon.IdPemira, samplePaslon.IdPaslon)
+		var currentPemira entity.Pemira
+		db.Where("status = ?", "BERJALAN").Order("id_pemira DESC").First(&currentPemira)
 
-			reqDelVoted, _ := http.NewRequest(http.MethodDelete, "/api/v1/admin/pemira/kandidat/"+strconv.FormatInt(samplePaslon.IdPaslon, 10), nil)
-			reqDelVoted.Header.Set("Authorization", "Bearer "+adminToken)
-			wDelVoted := httptest.NewRecorder()
-			router.ServeHTTP(wDelVoted, reqDelVoted)
+		votedPaslon := entity.Paslon{
+			IdPemira:    currentPemira.IdPemira,
+			NomorUrut:   88,
+			NimKetua:    "105223088",
+			NamaKetua:   "Kahim Voted",
+			NimWakil:    "105223089",
+			NamaWakil:   "Wakahim Voted",
+			NamaKabinet: "Kabinet Voted",
+			FotoPaslon:  "https://example.com/voted.png",
+		}
+		db.Create(&votedPaslon)
+		db.Exec("INSERT INTO suara (id_pemira, id_paslon, waktu_memilih) VALUES (?, ?, NOW())", currentPemira.IdPemira, votedPaslon.IdPaslon)
 
-			if wDelVoted.Code != http.StatusBadRequest {
-				t.Errorf("Ekspektasi 400 Bad Request untuk paslon dengan suara masuk, dapat: %d", wDelVoted.Code)
-			}
+		reqDelVoted, _ := http.NewRequest(http.MethodDelete, "/api/v1/admin/pemira/kandidat/"+strconv.FormatInt(votedPaslon.IdPaslon, 10), nil)
+		reqDelVoted.Header.Set("Authorization", "Bearer "+adminToken)
+		wDelVoted := httptest.NewRecorder()
+		router.ServeHTTP(wDelVoted, reqDelVoted)
+
+		if wDelVoted.Code != http.StatusBadRequest {
+			t.Errorf("Ekspektasi 400 Bad Request untuk paslon dengan suara masuk, dapat: %d", wDelVoted.Code)
 		}
 
 		// Paslon baru yang belum punya suara -> boleh dihapus
@@ -435,7 +463,7 @@ func TestAdminPemiraCRUD_And_PelantikanMPIK(t *testing.T) {
 		router.ServeHTTP(wDelNew, reqDelNew)
 
 		if wDelNew.Code != http.StatusOK {
-			t.Errorf("Ekspektasi 200 OK untuk paslon tanpa suara, dapat: %d", wDelNew.Code)
+			t.Errorf("Ekspektasi 200 OK untuk paslon tanpa suara, dapat: %d, body: %s", wDelNew.Code, wDelNew.Body.String())
 		}
 	})
 
