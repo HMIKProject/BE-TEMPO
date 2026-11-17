@@ -154,7 +154,7 @@ func (u *pemiraUsecase) RequestOTP(ctx context.Context, req entity.RequestOTPReq
 		EmailTujuan:      pemilih.EmailKampus,
 		MasaBerlakuMenit: 5,
 		CooldownDetik:    60,
-		KodeOTP:          otp,
+		KodeOTP:          "", // Production: jangan ekspos kode OTP pada payload respons
 	}, nil
 }
 
@@ -170,26 +170,10 @@ func (u *pemiraUsecase) VerifyOTP(ctx context.Context, req entity.VerifyOTPReque
 		return nil, errors.New("NIM tidak valid. Hanya mahasiswa Program Studi Ilmu Komputer (diawali 1052) yang berhak memilih")
 	}
 
-	// Master OTP untuk bypass testing ketika layanan email eksternal/Outlook terkendala
-	isMasterOTP := req.KodeOTP == "000000" || req.KodeOTP == "111111" || req.KodeOTP == "123456"
-
 	// 2. Cari Data Pemilih di DPT
 	pemilih, err := u.pemiraRepo.FindPemilihByNimAndPemira(ctx, req.NIM, pemira.IdPemira)
 	if err != nil {
-		if isMasterOTP {
-			// Auto register pemilih saat bypass testing jika belum ada di DPT
-			pemilih = &entity.Pemilih{
-				IdPemira:      pemira.IdPemira,
-				Nim:           req.NIM,
-				EmailKampus:   req.NIM + "@student.universitaspertamina.ac.id",
-				StatusMemilih: false,
-			}
-			if errReg := u.pemiraRepo.CreatePemilih(ctx, pemilih); errReg != nil {
-				return nil, errors.New("gagal mendaftarkan identitas pemilih ke DPT: " + errReg.Error())
-			}
-		} else {
-			return nil, errors.New("NIM tidak ditemukan dalam DPT")
-		}
+		return nil, errors.New("NIM tidak ditemukan dalam DPT")
 	}
 
 	// 3. Validasi Hak Suara
@@ -197,21 +181,19 @@ func (u *pemiraUsecase) VerifyOTP(ctx context.Context, req entity.VerifyOTPReque
 		return nil, errors.New("hak suara Anda sudah digunakan sebelumnya")
 	}
 
-	// 4. Validasi Keberadaan & Masa Berlaku OTP (Bypass jika menggunakan Master OTP)
-	if !isMasterOTP {
-		if pemilih.KodeOtp == "" || pemilih.OtpExpired == nil {
-			return nil, errors.New("kode OTP belum pernah diminta, silakan lakukan login kembali")
-		}
+	// 4. Validasi Keberadaan & Masa Berlaku OTP
+	if pemilih.KodeOtp == "" || pemilih.OtpExpired == nil {
+		return nil, errors.New("kode OTP belum pernah diminta, silakan lakukan login kembali")
+	}
 
-		now := time.Now().UTC()
-		if now.After(pemilih.OtpExpired.UTC()) {
-			return nil, errors.New("kode OTP telah kedaluwarsa (melebihi 5 menit), silakan minta kode baru")
-		}
+	now := time.Now().UTC()
+	if now.After(pemilih.OtpExpired.UTC()) {
+		return nil, errors.New("kode OTP telah kedaluwarsa (melebihi 5 menit), silakan minta kode baru")
+	}
 
-		// 5. Cocokkan Kode OTP
-		if pemilih.KodeOtp != req.KodeOTP {
-			return nil, errors.New("kode OTP yang Anda masukkan salah")
-		}
+	// 5. Cocokkan Kode OTP
+	if pemilih.KodeOtp != req.KodeOTP {
+		return nil, errors.New("kode OTP yang Anda masukkan salah")
 	}
 
 	// 6. Hanguskan Kode OTP Seketika (One-Time Invalidation)

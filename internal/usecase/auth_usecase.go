@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -283,7 +284,8 @@ func (u *authUsecase) StudentRequestOTP(ctx context.Context, req entity.StudentR
 	if err != nil {
 		otp = "123456"
 	}
-	expiredAt := time.Now().Add(5 * time.Minute)
+	now := time.Now().UTC()
+	expiredAt := now.Add(5 * time.Minute)
 
 	pengguna, err := u.penggunaRepo.FindByEmailOrUsername(nim)
 	if err != nil {
@@ -306,18 +308,16 @@ func (u *authUsecase) StudentRequestOTP(ctx context.Context, req entity.StudentR
 			return nil, errors.New("Gagal mendaftarkan sesi mahasiswa")
 		}
 	} else {
-		// Cek cooldown 60 detik
+		// Cek cooldown 60 detik (UTC)
 		if pengguna.KodeAktivasiExpired != nil {
-			createdAt := pengguna.KodeAktivasiExpired.Add(-5 * time.Minute)
-			elapsed := time.Since(createdAt)
+			createdAt := pengguna.KodeAktivasiExpired.UTC().Add(-5 * time.Minute)
+			elapsed := now.Sub(createdAt)
 			if elapsed >= 0 && elapsed < 60*time.Second {
 				sisa := int((60*time.Second - elapsed).Seconds()) + 1
-				return &entity.StudentRequestOTPResponse{
-					EmailKampus:  email,
-					NIM:          nim,
-					SisaCooldown: sisa,
-					KodeOTP:      *pengguna.KodeAktivasi,
-				}, nil
+				if sisa > 60 {
+					sisa = 60
+				}
+				return nil, fmt.Errorf("Harap tunggu %d detik sebelum meminta kode OTP kembali", sisa)
 			}
 		}
 
@@ -341,7 +341,7 @@ func (u *authUsecase) StudentRequestOTP(ctx context.Context, req entity.StudentR
 		EmailKampus:  email,
 		NIM:          nim,
 		SisaCooldown: 60,
-		KodeOTP:      otp,
+		KodeOTP:      "", // Production: jangan ekspos kode OTP pada payload respons
 	}, nil
 }
 
@@ -362,12 +362,10 @@ func (u *authUsecase) StudentVerifyOTP(ctx context.Context, req entity.StudentVe
 		}
 	}
 
-	// Master OTP "000000" selalu diizinkan untuk kemudahan dev & testing
+	now := time.Now().UTC()
 	isValid := false
-	if req.KodeOTP == "000000" {
-		isValid = true
-	} else if pengguna.KodeAktivasi != nil && *pengguna.KodeAktivasi == req.KodeOTP {
-		if pengguna.KodeAktivasiExpired == nil || time.Now().Before(*pengguna.KodeAktivasiExpired) {
+	if pengguna.KodeAktivasi != nil && *pengguna.KodeAktivasi == req.KodeOTP {
+		if pengguna.KodeAktivasiExpired != nil && now.Before(pengguna.KodeAktivasiExpired.UTC()) {
 			isValid = true
 		}
 	}

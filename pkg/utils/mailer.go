@@ -102,16 +102,12 @@ func sendSMTPEmailWithPurpose(toEmail, nim, otpCode, purpose string) error {
 
 	htmlBody := buildOTPEmailHTMLCustom(nim, otpCode, title, badge, contextDesc, senderName)
 
-	message := fmt.Sprintf("From: %s <%s>\r\n"+
-		"To: %s\r\n"+
-		"Reply-To: %s\r\n"+
+	message := fmt.Sprintf("From: \"%s\" <%s>\r\n"+
+		"To: <%s>\r\n"+
+		"Reply-To: <%s>\r\n"+
 		"Subject: %s\r\n"+
 		"Date: %s\r\n"+
 		"Message-ID: %s\r\n"+
-		"X-Priority: 3\r\n"+
-		"Importance: normal\r\n"+
-		"Auto-Submitted: auto-generated\r\n"+
-		"X-Auto-Response-Suppress: All\r\n"+
 		"MIME-Version: 1.0\r\n"+
 		"Content-Type: multipart/alternative; boundary=\"%s\"\r\n\r\n"+
 		"--%s\r\n"+
