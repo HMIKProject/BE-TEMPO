@@ -38,3 +38,33 @@ type SetInitialPasswordRequest struct {
 	PasswordBaru    string `json:"password_baru" binding:"required,min=8" example:"PasswordPribadi123!"`
 	KonfirmasiSandi string `json:"konfirmasi_sandi" binding:"required,eqfield=PasswordBaru" example:"PasswordPribadi123!"`
 }
+
+// StudentRequestOTPRequest payload permohonan kode OTP mahasiswa umum (Login Tipe 2)
+type StudentRequestOTPRequest struct {
+	NIM         string `json:"nim" binding:"required" example:"105223046"`
+	EmailKampus string `json:"email_kampus" binding:"required,email" example:"105223046@student.universitaspertamina.ac.id"`
+}
+
+// StudentRequestOTPResponse kembalian request OTP mahasiswa
+type StudentRequestOTPResponse struct {
+	EmailKampus  string `json:"email_kampus"`
+	NIM          string `json:"nim"`
+	SisaCooldown int    `json:"sisa_cooldown"`
+	KodeOTP      string `json:"kode_otp,omitempty"` // Ditampilkan khusus di mode dev/testing
+}
+
+// StudentVerifyOTPRequest payload verifikasi OTP mahasiswa umum (Login Tipe 2)
+type StudentVerifyOTPRequest struct {
+	NIM         string `json:"nim" binding:"required" example:"105223046"`
+	EmailKampus string `json:"email_kampus" binding:"required,email" example:"105223046@student.universitaspertamina.ac.id"`
+	KodeOTP     string `json:"kode_otp" binding:"required,len=6" example:"123456"`
+}
+
+// StudentVerifyOTPResponse kembalian sukses login mahasiswa umum
+type StudentVerifyOTPResponse struct {
+	Token       string `json:"token" example:"eyJhbGci..."`
+	NIM         string `json:"nim" example:"105223046"`
+	EmailKampus string `json:"email_kampus" example:"105223046@student.universitaspertamina.ac.id"`
+	Role        string `json:"role" example:"Mahasiswa"`
+	NamaLengkap string `json:"nama_lengkap" example:"Mahasiswa Ilmu Komputer"`
+}

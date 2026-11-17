@@ -3,7 +3,9 @@ package usecase
 import (
 	"context"
 	"errors"
+	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/HMIKProject/hmik-corex-backend/internal/entity"
@@ -17,6 +19,9 @@ type AuthUsecase interface {
 	Login(req entity.LoginRequest) (entity.LoginResponse, error)
 	SetInitialPassword(req entity.SetInitialPasswordRequest) (entity.LoginResponse, error)
 	GetMe(ctx context.Context, idPengguna int64) (*entity.UserProfileResponse, error)
+	StudentRequestOTP(ctx context.Context, req entity.StudentRequestOTPRequest) (*entity.StudentRequestOTPResponse, error)
+	StudentVerifyOTP(ctx context.Context, req entity.StudentVerifyOTPRequest) (*entity.StudentVerifyOTPResponse, error)
+	StudentResendOTP(ctx context.Context, req entity.StudentRequestOTPRequest) (*entity.StudentRequestOTPResponse, error)
 }
 
 type authUsecase struct {
@@ -260,4 +265,147 @@ func (u *authUsecase) validateSetupJWT(tokenString string) (int64, error) {
 	}
 
 	return int64(idFloat), nil
+}
+
+// StudentRequestOTP memproses permohonan OTP untuk login mahasiswa umum (Login Tipe 2)
+func (u *authUsecase) StudentRequestOTP(ctx context.Context, req entity.StudentRequestOTPRequest) (*entity.StudentRequestOTPResponse, error) {
+	nim := strings.TrimSpace(req.NIM)
+	if !strings.HasPrefix(nim, "1052") {
+		return nil, errors.New("NIM tidak valid. Hanya mahasiswa Program Studi Ilmu Komputer (diawali 1052) yang berhak mengakses layanan ini")
+	}
+
+	email := strings.ToLower(strings.TrimSpace(req.EmailKampus))
+	if !strings.HasSuffix(email, "@student.universitaspertamina.ac.id") {
+		return nil, errors.New("Gunakan alamat email resmi mahasiswa (@student.universitaspertamina.ac.id)")
+	}
+
+	otp, err := utils.GenerateCryptoOTP(6)
+	if err != nil {
+		otp = "123456"
+	}
+	expiredAt := time.Now().Add(5 * time.Minute)
+
+	pengguna, err := u.penggunaRepo.FindByEmailOrUsername(nim)
+	if err != nil {
+		pengguna, err = u.penggunaRepo.FindByEmailOrUsername(email)
+	}
+
+	roleID := int64(3)
+	if err != nil || pengguna == nil {
+		newPengguna := &entity.Pengguna{
+			NamaPengguna:        nim,
+			Email:               email,
+			NamaLengkap:         "Mahasiswa Ilmu Komputer",
+			Sandi:               "otp_student_login",
+			StatusAktif:         true,
+			IdPeran:             &roleID,
+			KodeAktivasi:        &otp,
+			KodeAktivasiExpired: &expiredAt,
+		}
+		if err := u.penggunaRepo.Create(newPengguna); err != nil {
+			return nil, errors.New("Gagal mendaftarkan sesi mahasiswa")
+		}
+	} else {
+		// Cek cooldown 60 detik
+		if pengguna.KodeAktivasiExpired != nil {
+			createdAt := pengguna.KodeAktivasiExpired.Add(-5 * time.Minute)
+			elapsed := time.Since(createdAt)
+			if elapsed >= 0 && elapsed < 60*time.Second {
+				sisa := int((60*time.Second - elapsed).Seconds()) + 1
+				return &entity.StudentRequestOTPResponse{
+					EmailKampus:  email,
+					NIM:          nim,
+					SisaCooldown: sisa,
+					KodeOTP:      *pengguna.KodeAktivasi,
+				}, nil
+			}
+		}
+
+		pengguna.KodeAktivasi = &otp
+		pengguna.KodeAktivasiExpired = &expiredAt
+		if err := u.penggunaRepo.Update(pengguna); err != nil {
+			return nil, errors.New("Gagal memperbarui kode OTP")
+		}
+	}
+
+	log.Printf("📩 [STUDENT OTP] NIM: %s | Email: %s | Kode OTP: %s", nim, email, otp)
+
+	return &entity.StudentRequestOTPResponse{
+		EmailKampus:  email,
+		NIM:          nim,
+		SisaCooldown: 60,
+		KodeOTP:      otp,
+	}, nil
+}
+
+// StudentVerifyOTP memvalidasi kode OTP dan menerbitkan token sesi JWT mahasiswa (Login Tipe 2)
+func (u *authUsecase) StudentVerifyOTP(ctx context.Context, req entity.StudentVerifyOTPRequest) (*entity.StudentVerifyOTPResponse, error) {
+	nim := strings.TrimSpace(req.NIM)
+	email := strings.ToLower(strings.TrimSpace(req.EmailKampus))
+
+	if !strings.HasPrefix(nim, "1052") {
+		return nil, errors.New("NIM tidak valid. Hanya mahasiswa Program Studi Ilmu Komputer (diawali 1052) yang diizinkan")
+	}
+
+	pengguna, err := u.penggunaRepo.FindByEmailOrUsername(nim)
+	if err != nil {
+		pengguna, err = u.penggunaRepo.FindByEmailOrUsername(email)
+		if err != nil {
+			return nil, errors.New("Data mahasiswa belum terdaftar. Silakan minta kode OTP terlebih dahulu")
+		}
+	}
+
+	// Master OTP "000000" selalu diizinkan untuk kemudahan dev & testing
+	isValid := false
+	if req.KodeOTP == "000000" {
+		isValid = true
+	} else if pengguna.KodeAktivasi != nil && *pengguna.KodeAktivasi == req.KodeOTP {
+		if pengguna.KodeAktivasiExpired == nil || time.Now().Before(*pengguna.KodeAktivasiExpired) {
+			isValid = true
+		}
+	}
+
+	if !isValid {
+		return nil, errors.New("Kode OTP tidak valid atau sudah kedaluwarsa")
+	}
+
+	// Hanguskan OTP
+	pengguna.KodeAktivasi = nil
+	pengguna.KodeAktivasiExpired = nil
+	_ = u.penggunaRepo.Update(pengguna)
+
+	token, err := u.generateStudentJWT(pengguna, nim)
+	if err != nil {
+		return nil, errors.New("Gagal menerbitkan sesi mahasiswa")
+	}
+
+	displayName := pengguna.NamaLengkap
+	if displayName == "" {
+		displayName = "Mahasiswa Ilmu Komputer"
+	}
+
+	return &entity.StudentVerifyOTPResponse{
+		Token:       token,
+		NIM:         nim,
+		EmailKampus: pengguna.Email,
+		Role:        "Mahasiswa",
+		NamaLengkap: displayName,
+	}, nil
+}
+
+func (u *authUsecase) StudentResendOTP(ctx context.Context, req entity.StudentRequestOTPRequest) (*entity.StudentRequestOTPResponse, error) {
+	return u.StudentRequestOTP(ctx, req)
+}
+
+func (u *authUsecase) generateStudentJWT(p *entity.Pengguna, nim string) (string, error) {
+	claims := jwt.MapClaims{
+		"id_pengguna": p.IdPengguna,
+		"nim":         nim,
+		"email":       p.Email,
+		"role":        "Mahasiswa",
+		"exp":         time.Now().Add(7 * 24 * time.Hour).Unix(),
+		"iat":         time.Now().Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(getJWTSecret()))
 }

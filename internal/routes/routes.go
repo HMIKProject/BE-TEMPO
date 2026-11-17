@@ -77,11 +77,19 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	// Grup API Versi 1
 	v1 := router.Group("/api/v1")
 	{
-		// Auth Routes
+		// Auth Routes (Login Tipe 1: Pengurus & Admin, Login Tipe 2: Mahasiswa Umum)
 		authGroup := v1.Group("/auth")
 		{
 			authGroup.POST("/login", authHandler.Login)
 			authGroup.POST("/set-initial-password", authHandler.SetInitialPassword)
+
+			// Student Auth Routes (Login Tipe 2: Mahasiswa Umum Ilkom via OTP)
+			studentAuth := authGroup.Group("/student")
+			{
+				studentAuth.POST("/request-otp", authHandler.StudentRequestOTP)
+				studentAuth.POST("/verify-otp", authHandler.StudentVerifyOTP)
+				studentAuth.POST("/resend-otp", authHandler.StudentResendOTP)
+			}
 		}
 
 		// Pemira (E-Voting) Voter Routes
@@ -108,10 +116,10 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 		// Endpoint untuk Program Kerja (Global, filterable by status/is_unggulan)
 		v1.GET("/program-kerja", prokerHandler.GetAllProgramKerja)
 
-		// Endpoint untuk Modul Pembelajaran (Publik - BP-03)
-		v1.GET("/learning/modul", modulHandler.GetAll)
-		v1.GET("/learning/modul/:id", modulHandler.GetByID)
-		v1.GET("/learning/modul/:id/download", modulHandler.Download)
+		// Endpoint untuk Modul Pembelajaran (Dilindungi LearningAccessMiddleware: Tipe 1 & Tipe 2)
+		v1.GET("/learning/modul", middleware.LearningAccessMiddleware(), modulHandler.GetAll)
+		v1.GET("/learning/modul/:id", middleware.LearningAccessMiddleware(), modulHandler.GetByID)
+		v1.GET("/learning/modul/:id/download", middleware.LearningAccessMiddleware(), modulHandler.Download)
 
 		// Jalur Rute Admin yang Dilindungi Middleware Token JWT (Standar Obsidian)
 		adminGroup := v1.Group("/admin")

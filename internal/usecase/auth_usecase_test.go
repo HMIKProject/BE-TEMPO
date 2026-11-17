@@ -49,6 +49,14 @@ func (m *mockPenggunaRepo) Update(pengguna *entity.Pengguna) error {
 	return nil
 }
 
+func (m *mockPenggunaRepo) Create(pengguna *entity.Pengguna) error {
+	if pengguna.IdPengguna == 0 {
+		pengguna.IdPengguna = int64(len(m.byID) + 1)
+	}
+	m.add(pengguna)
+	return nil
+}
+
 func TestAuthUsecase_LoginAndActivation(t *testing.T) {
 	repo := newMockPenggunaRepo()
 	uc := usecase.NewAuthUsecase(repo, nil)

@@ -10,6 +10,7 @@ type PenggunaRepository interface {
 	FindByEmailOrUsername(identifier string) (*entity.Pengguna, error)
 	FindByID(id int64) (*entity.Pengguna, error)
 	Update(pengguna *entity.Pengguna) error
+	Create(pengguna *entity.Pengguna) error
 }
 
 type penggunaRepository struct {
@@ -47,4 +48,9 @@ func (r *penggunaRepository) FindByID(id int64) (*entity.Pengguna, error) {
 // Update memperbarui data pengguna
 func (r *penggunaRepository) Update(pengguna *entity.Pengguna) error {
 	return r.db.Save(pengguna).Error
+}
+
+// Create menambahkan data pengguna baru
+func (r *penggunaRepository) Create(pengguna *entity.Pengguna) error {
+	return r.db.Create(pengguna).Error
 }
