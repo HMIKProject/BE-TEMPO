@@ -61,6 +61,7 @@ func (r *slotRepository) FindAllSlots() ([]entity.AccountSlotResponse, error) {
 		mapping := GetSlotOrgMapping(p.NamaPengguna, p.NamaLengkap)
 		resp := entity.AccountSlotResponse{
 			IdPengguna:          p.IdPengguna,
+			IdPeran:             p.IdPeran,
 			NamaPengguna:        p.NamaPengguna,
 			Email:               p.Email,
 			Jabatan:             mapping.Jabatan,

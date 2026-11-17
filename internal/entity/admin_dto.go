@@ -67,6 +67,7 @@ type SlotPeminjamInfo struct {
 // AccountSlotResponse representasi kartu slot akun di dashboard admin
 type AccountSlotResponse struct {
 	IdPengguna          int64             `json:"id_pengguna"`
+	IdPeran             *int64            `json:"id_peran,omitempty"`
 	NamaPengguna        string            `json:"nama_pengguna"`
 	Email               string            `json:"email"`
 	Jabatan             string            `json:"jabatan"`

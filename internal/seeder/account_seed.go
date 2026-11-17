@@ -17,6 +17,15 @@ func SeedAllRoleAccounts(db *gorm.DB) error {
 	}
 	hashStr := string(hashedPassword)
 
+	// Pastikan master roles tersedia di database
+	_ = db.Exec(`
+		INSERT INTO roles (id_role, nama_role, deskripsi) VALUES
+		(1, 'BPH (Super Administrator)', 'Akses penuh seluruh fitur admin dan tata kelola himpunan'),
+		(2, 'Admin Operasional', 'Akses operasional harian Buku Induk Anggota dan Program Kerja'),
+		(3, 'Pengurus / Anggota', 'Akses pengguna umum modul pembelajaran')
+		ON CONFLICT (id_role) DO UPDATE SET nama_role = EXCLUDED.nama_role, deskripsi = EXCLUDED.deskripsi;
+	`).Error
+
 	accounts := []struct {
 		Username string
 		Email    string
@@ -77,6 +86,13 @@ func SeedAllRoleAccounts(db *gorm.DB) error {
 	}
 
 	for _, acc := range accounts {
+		defaultRole := int64(2)
+		if acc.Username == "hmik.admin" || acc.Username == "hmik.kahim.01" || acc.Username == "hmik.wakahim.01" ||
+			acc.Username == "hmik.sekretaris.01" || acc.Username == "hmik.sekretaris.02" ||
+			acc.Username == "hmik.bendahara.01" || acc.Username == "hmik.bendahara.02" {
+			defaultRole = int64(1)
+		}
+
 		var existing entity.Pengguna
 		res := db.Where("email = ? OR nama_pengguna = ?", acc.Email, acc.Username).First(&existing)
 		if res.Error == nil {
@@ -85,6 +101,9 @@ func SeedAllRoleAccounts(db *gorm.DB) error {
 			existing.Email = acc.Email
 			existing.Sandi = hashStr
 			existing.StatusAktif = true
+			if existing.IdPeran == nil {
+				existing.IdPeran = &defaultRole
+			}
 			if err := db.Save(&existing).Error; err != nil {
 				log.Printf("❌ [Seeder] Gagal update akun %s: %v", acc.Username, err)
 			} else {
@@ -97,6 +116,7 @@ func SeedAllRoleAccounts(db *gorm.DB) error {
 				Email:        acc.Email,
 				Sandi:        hashStr,
 				StatusAktif:  true,
+				IdPeran:      &defaultRole,
 			}
 			if err := db.Create(&newAcc).Error; err != nil {
 				log.Printf("❌ [Seeder] Gagal insert akun %s: %v", acc.Username, err)
