@@ -9,32 +9,32 @@ import (
 	"time"
 )
 
-// SendOTPEmail mengirimkan kode OTP ke email tujuan dengan deteksi mode otomatis (Dual-Mode Architecture).
-// Sesuai standar TS-Infra-Layanan-Mailer-dan-OTP:
-// 1. Mode Development (atau jika SMTP_HOST belum diset): Mencetak banner OTP ke terminal tanpa crash/network error.
-// 2. Mode Production: Mengirim email HTML resmi via SMTP TLS ke kotak masuk mahasiswa.
+// SendOTPEmail mengirimkan kode OTP ke email tujuan (default untuk Pemira)
 func SendOTPEmail(emailTujuan, nim, otpCode string) error {
-	appEnv := strings.ToLower(os.Getenv("APP_ENV"))
+	return SendOTPEmailWithPurpose(emailTujuan, nim, otpCode, "pemira")
+}
+
+// SendOTPEmailWithPurpose mengirimkan kode OTP ke email tujuan dengan kustomisasi peruntukan (Pemira / Modul Belajar).
+func SendOTPEmailWithPurpose(emailTujuan, nim, otpCode, purpose string) error {
 	smtpHost := os.Getenv("SMTP_HOST")
 	smtpUser := os.Getenv("SMTP_USER")
 	if smtpUser == "" {
 		smtpUser = os.Getenv("SMTP_EMAIL")
 	}
 
-	// 1. PRODUCTION / SMTP MODE (Aktif jika SMTP_HOST & SMTP_USER terisi dan APP_ENV bukan "development")
-	if smtpHost != "" && smtpUser != "" && appEnv != "development" {
-		err := sendSMTPEmail(emailTujuan, nim, otpCode)
-		if err != nil {
-			log.Printf("⚠️ [SMTP ERROR] Gagal mengirim email ke %s: %v", emailTujuan, err)
-			return err
+	// 1. SMTP MODE: Jika SMTP_HOST & SMTP_USER terisi, selalu coba kirim email fisik via SMTP
+	if smtpHost != "" && smtpUser != "" {
+		err := sendSMTPEmailWithPurpose(emailTujuan, nim, otpCode, purpose)
+		if err == nil {
+			log.Printf("✅ [SMTP SUCCESS] Email OTP berhasil dikirimkan ke %s via %s (Tujuan: %s)", emailTujuan, smtpHost, purpose)
+			return nil
 		}
-		log.Printf("✅ [SMTP SUCCESS] Email OTP berhasil dikirimkan ke %s via %s", emailTujuan, smtpHost)
-		return nil
+		log.Printf("⚠️ [SMTP ERROR] Gagal mengirim email ke %s: %v. Menggunakan console fallback.", emailTujuan, err)
 	}
 
-	// 2. FALLBACK / DEVELOPMENT MODE (Cetak ke konsol terminal)
+	// 2. FALLBACK / DEVELOPMENT MODE (Cetak ke konsol terminal agar tetap bisa dites lokal)
 	log.Println("================================================================")
-	log.Printf("📧 [DEV MAILER - CONSOLE FALLBACK]")
+	log.Printf("📧 [DEV MAILER - CONSOLE FALLBACK - %s]", strings.ToUpper(purpose))
 	log.Printf("   Tujuan   : %s (NIM: %s)", emailTujuan, nim)
 	log.Printf("   KODE OTP : >>> %s <<< (Masa Berlaku: 5 Menit)", otpCode)
 	log.Println("================================================================")
@@ -43,6 +43,10 @@ func SendOTPEmail(emailTujuan, nim, otpCode string) error {
 
 // sendSMTPEmail melakukan transmisi paket email HTML via protokol SMTP
 func sendSMTPEmail(toEmail, nim, otpCode string) error {
+	return sendSMTPEmailWithPurpose(toEmail, nim, otpCode, "pemira")
+}
+
+func sendSMTPEmailWithPurpose(toEmail, nim, otpCode, purpose string) error {
 	smtpHost := os.Getenv("SMTP_HOST")
 	smtpPort := os.Getenv("SMTP_PORT")
 	if smtpPort == "" {
@@ -59,30 +63,44 @@ func sendSMTPEmail(toEmail, nim, otpCode string) error {
 	smtpPass := strings.ReplaceAll(os.Getenv("SMTP_PASSWORD"), " ", "")
 	senderName := os.Getenv("SMTP_SENDER_NAME")
 	if senderName == "" {
-		senderName = "Panitia Pemira HMIK"
+		if purpose == "learning" {
+			senderName = "Portal Pembelajaran HMIK UP"
+		} else {
+			senderName = "Panitia Pemira HMIK"
+		}
 	}
 
 	auth := smtp.PlainAuth("", smtpUser, smtpPass, smtpHost)
 
 	subject := "Kode Akses Masuk Bilik Suara Pemira HMIK"
-	boundary := fmt.Sprintf("hmik_pemira_%d", time.Now().UnixNano())
-	userDomain := "brevo.com"
+	title := "Verifikasi Bilik Suara Virtual"
+	badge := "Pemilihan Raya HMIK"
+	contextDesc := "untuk masuk ke bilik suara virtual Pemira"
+	if purpose == "learning" {
+		subject = "Kode Akses Masuk Portal Modul Belajar HMIK"
+		title = "Portal Modul Pembelajaran Perkuliahan"
+		badge = "Modul Belajar HMIK"
+		contextDesc = "untuk mengakses katalog modul pembelajaran dosen HMIK"
+	}
+
+	boundary := fmt.Sprintf("hmik_%s_%d", purpose, time.Now().UnixNano())
+	userDomain := "gmail.com"
 	if parts := strings.Split(senderEmail, "@"); len(parts) > 1 {
 		userDomain = parts[1]
 	}
 	messageID := fmt.Sprintf("<%d.%d@%s>", time.Now().Unix(), time.Now().UnixNano()%1000000, userDomain)
 	dateHeader := time.Now().Format(time.RFC1123Z)
 
-	textBody := fmt.Sprintf("PEMILIHAN RAYA HMIK\r\n\r\n"+
+	textBody := fmt.Sprintf("HIMPUNAN MAHASISWA ILMU KOMPUTER\r\n\r\n"+
 		"Halo Mahasiswa (NIM: %s),\r\n\r\n"+
-		"Berikut kode akses verifikasi untuk masuk ke Bilik Suara Virtual Pemira:\r\n"+
+		"Berikut kode akses verifikasi %s:\r\n"+
 		">>> %s <<<\r\n\r\n"+
 		"Kode verifikasi ini hanya berlaku selama 5 menit.\r\n"+
-		"Jangan bagikan kode ini kepada siapa pun untuk menjaga kerahasiaan suara Anda.\r\n\r\n"+
-		"Pesan ini dikirimkan otomatis kepada pemilih yang terdaftar di DPT Pemira HMIK.\r\n"+
-		"© Panitia Pemilihan Raya HMIK", nim, otpCode)
+		"Jangan bagikan kode ini kepada siapa pun.\r\n\r\n"+
+		"Pesan ini dikirimkan otomatis kepada mahasiswa Ilmu Komputer Universitas Pertamina.\r\n"+
+		"© %s", nim, contextDesc, otpCode, senderName)
 
-	htmlBody := buildOTPEmailHTML(nim, otpCode)
+	htmlBody := buildOTPEmailHTMLCustom(nim, otpCode, title, badge, contextDesc, senderName)
 
 	message := fmt.Sprintf("From: %s <%s>\r\n"+
 		"To: %s\r\n"+
@@ -111,14 +129,14 @@ func sendSMTPEmail(toEmail, nim, otpCode string) error {
 	return smtp.SendMail(addr, auth, senderEmail, []string{toEmail}, []byte(message))
 }
 
-// buildOTPEmailHTML menghasilkan markup template email responsif bertema HMIK Neo-Brutalisme
-func buildOTPEmailHTML(nim, otpCode string) string {
+// buildOTPEmailHTMLCustom menghasilkan markup template email responsif bertema HMIK Neo-Brutalisme
+func buildOTPEmailHTMLCustom(nim, otpCode, title, badge, contextDesc, senderName string) string {
 	return fmt.Sprintf(`<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kode Verifikasi Pemira HMIK</title>
+    <title>%s</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #F8FAFC; margin: 0; padding: 20px; color: #1E293B; }
         .container { max-width: 480px; margin: 0 auto; background-color: #FFFFFF; border: 2px solid #CBD5E1; border-radius: 12px; padding: 32px 24px; }
@@ -135,27 +153,27 @@ func buildOTPEmailHTML(nim, otpCode string) string {
 <body>
     <!-- Hidden preheader text for Outlook inbox preview -->
     <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
-        Kode akses bilik suara virtual Pemira HMIK Anda adalah %s. Berlaku selama 5 menit.
+        Kode verifikasi Anda adalah %s. Berlaku selama 5 menit.
     </div>
 
     <div class="container">
         <div class="header">
-            <div class="badge">Pemilihan Raya HMIK</div>
-            <h2 class="title">Verifikasi Bilik Suara Virtual</h2>
-            <p class="greeting">Halo Mahasiswa (NIM: %s), berikut kode verifikasi untuk masuk ke bilik suara:</p>
+            <div class="badge">%s</div>
+            <h2 class="title">%s</h2>
+            <p class="greeting">Halo Mahasiswa (NIM: %s), berikut kode verifikasi %s:</p>
         </div>
         <div class="otp-box">
             <h1 class="otp-number">%s</h1>
         </div>
         <p class="warning">
             Kode ini hanya berlaku selama <strong>5 menit</strong>.<br>
-            Demi menjaga kerahasiaan suara Anda, mohon tidak membagikan kode ini kepada siapa pun.
+            Demi menjaga keamanan akun dan akses modul Anda, mohon tidak membagikan kode ini kepada siapa pun.
         </p>
         <div class="footer">
-            Email ini dikirimkan otomatis karena NIM Anda terdaftar dalam DPT Pemira HMIK.<br>
-            &copy; Panitia Pemilihan Raya HMIK
+            Email ini dikirimkan otomatis kepada mahasiswa Ilmu Komputer Universitas Pertamina.<br>
+            &copy; %s
         </div>
     </div>
 </body>
-</html>`, otpCode, nim, otpCode)
+</html>`, title, otpCode, badge, title, nim, contextDesc, otpCode, senderName)
 }
