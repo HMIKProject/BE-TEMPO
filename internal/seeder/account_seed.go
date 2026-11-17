@@ -2,7 +2,6 @@ package seeder
 
 import (
 	"log"
-	"strings"
 
 	"github.com/HMIKProject/hmik-corex-backend/internal/entity"
 	"golang.org/x/crypto/bcrypt"
