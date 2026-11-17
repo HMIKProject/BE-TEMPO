@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"time"
 
 	"github.com/HMIKProject/hmik-corex-backend/internal/entity"
 	"github.com/HMIKProject/hmik-corex-backend/internal/repository"
@@ -18,11 +19,12 @@ type AdminBIAUsecase interface {
 
 type adminBIAUsecase struct {
 	anggotaRepo repository.AnggotaRepository
+	slotRepo    repository.SlotRepository
 }
 
 // NewAdminBIAUsecase menginisiasi usecase BIA baru
-func NewAdminBIAUsecase(anggotaRepo repository.AnggotaRepository) AdminBIAUsecase {
-	return &adminBIAUsecase{anggotaRepo: anggotaRepo}
+func NewAdminBIAUsecase(anggotaRepo repository.AnggotaRepository, slotRepo repository.SlotRepository) AdminBIAUsecase {
+	return &adminBIAUsecase{anggotaRepo: anggotaRepo, slotRepo: slotRepo}
 }
 
 // GetAnggotaList mengambil daftar anggota terfilter dan terpaginasi
@@ -69,6 +71,26 @@ func (u *adminBIAUsecase) CreateAnggota(req entity.CreateAnggotaRequest) (*entit
 		status = "Pengurus"
 	}
 
+	// 3. Jika id_pengguna disediakan, sinkronkan jabatan & struktur dari slot akun resmi
+	var slotPengguna *entity.Pengguna
+	if req.IdPengguna != nil && *req.IdPengguna > 0 && u.slotRepo != nil {
+		slot, err := u.slotRepo.FindSlotByID(*req.IdPengguna)
+		if err != nil || slot == nil {
+			return nil, errors.New("slot akun resmi tidak ditemukan")
+		}
+		// Cek apakah slot sudah terpakai oleh pengurus lain
+		borrower, err := u.slotRepo.FindBorrowerBySlotID(*req.IdPengguna)
+		if err == nil && borrower != nil {
+			return nil, errors.New("slot akun tersebut sudah terpakai oleh pengurus lain: " + borrower.NamaLengkap)
+		}
+		slotPengguna = slot
+		mapping := repository.GetSlotOrgMapping(slot.NamaPengguna, slot.NamaLengkap)
+		req.Jabatan = mapping.Jabatan
+		req.IdDepartemen = mapping.IdDepartemen
+		req.IdDivisi = mapping.IdDivisi
+		status = "Pengurus"
+	}
+
 	newAnggota := &entity.Anggota{
 		Nim:          req.Nim,
 		NamaLengkap:  req.NamaLengkap,
@@ -82,10 +104,18 @@ func (u *adminBIAUsecase) CreateAnggota(req entity.CreateAnggotaRequest) (*entit
 		DepartemenID: req.IdDepartemen,
 		DivisiID:     req.IdDivisi,
 		Periode:      req.Periode,
+		PenggunaID:   req.IdPengguna,
 	}
 
 	if err := u.anggotaRepo.Create(newAnggota); err != nil {
 		return nil, err
+	}
+
+	// Jika memilih slot akun, terbitkan kode aktivasi 7 hari
+	if slotPengguna != nil && u.slotRepo != nil {
+		code, _ := GenerateActivationCode()
+		expiredAt := time.Now().Add(7 * 24 * time.Hour)
+		_ = u.slotRepo.AssignSlot(slotPengguna.IdPengguna, newAnggota.IdAnggota, code, expiredAt)
 	}
 
 	// Ambil kembali data lengkap dengan eager loading
@@ -97,6 +127,34 @@ func (u *adminBIAUsecase) UpdateAnggota(id int64, req entity.UpdateAnggotaReques
 	anggota, err := u.anggotaRepo.FindByID(id)
 	if err != nil {
 		return nil, errors.New("data anggota tidak ditemukan")
+	}
+
+	// Penanganan sinkronisasi slot akun
+	if req.IdPengguna != nil && *req.IdPengguna > 0 && u.slotRepo != nil {
+		if anggota.PenggunaID == nil || *anggota.PenggunaID != *req.IdPengguna {
+			// Jika anggota sebelumnya memegang slot lain, lepas dulu
+			if anggota.PenggunaID != nil {
+				hash, _ := GenerateRandomPasswordHash()
+				_ = u.slotRepo.UnassignSlot(*anggota.PenggunaID, hash)
+			}
+			code, _ := GenerateActivationCode()
+			expiredAt := time.Now().Add(7 * 24 * time.Hour)
+			_ = u.slotRepo.AssignSlot(*req.IdPengguna, id, code, expiredAt)
+		}
+		// Selaraskan jabatan & struktur dengan slot yang dipegang
+		slot, err := u.slotRepo.FindSlotByID(*req.IdPengguna)
+		if err == nil && slot != nil {
+			mapping := repository.GetSlotOrgMapping(slot.NamaPengguna, slot.NamaLengkap)
+			req.Jabatan = mapping.Jabatan
+			req.IdDepartemen = mapping.IdDepartemen
+			req.IdDivisi = mapping.IdDivisi
+			req.Status = "Pengurus"
+		}
+	} else if (req.IdPengguna == nil || *req.IdPengguna == 0) && anggota.PenggunaID != nil && u.slotRepo != nil {
+		// Jika slot dilepas dari anggota
+		hash, _ := GenerateRandomPasswordHash()
+		_ = u.slotRepo.UnassignSlot(*anggota.PenggunaID, hash)
+		anggota.PenggunaID = nil
 	}
 
 	// Rekam riwayat jabatan jika terjadi transisi kepengurusan (periode/jabatan berubah atau demisioner aktif kembali)

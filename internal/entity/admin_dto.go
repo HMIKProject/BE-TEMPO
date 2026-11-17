@@ -26,6 +26,7 @@ type CreateAnggotaRequest struct {
 	CvUrl        string `json:"cv_url" example:"https://res.cloudinary.com/.../cv.pdf"`
 	IdDepartemen *int64 `json:"id_departemen" example:"1"`
 	IdDivisi     *int64 `json:"id_divisi" example:"2"`
+	IdPengguna   *int64 `json:"id_pengguna,omitempty" example:"60"`
 	Periode      string `json:"periode" example:"2026/2027"`
 }
 
@@ -41,6 +42,7 @@ type UpdateAnggotaRequest struct {
 	CvUrl        string `json:"cv_url" example:"https://res.cloudinary.com/.../cv.pdf"`
 	IdDepartemen *int64 `json:"id_departemen" example:"1"`
 	IdDivisi     *int64 `json:"id_divisi" example:"2"`
+	IdPengguna   *int64 `json:"id_pengguna,omitempty" example:"60"`
 	Periode      string `json:"periode" example:"2026/2027"`
 }
 
@@ -68,6 +70,10 @@ type AccountSlotResponse struct {
 	NamaPengguna        string            `json:"nama_pengguna"`
 	Email               string            `json:"email"`
 	Jabatan             string            `json:"jabatan"`
+	IdDepartemen        *int64            `json:"id_departemen,omitempty"`
+	NamaDepartemen      string            `json:"nama_departemen,omitempty"`
+	IdDivisi            *int64            `json:"id_divisi,omitempty"`
+	NamaDivisi          string            `json:"nama_divisi,omitempty"`
 	StatusSlot          string            `json:"status_slot"` // "TERPAKAI" atau "KOSONG"
 	Peminjam            *SlotPeminjamInfo `json:"peminjam,omitempty"`
 	KodeAktivasi        *string           `json:"kode_aktivasi,omitempty"`

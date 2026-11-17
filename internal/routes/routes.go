@@ -51,7 +51,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	authHandler := handler.NewAuthHandler(authUsecase)
 
 	// Admin Buku Induk Anggota (BIA)
-	adminBIAUsecase := usecase.NewAdminBIAUsecase(anggotaRepo)
+	adminBIAUsecase := usecase.NewAdminBIAUsecase(anggotaRepo, slotRepo)
 	adminBIAHandler := handler.NewAdminBIAHandler(adminBIAUsecase)
 
 	// Admin Struktur Organisasi & Departemen

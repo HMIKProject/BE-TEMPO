@@ -32,8 +32,8 @@ func NewAdminSlotUsecase(slotRepo repository.SlotRepository) AdminSlotUsecase {
 	return &adminSlotUsecase{slotRepo: slotRepo}
 }
 
-// generateActivationCode membuat kode unik sekali pakai format ACT-XXXX-XXXX (alfanumerik kapital)
-func generateActivationCode() (string, error) {
+// GenerateActivationCode membuat kode unik sekali pakai format ACT-XXXX-XXXX (alfanumerik kapital)
+func GenerateActivationCode() (string, error) {
 	const charset = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789" // Hindari karakter ambigu O/0, I/1
 	part1 := make([]byte, 4)
 	part2 := make([]byte, 4)
@@ -57,8 +57,8 @@ func generateActivationCode() (string, error) {
 	return fmt.Sprintf("ACT-%s-%s", string(part1), string(part2)), nil
 }
 
-// generateRandomPasswordHash menghasilkan hash bcrypt dari random string untuk mengamankan akun kosong
-func generateRandomPasswordHash() (string, error) {
+// GenerateRandomPasswordHash menghasilkan hash bcrypt dari random string untuk mengamankan akun kosong
+func GenerateRandomPasswordHash() (string, error) {
 	randomBytes := make([]byte, 32)
 	if _, err := rand.Read(randomBytes); err != nil {
 		return "", err
@@ -85,7 +85,7 @@ func (u *adminSlotUsecase) AssignSlot(req entity.AssignSlotRequest) (*entity.Ass
 	}
 
 	// 2. Buat kode aktivasi 8 karakter dengan TTL 7 hari
-	code, err := generateActivationCode()
+	code, err := GenerateActivationCode()
 	if err != nil {
 		return nil, errors.New("gagal menerbitkan kode aktivasi")
 	}
@@ -123,7 +123,7 @@ func (u *adminSlotUsecase) UnassignSlot(idPengguna int64) error {
 	}
 
 	// Buat hash sandi acak baru (Zero-Knowledge)
-	randomHash, err := generateRandomPasswordHash()
+	randomHash, err := GenerateRandomPasswordHash()
 	if err != nil {
 		return errors.New("gagal mereset keamanan kredensial slot")
 	}
@@ -133,7 +133,7 @@ func (u *adminSlotUsecase) UnassignSlot(idPengguna int64) error {
 
 // DemisionerMassal mengeksekusi transisi serentak akhir periode kabinet
 func (u *adminSlotUsecase) DemisionerMassal() (*entity.DemisionerSummary, error) {
-	randomHash, err := generateRandomPasswordHash()
+	randomHash, err := GenerateRandomPasswordHash()
 	if err != nil {
 		return nil, errors.New("gagal mereset keamanan kredensial massal")
 	}
@@ -158,7 +158,7 @@ func (u *adminSlotUsecase) ResetSlotPassword(idPengguna int64) (*entity.ResetSlo
 	}
 
 	// Terbitkan kode aktivasi baru
-	code, err := generateActivationCode()
+	code, err := GenerateActivationCode()
 	if err != nil {
 		return nil, errors.New("gagal menerbitkan kode aktivasi baru")
 	}

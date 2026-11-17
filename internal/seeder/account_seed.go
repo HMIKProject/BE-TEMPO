@@ -25,7 +25,6 @@ func SeedAllRoleAccounts(db *gorm.DB) error {
 	}{
 		// 1. Akun Admin Utama
 		{"hmik.admin", "hmik.up@gmail.com", "Super Admin"},
-		{"hmik.human.01", "hmik.human.01@hmik.com", "Slot Humas Human"},
 
 		// 2. BPH (Badan Pengurus Harian)
 		{"hmik.kahim.01", "hmik.kahim.01@hmik.com", "Ketua Himpunan"},
@@ -67,6 +66,7 @@ func SeedAllRoleAccounts(db *gorm.DB) error {
 		{"hmik.internal.aset.01", "hmik.internal.aset.01@hmik.com", "Ketua Divisi Aset & Perlengkapan"},
 		{"hmik.internal.aset.02", "hmik.internal.aset.02@hmik.com", "Anggota Divisi Aset & Perlengkapan"},
 		{"hmik.internal.minatbakat.01", "hmik.internal.minatbakat.01@hmik.com", "Ketua Divisi Minat & Bakat Internal"},
+		{"hmik.internal.minatbakat.02", "hmik.internal.minatbakat.02@hmik.com", "Anggota Divisi Minat & Bakat Internal"},
 
 		// 7. Academy UP
 		{"hmik.academy.01", "hmik.academy.01@hmik.com", "Ketua Departemen Academy UP"},

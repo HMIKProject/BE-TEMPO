@@ -90,7 +90,7 @@ func (m *mockAnggotaRepo) AddRiwayatJabatan(riwayat *entity.RiwayatJabatan) erro
 
 func TestAdminBIAUsecase_CRUD(t *testing.T) {
 	repo := newMockAnggotaRepo()
-	uc := usecase.NewAdminBIAUsecase(repo)
+	uc := usecase.NewAdminBIAUsecase(repo, nil)
 
 	// 1. Test CreateAnggota
 	createReq := entity.CreateAnggotaRequest{

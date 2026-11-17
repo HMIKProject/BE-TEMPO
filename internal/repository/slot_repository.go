@@ -58,11 +58,16 @@ func (r *slotRepository) FindAllSlots() ([]entity.AccountSlotResponse, error) {
 
 	var responses []entity.AccountSlotResponse
 	for _, p := range penggunaList {
+		mapping := GetSlotOrgMapping(p.NamaPengguna, p.NamaLengkap)
 		resp := entity.AccountSlotResponse{
 			IdPengguna:          p.IdPengguna,
 			NamaPengguna:        p.NamaPengguna,
 			Email:               p.Email,
-			Jabatan:             p.NamaPengguna,
+			Jabatan:             mapping.Jabatan,
+			IdDepartemen:        mapping.IdDepartemen,
+			NamaDepartemen:      mapping.NamaDepartemen,
+			IdDivisi:            mapping.IdDivisi,
+			NamaDivisi:          mapping.NamaDivisi,
 			KodeAktivasi:        p.KodeAktivasi,
 			KodeAktivasiExpired: p.KodeAktivasiExpired,
 			IsFirstLogin:        p.IsFirstLogin,
@@ -125,7 +130,12 @@ func (r *slotRepository) FindSlotByAnggotaID(idAnggota int64) (*entity.Pengguna,
 // AssignSlot menautkan slot kosong ke anggota dan memasang kode aktivasi 7 hari
 func (r *slotRepository) AssignSlot(idPengguna int64, idAnggota int64, kodeAktivasi string, expiredAt time.Time) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
-		// 1. Cek apakah slot sudah terisi
+		// 1. Ambil data slot pengguna & cek apakah slot sudah terisi
+		var targetSlot entity.Pengguna
+		if err := tx.First(&targetSlot, idPengguna).Error; err != nil {
+			return errors.New("data slot akun tidak ditemukan")
+		}
+
 		var existingBorrower entity.Anggota
 		err := tx.Where("id_pengguna = ?", idPengguna).First(&existingBorrower).Error
 		if err == nil {
@@ -139,19 +149,26 @@ func (r *slotRepository) AssignSlot(idPengguna int64, idAnggota int64, kodeAktiv
 		if err := tx.First(&targetAnggota, idAnggota).Error; err != nil {
 			return errors.New("data anggota tidak ditemukan")
 		}
-		if targetAnggota.PenggunaID != nil {
+		if targetAnggota.PenggunaID != nil && *targetAnggota.PenggunaID != idPengguna {
 			return errors.New("anggota tersebut sudah terdaftar memegang slot akun lain")
 		}
 
-		// 3. Update tabel anggota: tautkan id_pengguna & pastikan status 'Pengurus'
-		if err := tx.Model(&targetAnggota).Updates(map[string]interface{}{
-			"id_pengguna": idPengguna,
-			"status":      "Pengurus",
-		}).Error; err != nil {
+		// 3. Petakan jabatan, departemen, dan divisi dari akun slot
+		mapping := GetSlotOrgMapping(targetSlot.NamaPengguna, targetSlot.NamaLengkap)
+
+		// 4. Update tabel anggota: tautkan id_pengguna, sinkronkan jabatan, departemen, divisi & pastikan status 'Pengurus'
+		updates := map[string]interface{}{
+			"id_pengguna":   idPengguna,
+			"status":        "Pengurus",
+			"jabatan":       mapping.Jabatan,
+			"id_departemen": mapping.IdDepartemen,
+			"id_divisi":     mapping.IdDivisi,
+		}
+		if err := tx.Model(&targetAnggota).Updates(updates).Error; err != nil {
 			return err
 		}
 
-		// 4. Update tabel pengguna: pasang kode aktivasi & aktifkan is_first_login
+		// 5. Update tabel pengguna: pasang kode aktivasi & aktifkan is_first_login
 		if err := tx.Model(&entity.Pengguna{}).Where("id_pengguna = ?", idPengguna).Updates(map[string]interface{}{
 			"kode_aktivasi":         kodeAktivasi,
 			"kode_aktivasi_expired": expiredAt,
