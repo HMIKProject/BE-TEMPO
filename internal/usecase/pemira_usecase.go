@@ -751,7 +751,7 @@ func (u *pemiraUsecase) PelantikanMPIK(ctx context.Context) (*entity.PelantikanM
 	if strings.TrimSpace(fotoKetua) == "" {
 		fotoKetua = winner.FotoPaslon
 	}
-	ketua, err := u.pemiraRepo.UpsertAnggotaBPH(ctx, winner.NimKetua, winner.NamaKetua, "Ketua Himpunan", angkatanKetua, fotoKetua)
+	ketua, codeKetua, err := u.pemiraRepo.UpsertAnggotaBPH(ctx, winner.NimKetua, winner.NamaKetua, "Ketua Himpunan", angkatanKetua, fotoKetua)
 	if err != nil {
 		return nil, fmt.Errorf("gagal mencatat data Ketua Himpunan baru: %w", err)
 	}
@@ -761,7 +761,7 @@ func (u *pemiraUsecase) PelantikanMPIK(ctx context.Context) (*entity.PelantikanM
 	if strings.TrimSpace(fotoWakil) == "" {
 		fotoWakil = winner.FotoPaslon
 	}
-	wakil, err := u.pemiraRepo.UpsertAnggotaBPH(ctx, winner.NimWakil, winner.NamaWakil, "Wakil Ketua Himpunan", angkatanWakil, fotoWakil)
+	wakil, codeWakil, err := u.pemiraRepo.UpsertAnggotaBPH(ctx, winner.NimWakil, winner.NamaWakil, "Wakil Ketua Himpunan", angkatanWakil, fotoWakil)
 	if err != nil {
 		return nil, fmt.Errorf("gagal mencatat data Wakil Ketua Himpunan baru: %w", err)
 	}
@@ -777,11 +777,13 @@ func (u *pemiraUsecase) PelantikanMPIK(ctx context.Context) (*entity.PelantikanM
 	}
 
 	return &entity.PelantikanMPIKResponse{
-		StatusPelantikan: "APPROVED",
-		Pesan:            fmt.Sprintf("Pelantikan berhasil! Kabinet %s resmi dilantik oleh MPIK dan BPH baru telah terintegrasi ke Manajemen Himpunan.", winner.NamaKabinet),
-		KabinetBaru:      kabinet,
-		KetuaBaru:        ketua,
-		WakilBaru:        wakil,
+		StatusPelantikan:  "APPROVED",
+		Pesan:             fmt.Sprintf("Pelantikan berhasil! Kabinet %s resmi dilantik oleh MPIK dan BPH baru telah terintegrasi ke Manajemen Himpunan.", winner.NamaKabinet),
+		KabinetBaru:       kabinet,
+		KetuaBaru:         ketua,
+		WakilBaru:         wakil,
+		KodeAktivasiKetua: codeKetua,
+		KodeAktivasiWakil: codeWakil,
 	}, nil
 }
 

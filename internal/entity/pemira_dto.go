@@ -164,11 +164,13 @@ type UpdatePemiraScheduleRequest struct {
 
 // PelantikanMPIKResponse konfirmasi pelantikan kabinet dan BPH baru pasca sidang MPIK
 type PelantikanMPIKResponse struct {
-	StatusPelantikan string   `json:"status_pelantikan" example:"APPROVED"`
-	Pesan            string   `json:"pesan" example:"Pelantikan berhasil! Kabinet dan BPH baru telah aktif di Manajemen Himpunan."`
-	KabinetBaru      Kabinet  `json:"kabinet_baru"`
-	KetuaBaru        *Anggota `json:"ketua_baru,omitempty"`
-	WakilBaru        *Anggota `json:"wakil_baru,omitempty"`
+	StatusPelantikan  string   `json:"status_pelantikan" example:"APPROVED"`
+	Pesan             string   `json:"pesan" example:"Pelantikan berhasil! Kabinet dan BPH baru telah aktif di Manajemen Himpunan."`
+	KabinetBaru       Kabinet  `json:"kabinet_baru"`
+	KetuaBaru         *Anggota `json:"ketua_baru,omitempty"`
+	WakilBaru         *Anggota `json:"wakil_baru,omitempty"`
+	KodeAktivasiKetua string   `json:"kode_aktivasi_ketua,omitempty"`
+	KodeAktivasiWakil string   `json:"kode_aktivasi_wakil,omitempty"`
 }
 
 // PublicElectionScheduleResponse data jadwal & status bilik suara untuk publik/pemilih

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/HMIKProject/hmik-corex-backend/internal/entity"
+	"github.com/HMIKProject/hmik-corex-backend/pkg/utils"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -48,7 +49,7 @@ type PemiraRepository interface {
 	// 5. Pelantikan MPIK & Transisi Manajemen Himpunan
 	GetWinningPaslon(ctx context.Context, idPemira int64) (*entity.Paslon, int64, error)
 	PromoteKabinet(ctx context.Context, kabinet *entity.Kabinet) error
-	UpsertAnggotaBPH(ctx context.Context, nim, nama, jabatan string, angkatan int, foto string) (*entity.Anggota, error)
+	UpsertAnggotaBPH(ctx context.Context, nim, nama, jabatan string, angkatan int, foto string) (*entity.Anggota, string, error)
 	DemisionerkanPengurusLama(ctx context.Context, exceptNIMs []string) error
 	PurgeVotersAndVotes(ctx context.Context, idPemira int64) error
 }
@@ -382,11 +383,54 @@ func (r *pemiraRepository) PromoteKabinet(ctx context.Context, kabinet *entity.K
 	})
 }
 
-func (r *pemiraRepository) UpsertAnggotaBPH(ctx context.Context, nim, nama, jabatan string, angkatan int, foto string) (*entity.Anggota, error) {
+func (r *pemiraRepository) UpsertAnggotaBPH(ctx context.Context, nim, nama, jabatan string, angkatan int, foto string) (*entity.Anggota, string, error) {
+	// 1. Cari slot akun resmi sesuai jabatan ("Ketua Himpunan" -> hmik.kahim.01, "Wakil Ketua Himpunan" -> hmik.wakahim.01)
+	var slotPattern string
+	if strings.Contains(strings.ToLower(jabatan), "wakil") {
+		slotPattern = "hmik.wakahim%"
+	} else {
+		slotPattern = "hmik.kahim%"
+	}
+
+	var slotPengguna entity.Pengguna
+	_ = r.db.WithContext(ctx).
+		Where("email LIKE ? OR nama_pengguna LIKE ?", slotPattern, slotPattern).
+		First(&slotPengguna).Error
+
+	var generatedCode string
+	if slotPengguna.IdPengguna != 0 {
+		code, errCode := utils.GenerateActivationCode()
+		if errCode == nil {
+			generatedCode = code
+		} else {
+			generatedCode = "ACT-" + strings.ToUpper(nim)
+		}
+		expiredAt := time.Now().Add(7 * 24 * time.Hour)
+
+		// Pasang kode aktivasi baru dan tandai is_first_login pada slot akun
+		_ = r.db.WithContext(ctx).Model(&entity.Pengguna{}).
+			Where("id_pengguna = ?", slotPengguna.IdPengguna).
+			Updates(map[string]interface{}{
+				"kode_aktivasi":         generatedCode,
+				"kode_aktivasi_expired": expiredAt,
+				"is_first_login":        true,
+				"token_version":         gorm.Expr("token_version + 1"),
+			}).Error
+
+		// Lepaskan slot dari anggota lain jika ada yang masih menautkannya
+		_ = r.db.WithContext(ctx).Model(&entity.Anggota{}).
+			Where("id_pengguna = ? AND nim != ?", slotPengguna.IdPengguna, nim).
+			Update("id_pengguna", nil).Error
+	}
+
 	var existing entity.Anggota
-	err := r.db.WithContext(ctx).Where("nim = ?", nim).First(&existing).Error
+	err := r.db.WithContext(ctx).Preload("Departemen").Preload("Divisi").Where("nim = ?", nim).First(&existing).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			var pID *int64
+			if slotPengguna.IdPengguna != 0 {
+				pID = &slotPengguna.IdPengguna
+			}
 			newAnggota := entity.Anggota{
 				Nim:          nim,
 				NamaLengkap:  nama,
@@ -395,30 +439,75 @@ func (r *pemiraRepository) UpsertAnggotaBPH(ctx context.Context, nim, nama, jaba
 				Jabatan:      jabatan,
 				Status:       "Pengurus",
 				FotoProfil:   foto,
+				PenggunaID:   pID,
 			}
 			if err := r.db.WithContext(ctx).Create(&newAnggota).Error; err != nil {
-				return nil, err
+				return nil, "", err
 			}
-			return &newAnggota, nil
+			return &newAnggota, generatedCode, nil
 		}
-		return nil, err
+		return nil, "", err
+	}
+
+	// Jika anggota sudah ada dan sebelumnya memegang slot lain, bersihkan slot lamanya
+	if existing.PenggunaID != nil && slotPengguna.IdPengguna != 0 && *existing.PenggunaID != slotPengguna.IdPengguna {
+		_ = r.db.WithContext(ctx).Model(&entity.Pengguna{}).
+			Where("id_pengguna = ?", *existing.PenggunaID).
+			Updates(map[string]interface{}{
+				"kode_aktivasi":         nil,
+				"kode_aktivasi_expired": nil,
+				"is_first_login":        false,
+				"token_version":         gorm.Expr("token_version + 1"),
+			}).Error
+	}
+
+	// Catat riwayat jabatan lama jika jabatan sebelumnya berbeda
+	if existing.Jabatan != "" && existing.Jabatan != jabatan {
+		deptName := ""
+		if existing.Departemen != nil {
+			deptName = existing.Departemen.NamaDepartemen
+		}
+		divName := ""
+		if existing.Divisi != nil {
+			divName = existing.Divisi.NamaDivisi
+		}
+		var count int64
+		r.db.Model(&entity.RiwayatJabatan{}).
+			Where("id_anggota = ? AND periode = ? AND jabatan = ?", existing.IdAnggota, existing.Periode, existing.Jabatan).
+			Count(&count)
+		if count == 0 {
+			_ = r.db.Create(&entity.RiwayatJabatan{
+				IdAnggota:      existing.IdAnggota,
+				Nim:            existing.Nim,
+				Periode:        existing.Periode,
+				Jabatan:        existing.Jabatan,
+				NamaDepartemen: deptName,
+				NamaDivisi:     divName,
+				Status:         "Demisioner",
+			}).Error
+		}
 	}
 
 	updates := map[string]interface{}{
-		"nama_lengkap": nama,
-		"jabatan":      jabatan,
-		"status":       "Pengurus",
-		"diubah_pada":  time.Now(),
+		"nama_lengkap":  nama,
+		"jabatan":       jabatan,
+		"status":        "Pengurus",
+		"id_departemen": nil,
+		"id_divisi":     nil,
+		"diubah_pada":   time.Now(),
+	}
+	if slotPengguna.IdPengguna != 0 {
+		updates["id_pengguna"] = slotPengguna.IdPengguna
 	}
 	if foto != "" {
 		updates["foto_profil"] = foto
 	}
 	if err := r.db.WithContext(ctx).Model(&existing).Updates(updates).Error; err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	r.db.WithContext(ctx).First(&existing, existing.IdAnggota)
-	return &existing, nil
+	return &existing, generatedCode, nil
 }
 
 func (r *pemiraRepository) DemisionerkanPengurusLama(ctx context.Context, exceptNIMs []string) error {
@@ -454,6 +543,17 @@ func (r *pemiraRepository) DemisionerkanPengurusLama(ctx context.Context, except
 					NamaDivisi:     divName,
 					Status:         "Demisioner",
 				}).Error
+			}
+			// Bersihkan slot akun yang pernah dipegang pengurus lama
+			if a.PenggunaID != nil {
+				_ = r.db.WithContext(ctx).Model(&entity.Pengguna{}).
+					Where("id_pengguna = ?", *a.PenggunaID).
+					Updates(map[string]interface{}{
+						"kode_aktivasi":         nil,
+						"kode_aktivasi_expired": nil,
+						"is_first_login":        false,
+						"token_version":         gorm.Expr("token_version + 1"),
+					}).Error
 			}
 		}
 	}
