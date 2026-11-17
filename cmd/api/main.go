@@ -70,6 +70,7 @@ func main() {
 			if strings.HasSuffix(origin, ".netlify.app") || 
 			   strings.HasSuffix(origin, ".pages.dev") || 
 			   strings.HasSuffix(origin, ".workers.dev") || 
+			   strings.HasSuffix(origin, "hmikup.id") || 
 			   strings.Contains(origin, "gowebdigital.agency") {
 				return true
 			}
