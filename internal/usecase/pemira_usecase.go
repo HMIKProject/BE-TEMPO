@@ -144,10 +144,12 @@ func (u *pemiraUsecase) RequestOTP(ctx context.Context, req entity.RequestOTPReq
 		return nil, errors.New("gagal memperbarui kode verifikasi pemilih")
 	}
 
-	// 9. Kirim OTP via Mailer (Dual-Mode: SMTP / Console Fallback)
-	if err := utils.SendOTPEmail(pemilih.EmailKampus, pemilih.Nim, otp); err != nil {
-		return nil, errors.New("gagal mengirimkan email verifikasi, silakan coba beberapa saat lagi")
-	}
+	// 9. Kirim OTP via Mailer (Dual-Mode: SMTP / Console Fallback) secara asinkron agar respon cepat
+	go func(targetEmail, targetNim, targetOtp string) {
+		if err := utils.SendOTPEmail(targetEmail, targetNim, targetOtp); err != nil {
+			log.Printf("⚠️ Gagal mengirim OTP email Pemira ke %s: %v", targetEmail, err)
+		}
+	}(pemilih.EmailKampus, pemilih.Nim, otp)
 
 	return &entity.RequestOTPResponse{
 		NIM:              pemilih.Nim,
