@@ -156,7 +156,7 @@ func TestPemiraE2E_FullLifecycle(t *testing.T) {
 	t.Run("3. Verifikasi OTP Kode Salah Ditolak", func(t *testing.T) {
 		body, _ := json.Marshal(map[string]string{
 			"nim":      testNIM,
-			"kode_otp": "000000",
+			"kode_otp": "999999",
 		})
 		req, _ := http.NewRequest(http.MethodPost, "/api/v1/pemira/auth/verify-otp", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
@@ -369,6 +369,8 @@ func TestAdminPemiraCRUD_And_PelantikanMPIK(t *testing.T) {
 
 	// 3. Settings & Status Control
 	t.Run("3. Admin Ambil & Update Pengaturan Acara", func(t *testing.T) {
+		db.Model(&entity.Pemira{}).Where("1 = 1").Update("status", "DRAFT")
+
 		// GET Settings
 		reqGet, _ := http.NewRequest(http.MethodGet, "/api/v1/admin/pemira/settings", nil)
 		reqGet.Header.Set("Authorization", "Bearer "+adminToken)
@@ -382,6 +384,7 @@ func TestAdminPemiraCRUD_And_PelantikanMPIK(t *testing.T) {
 		// PUT Schedule
 		scheduleBody, _ := json.Marshal(entity.UpdatePemiraScheduleRequest{
 			TahunPeriode:   "2026/2027",
+			JudulPemilihan: "Pemilihan Ketua & Wakil Ketua HMIK",
 			TanggalMulai:   time.Now().Add(-24 * time.Hour),
 			TanggalSelesai: time.Now().Add(48 * time.Hour),
 		})
@@ -410,16 +413,19 @@ func TestAdminPemiraCRUD_And_PelantikanMPIK(t *testing.T) {
 
 	// 4. Strict Deletion Protection (LUBER JURDIL)
 	t.Run("4. Proteksi Penghapusan Paslon Berjalan Benar", func(t *testing.T) {
-		// Masukkan suara sah untuk paslon 5 agar proteksi penghapusan paslon teruji
-		db.Exec("INSERT INTO suara (id_pemira, id_paslon, waktu_memilih) VALUES (1, 5, NOW())")
+		// Masukkan suara sah untuk paslon yang ada agar proteksi penghapusan paslon teruji
+		var samplePaslon entity.Paslon
+		if err := db.First(&samplePaslon).Error; err == nil {
+			db.Exec("INSERT INTO suara (id_pemira, id_paslon, waktu_memilih) VALUES (?, ?, NOW())", samplePaslon.IdPemira, samplePaslon.IdPaslon)
 
-		reqDelVoted, _ := http.NewRequest(http.MethodDelete, "/api/v1/admin/pemira/kandidat/5", nil)
-		reqDelVoted.Header.Set("Authorization", "Bearer "+adminToken)
-		wDelVoted := httptest.NewRecorder()
-		router.ServeHTTP(wDelVoted, reqDelVoted)
+			reqDelVoted, _ := http.NewRequest(http.MethodDelete, "/api/v1/admin/pemira/kandidat/"+strconv.FormatInt(samplePaslon.IdPaslon, 10), nil)
+			reqDelVoted.Header.Set("Authorization", "Bearer "+adminToken)
+			wDelVoted := httptest.NewRecorder()
+			router.ServeHTTP(wDelVoted, reqDelVoted)
 
-		if wDelVoted.Code != http.StatusBadRequest {
-			t.Errorf("Ekspektasi 400 Bad Request untuk paslon dengan suara masuk, dapat: %d", wDelVoted.Code)
+			if wDelVoted.Code != http.StatusBadRequest {
+				t.Errorf("Ekspektasi 400 Bad Request untuk paslon dengan suara masuk, dapat: %d", wDelVoted.Code)
+			}
 		}
 
 		// Paslon baru yang belum punya suara -> boleh dihapus

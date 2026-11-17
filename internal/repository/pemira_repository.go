@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/HMIKProject/hmik-corex-backend/internal/entity"
@@ -18,7 +19,7 @@ type PemiraRepository interface {
 	GetPemiraByID(ctx context.Context, idPemira int64) (*entity.Pemira, error)
 	GetLatestPemira(ctx context.Context) (*entity.Pemira, error)
 	UpdatePemiraStatus(ctx context.Context, idPemira int64, status string) error
-	UpdatePemiraSchedule(ctx context.Context, idPemira int64, tahunPeriode string, tMulai, tSelesai time.Time) error
+	UpdatePemiraSchedule(ctx context.Context, idPemira int64, tahunPeriode, judulPemilihan string, tMulai, tSelesai time.Time) error
 	CreatePemira(ctx context.Context, pemira *entity.Pemira) error
 
 	// 2. Paslon (Kandidat)
@@ -296,15 +297,19 @@ func (r *pemiraRepository) UpdatePemiraStatus(ctx context.Context, idPemira int6
 		Update("status", status).Error
 }
 
-func (r *pemiraRepository) UpdatePemiraSchedule(ctx context.Context, idPemira int64, tahunPeriode string, tMulai, tSelesai time.Time) error {
+func (r *pemiraRepository) UpdatePemiraSchedule(ctx context.Context, idPemira int64, tahunPeriode, judulPemilihan string, tMulai, tSelesai time.Time) error {
+	updates := map[string]interface{}{
+		"tahun_periode":   tahunPeriode,
+		"tanggal_mulai":   tMulai,
+		"tanggal_selesai": tSelesai,
+		"diperbarui_pada": time.Now(),
+	}
+	if strings.TrimSpace(judulPemilihan) != "" {
+		updates["judul_pemilihan"] = strings.TrimSpace(judulPemilihan)
+	}
 	return r.db.WithContext(ctx).Model(&entity.Pemira{}).
 		Where("id_pemira = ?", idPemira).
-		Updates(map[string]interface{}{
-			"tahun_periode":   tahunPeriode,
-			"tanggal_mulai":   tMulai,
-			"tanggal_selesai": tSelesai,
-			"diperbarui_pada": time.Now(),
-		}).Error
+		Updates(updates).Error
 }
 
 func (r *pemiraRepository) CreatePemira(ctx context.Context, pemira *entity.Pemira) error {

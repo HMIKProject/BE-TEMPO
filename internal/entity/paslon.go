@@ -12,6 +12,9 @@ type Paslon struct {
 	NamaWakil      string    `gorm:"column:nama_wakil;type:varchar(100);not null" json:"nama_wakil"`
 	NamaKabinet    string    `gorm:"column:nama_kabinet;type:varchar(100);not null" json:"nama_kabinet"`
 	FotoPaslon     string    `gorm:"column:foto_paslon;type:varchar(255)" json:"foto_paslon"`
+	FotoKetua      string    `gorm:"column:foto_ketua;type:varchar(255)" json:"foto_ketua"`
+	FotoWakil      string    `gorm:"column:foto_wakil;type:varchar(255)" json:"foto_wakil"`
+	LogoKabinet    string    `gorm:"column:logo_kabinet;type:varchar(255)" json:"logo_kabinet"`
 	Visi           string    `gorm:"column:visi;type:text" json:"visi"`
 	Misi           string    `gorm:"column:misi;type:text" json:"misi"`
 	DibuatPada     time.Time `gorm:"column:dibuat_pada;autoCreateTime" json:"dibuat_pada"`

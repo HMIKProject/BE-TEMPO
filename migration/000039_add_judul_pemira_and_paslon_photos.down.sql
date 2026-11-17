@@ -1,0 +1,6 @@
+ALTER TABLE pemira DROP COLUMN IF EXISTS judul_pemilihan;
+
+ALTER TABLE paslon 
+DROP COLUMN IF EXISTS foto_ketua,
+DROP COLUMN IF EXISTS foto_wakil,
+DROP COLUMN IF EXISTS logo_kabinet;

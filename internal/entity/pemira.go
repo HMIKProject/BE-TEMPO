@@ -5,6 +5,7 @@ import "time"
 type Pemira struct {
 	IdPemira       int64     `gorm:"primaryKey;column:id_pemira;autoIncrement" json:"id_pemira"`
 	TahunPeriode   string    `gorm:"column:tahun_periode;type:varchar(50);not null" json:"tahun_periode"`
+	JudulPemilihan string    `gorm:"column:judul_pemilihan;type:varchar(255);not null;default:'Pemilihan Ketua & Wakil Ketua HMIK'" json:"judul_pemilihan"`
 	TanggalMulai   time.Time `gorm:"column:tanggal_mulai;not null" json:"tanggal_mulai"`
 	TanggalSelesai time.Time `gorm:"column:tanggal_selesai;not null" json:"tanggal_selesai"`
 	Status         string    `gorm:"column:status;type:varchar(20);default:'DRAFT'" json:"status"`

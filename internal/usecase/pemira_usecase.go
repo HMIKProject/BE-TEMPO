@@ -473,6 +473,9 @@ func (u *pemiraUsecase) CreateCandidate(ctx context.Context, req entity.CreatePa
 		NamaWakil:   req.NamaWakil,
 		NamaKabinet: req.NamaKabinet,
 		FotoPaslon:  req.FotoPaslon,
+		FotoKetua:   req.FotoKetua,
+		FotoWakil:   req.FotoWakil,
+		LogoKabinet: req.LogoKabinet,
 		Visi:        req.Visi,
 		Misi:        req.Misi,
 	}
@@ -498,6 +501,15 @@ func (u *pemiraUsecase) UpdateCandidate(ctx context.Context, id int64, req entit
 	paslon.NamaKabinet = req.NamaKabinet
 	if req.FotoPaslon != "" {
 		paslon.FotoPaslon = req.FotoPaslon
+	}
+	if req.FotoKetua != "" {
+		paslon.FotoKetua = req.FotoKetua
+	}
+	if req.FotoWakil != "" {
+		paslon.FotoWakil = req.FotoWakil
+	}
+	if req.LogoKabinet != "" {
+		paslon.LogoKabinet = req.LogoKabinet
 	}
 	paslon.Visi = req.Visi
 	paslon.Misi = req.Misi
@@ -549,6 +561,7 @@ func (u *pemiraUsecase) GetElectionSettings(ctx context.Context) (*entity.Electi
 	return &entity.ElectionSettingsResponse{
 		IdPemira:       pemira.IdPemira,
 		TahunPeriode:   pemira.TahunPeriode,
+		JudulPemilihan: pemira.JudulPemilihan,
 		Status:         pemira.Status,
 		TanggalMulai:   pemira.TanggalMulai,
 		TanggalSelesai: pemira.TanggalSelesai,
@@ -583,7 +596,12 @@ func (u *pemiraUsecase) UpdateElectionSchedule(ctx context.Context, req entity.U
 		return errors.New("tanggal selesai tidak boleh mendahului tanggal mulai")
 	}
 
-	return u.pemiraRepo.UpdatePemiraSchedule(ctx, pemira.IdPemira, req.TahunPeriode, req.TanggalMulai, req.TanggalSelesai)
+	judul := strings.TrimSpace(req.JudulPemilihan)
+	if judul == "" {
+		judul = pemira.JudulPemilihan
+	}
+
+	return u.pemiraRepo.UpdatePemiraSchedule(ctx, pemira.IdPemira, req.TahunPeriode, judul, req.TanggalMulai, req.TanggalSelesai)
 }
 
 func (u *pemiraUsecase) UpdateElectionStatus(ctx context.Context, req entity.UpdatePemiraStatusRequest) error {
@@ -624,8 +642,14 @@ func (u *pemiraUsecase) CreateNewPeriod(ctx context.Context, req entity.CreatePe
 		return nil, errors.New("tanggal selesai pemilihan tidak boleh lebih awal dari tanggal mulai")
 	}
 
+	judul := strings.TrimSpace(req.JudulPemilihan)
+	if judul == "" {
+		judul = "Pemilihan Ketua & Wakil Ketua HMIK"
+	}
+
 	newPemira := &entity.Pemira{
 		TahunPeriode:   strings.TrimSpace(req.TahunPeriode),
+		JudulPemilihan: judul,
 		TanggalMulai:   req.TanggalMulai,
 		TanggalSelesai: req.TanggalSelesai,
 		Status:         "DRAFT",
@@ -668,6 +692,7 @@ func (u *pemiraUsecase) GetPublicSchedule(ctx context.Context) (*entity.PublicEl
 	return &entity.PublicElectionScheduleResponse{
 		IdPemira:       pemira.IdPemira,
 		TahunPeriode:   pemira.TahunPeriode,
+		JudulPemilihan: pemira.JudulPemilihan,
 		Status:         pemira.Status,
 		TanggalMulai:   pemira.TanggalMulai,
 		TanggalSelesai: pemira.TanggalSelesai,
@@ -700,11 +725,15 @@ func (u *pemiraUsecase) PelantikanMPIK(ctx context.Context) (*entity.PelantikanM
 	tahunMulai, tahunSelesai := parsePeriodeYears(pemira.TahunPeriode)
 
 	// 4. Promosikan ke Tabel Kabinet (Nonaktifkan Kabinet Lama, Aktifkan Kabinet Baru)
+	logoKabinet := winner.LogoKabinet
+	if strings.TrimSpace(logoKabinet) == "" {
+		logoKabinet = winner.FotoPaslon
+	}
 	kabinet := entity.Kabinet{
 		NamaKabinet:  winner.NamaKabinet,
 		TahunMulai:   tahunMulai,
 		TahunSelesai: tahunSelesai,
-		LogoKabinet:  winner.FotoPaslon,
+		LogoKabinet:  logoKabinet,
 		Visi:         winner.Visi,
 		Misi:         winner.Misi,
 		IsAktif:      true,
@@ -718,13 +747,21 @@ func (u *pemiraUsecase) PelantikanMPIK(ctx context.Context) (*entity.PelantikanM
 	angkatanWakil := parseAngkatanFromNIM(winner.NimWakil)
 
 	// 6. Upsert Data Ketua Himpunan ke Tabel Anggota (Status = Pengurus, BPH id_departemen = null)
-	ketua, err := u.pemiraRepo.UpsertAnggotaBPH(ctx, winner.NimKetua, winner.NamaKetua, "Ketua Himpunan", angkatanKetua, winner.FotoPaslon)
+	fotoKetua := winner.FotoKetua
+	if strings.TrimSpace(fotoKetua) == "" {
+		fotoKetua = winner.FotoPaslon
+	}
+	ketua, err := u.pemiraRepo.UpsertAnggotaBPH(ctx, winner.NimKetua, winner.NamaKetua, "Ketua Himpunan", angkatanKetua, fotoKetua)
 	if err != nil {
 		return nil, fmt.Errorf("gagal mencatat data Ketua Himpunan baru: %w", err)
 	}
 
 	// 7. Upsert Data Wakil Ketua Himpunan ke Tabel Anggota
-	wakil, err := u.pemiraRepo.UpsertAnggotaBPH(ctx, winner.NimWakil, winner.NamaWakil, "Wakil Ketua Himpunan", angkatanWakil, winner.FotoPaslon)
+	fotoWakil := winner.FotoWakil
+	if strings.TrimSpace(fotoWakil) == "" {
+		fotoWakil = winner.FotoPaslon
+	}
+	wakil, err := u.pemiraRepo.UpsertAnggotaBPH(ctx, winner.NimWakil, winner.NamaWakil, "Wakil Ketua Himpunan", angkatanWakil, fotoWakil)
 	if err != nil {
 		return nil, fmt.Errorf("gagal mencatat data Wakil Ketua Himpunan baru: %w", err)
 	}

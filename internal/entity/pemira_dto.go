@@ -108,6 +108,9 @@ type CreatePaslonRequest struct {
 	NamaWakil   string `json:"nama_wakil" binding:"required" example:"Calon Wakil"`
 	NamaKabinet string `json:"nama_kabinet" binding:"required" example:"Kabinet Bersama"`
 	FotoPaslon  string `json:"foto_paslon" example:"https://..."`
+	FotoKetua   string `json:"foto_ketua" example:"https://..."`
+	FotoWakil   string `json:"foto_wakil" example:"https://..."`
+	LogoKabinet string `json:"logo_kabinet" example:"https://..."`
 	Visi        string `json:"visi" example:"Mewujudkan HMIK unggul"`
 	Misi        string `json:"misi" example:"1. Kolaborasi riset"`
 }
@@ -121,6 +124,9 @@ type UpdatePaslonRequest struct {
 	NamaWakil   string `json:"nama_wakil" binding:"required" example:"Calon Wakil"`
 	NamaKabinet string `json:"nama_kabinet" binding:"required" example:"Kabinet Bersama"`
 	FotoPaslon  string `json:"foto_paslon" example:"https://..."`
+	FotoKetua   string `json:"foto_ketua" example:"https://..."`
+	FotoWakil   string `json:"foto_wakil" example:"https://..."`
+	LogoKabinet string `json:"logo_kabinet" example:"https://..."`
 	Visi        string `json:"visi" example:"Mewujudkan HMIK unggul"`
 	Misi        string `json:"misi" example:"1. Kolaborasi riset"`
 }
@@ -133,6 +139,7 @@ type UpdatePaslonRequest struct {
 type ElectionSettingsResponse struct {
 	IdPemira       int64     `json:"id_pemira" example:"1"`
 	TahunPeriode   string    `json:"tahun_periode" example:"2026/2027"`
+	JudulPemilihan string    `json:"judul_pemilihan" example:"Pemilihan Ketua & Wakil Ketua HMIK"`
 	Status         string    `json:"status" example:"BERJALAN"`
 	TanggalMulai   time.Time `json:"tanggal_mulai"`
 	TanggalSelesai time.Time `json:"tanggal_selesai"`
@@ -150,6 +157,7 @@ type UpdatePemiraStatusRequest struct {
 // UpdatePemiraScheduleRequest payload pengaturan jadwal acara
 type UpdatePemiraScheduleRequest struct {
 	TahunPeriode   string    `json:"tahun_periode" binding:"required" example:"2026/2027"`
+	JudulPemilihan string    `json:"judul_pemilihan" example:"Pemilihan Ketua & Wakil Ketua HMIK"`
 	TanggalMulai   time.Time `json:"tanggal_mulai" binding:"required"`
 	TanggalSelesai time.Time `json:"tanggal_selesai" binding:"required"`
 }
@@ -167,6 +175,7 @@ type PelantikanMPIKResponse struct {
 type PublicElectionScheduleResponse struct {
 	IdPemira       int64     `json:"id_pemira" example:"1"`
 	TahunPeriode   string    `json:"tahun_periode" example:"2026/2027"`
+	JudulPemilihan string    `json:"judul_pemilihan" example:"Pemilihan Ketua & Wakil Ketua HMIK"`
 	Status         string    `json:"status" example:"BERJALAN"`
 	TanggalMulai   time.Time `json:"tanggal_mulai"`
 	TanggalSelesai time.Time `json:"tanggal_selesai"`
@@ -177,6 +186,7 @@ type PublicElectionScheduleResponse struct {
 // CreatePemiraPeriodRequest payload pembukaan periode pemira baru di masa depan
 type CreatePemiraPeriodRequest struct {
 	TahunPeriode   string    `json:"tahun_periode" binding:"required" example:"2027/2028"`
+	JudulPemilihan string    `json:"judul_pemilihan" example:"Pemilihan Ketua & Wakil Ketua HMIK"`
 	TanggalMulai   time.Time `json:"tanggal_mulai" binding:"required"`
 	TanggalSelesai time.Time `json:"tanggal_selesai" binding:"required"`
 }
