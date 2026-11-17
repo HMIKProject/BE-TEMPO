@@ -565,6 +565,20 @@ func (u *pemiraUsecase) UpdateElectionSchedule(ctx context.Context, req entity.U
 		return errors.New("data pemilihan raya tidak ditemukan")
 	}
 
+	if pemira.Status == "SELESAI" {
+		return errors.New("pengaturan jadwal tidak dapat diubah karena pemilihan raya telah selesai")
+	}
+
+	if pemira.Status == "BERJALAN" {
+		// Asas Integritas Pemilu: Parameter acara dikunci saat bilik suara aktif
+		if strings.TrimSpace(req.TahunPeriode) != "" && strings.TrimSpace(req.TahunPeriode) != pemira.TahunPeriode {
+			return errors.New("tahun periode tidak dapat diubah saat pemilihan sedang aktif berjalan (LUBER JURDIL)")
+		}
+		if !req.TanggalMulai.IsZero() && !req.TanggalMulai.Equal(pemira.TanggalMulai) && req.TanggalMulai.After(time.Now()) {
+			return errors.New("tanggal mulai tidak dapat diubah ke masa depan saat bilik suara sedang aktif dibuka")
+		}
+	}
+
 	if req.TanggalSelesai.Before(req.TanggalMulai) {
 		return errors.New("tanggal selesai tidak boleh mendahului tanggal mulai")
 	}
@@ -581,6 +595,17 @@ func (u *pemiraUsecase) UpdateElectionStatus(ctx context.Context, req entity.Upd
 	pemira, err := u.pemiraRepo.GetLatestPemira(ctx)
 	if err != nil {
 		return errors.New("data pemilihan raya tidak ditemukan")
+	}
+
+	// Proteksi Asas Pemilu: Validasi kelayakan sebelum membuka pemilihan
+	if status == "BERJALAN" {
+		paslons, _ := u.pemiraRepo.GetPaslonByPemiraID(ctx, pemira.IdPemira)
+		if len(paslons) == 0 {
+			return errors.New("pemilihan tidak dapat dibuka: belum ada pasangan calon yang didaftarkan")
+		}
+		if !pemira.TanggalSelesai.IsZero() && pemira.TanggalSelesai.Before(time.Now()) {
+			return errors.New("pemilihan tidak dapat dibuka: batas waktu selesai telah terlewati, silakan perbarui jadwal terlebih dahulu")
+		}
 	}
 
 	return u.pemiraRepo.UpdatePemiraStatus(ctx, pemira.IdPemira, status)
