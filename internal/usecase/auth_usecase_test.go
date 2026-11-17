@@ -51,7 +51,7 @@ func (m *mockPenggunaRepo) Update(pengguna *entity.Pengguna) error {
 
 func TestAuthUsecase_LoginAndActivation(t *testing.T) {
 	repo := newMockPenggunaRepo()
-	uc := usecase.NewAuthUsecase(repo)
+	uc := usecase.NewAuthUsecase(repo, nil)
 
 	// Hash password standard
 	defaultPass := "qwerqwer"

@@ -77,3 +77,41 @@ func (h *AuthHandler) SetInitialPassword(c *gin.Context) {
 
 	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Kata sandi berhasil diatur, akun Anda kini aktif", res))
 }
+
+// GetMe godoc
+// @Summary      Ambil Profil Pengguna Saat Ini (Admin)
+// @Description  Mengembalikan informasi profil pengguna yang sedang login berdasarkan token JWT
+// @Tags         Admin - Auth
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200 {object} utils.JSendResponse{data=entity.UserProfileResponse} "Profil pengguna berhasil diambil"
+// @Failure      401 {object} utils.JSendResponse "Akses Ditolak: Token tidak valid"
+// @Router       /admin/me [get]
+func (h *AuthHandler) GetMe(c *gin.Context) {
+	idVal, exists := c.Get("id_pengguna")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, utils.BuildFailResponse("Akses Ditolak: Sesi login tidak ditemukan", nil))
+		return
+	}
+
+	var idPengguna int64
+	switch v := idVal.(type) {
+	case float64:
+		idPengguna = int64(v)
+	case int64:
+		idPengguna = v
+	case int:
+		idPengguna = int64(v)
+	default:
+		c.JSON(http.StatusUnauthorized, utils.BuildFailResponse("Akses Ditolak: Format ID pengguna tidak valid", nil))
+		return
+	}
+
+	profile, err := h.authUsecase.GetMe(c.Request.Context(), idPengguna)
+	if err != nil {
+		c.JSON(http.StatusNotFound, utils.BuildFailResponse(err.Error(), nil))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Profil pengguna berhasil diambil", profile))
+}

@@ -40,19 +40,19 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	// Upload (Cloudinary)
 	uploadHandler := handler.NewUploadHandler()
 
+	// Admin Slot Akun Pinjam Pakai
+	slotRepo := repository.NewSlotRepository(db)
+	adminSlotUsecase := usecase.NewAdminSlotUsecase(slotRepo)
+	adminSlotHandler := handler.NewAdminSlotHandler(adminSlotUsecase)
+
 	// Auth
 	penggunaRepo := repository.NewPenggunaRepository(db)
-	authUsecase := usecase.NewAuthUsecase(penggunaRepo)
+	authUsecase := usecase.NewAuthUsecase(penggunaRepo, slotRepo)
 	authHandler := handler.NewAuthHandler(authUsecase)
 
 	// Admin Buku Induk Anggota (BIA)
 	adminBIAUsecase := usecase.NewAdminBIAUsecase(anggotaRepo)
 	adminBIAHandler := handler.NewAdminBIAHandler(adminBIAUsecase)
-
-	// Admin Slot Akun Pinjam Pakai
-	slotRepo := repository.NewSlotRepository(db)
-	adminSlotUsecase := usecase.NewAdminSlotUsecase(slotRepo)
-	adminSlotHandler := handler.NewAdminSlotHandler(adminSlotUsecase)
 
 	// Admin Struktur Organisasi & Departemen
 	organisasiRepo := repository.NewOrganisasiRepository(db)
@@ -117,6 +117,9 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 		adminGroup := v1.Group("/admin")
 		adminGroup.Use(middleware.AuthMiddleware())
 		{
+			// Profil Akun Pengguna Aktif (Sidebar & Header Admin)
+			adminGroup.GET("/me", authHandler.GetMe)
+
 			dashboardGroup := adminGroup.Group("/dashboard")
 			{
 				dashboardGroup.GET("/stats", dashboardHandler.GetDashboardStats)
@@ -132,6 +135,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 				adminPemiraGroup.POST("/reset-kotak-suara", pemiraHandler.ResetKotakSuara)
 
 				// Manajemen Paslon (Kandidat) CRUD
+				adminPemiraGroup.GET("/kandidat", pemiraHandler.GetCandidatesAdmin)
 				adminPemiraGroup.POST("/kandidat", pemiraHandler.CreateCandidate)
 				adminPemiraGroup.PUT("/kandidat/:id", pemiraHandler.UpdateCandidate)
 				adminPemiraGroup.DELETE("/kandidat/:id", pemiraHandler.DeleteCandidate)

@@ -11,10 +11,25 @@ type LoginResponse struct {
 	Token                 string `json:"token,omitempty" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
 	IDPengguna            int64  `json:"id_pengguna" example:"1"`
 	NamaPengguna          string `json:"nama_pengguna" example:"hmik.humas.01"`
+	NamaLengkap           string `json:"nama_lengkap,omitempty" example:"Super Admin"`
 	RequirePasswordChange bool   `json:"require_password_change" example:"false"`
 	SetupToken            string `json:"setup_token,omitempty" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
 	Email                 string `json:"email,omitempty" example:"hmik.humas.01@hmik.com"`
 	Jabatan               string `json:"jabatan,omitempty" example:"Ketua Departemen Hubungan External"`
+	Role                  string `json:"role,omitempty" example:"Administrator"`
+	Initials              string `json:"initials,omitempty" example:"SA"`
+}
+
+// UserProfileResponse merepresentasikan profil akun pengguna yang sedang aktif/login
+type UserProfileResponse struct {
+	IDPengguna   int64  `json:"id_pengguna"`
+	NamaPengguna string `json:"nama_pengguna"`
+	NamaLengkap  string `json:"nama_lengkap"`
+	Email        string `json:"email"`
+	Role         string `json:"role"`
+	Jabatan      string `json:"jabatan"`
+	Initials     string `json:"initials"`
+	Foto         string `json:"foto,omitempty"`
 }
 
 // SetInitialPasswordRequest payload aktivasi mandiri pengurus baru dari popup /login

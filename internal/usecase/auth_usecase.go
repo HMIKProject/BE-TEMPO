@@ -1,12 +1,14 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 	"os"
 	"time"
 
 	"github.com/HMIKProject/hmik-corex-backend/internal/entity"
 	"github.com/HMIKProject/hmik-corex-backend/internal/repository"
+	"github.com/HMIKProject/hmik-corex-backend/pkg/utils"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -14,14 +16,19 @@ import (
 type AuthUsecase interface {
 	Login(req entity.LoginRequest) (entity.LoginResponse, error)
 	SetInitialPassword(req entity.SetInitialPasswordRequest) (entity.LoginResponse, error)
+	GetMe(ctx context.Context, idPengguna int64) (*entity.UserProfileResponse, error)
 }
 
 type authUsecase struct {
 	penggunaRepo repository.PenggunaRepository
+	slotRepo     repository.SlotRepository
 }
 
-func NewAuthUsecase(repo repository.PenggunaRepository) AuthUsecase {
-	return &authUsecase{penggunaRepo: repo}
+func NewAuthUsecase(repo repository.PenggunaRepository, slotRepo repository.SlotRepository) AuthUsecase {
+	return &authUsecase{
+		penggunaRepo: repo,
+		slotRepo:     slotRepo,
+	}
 }
 
 func getJWTSecret() string {
@@ -86,10 +93,16 @@ func (u *authUsecase) Login(req entity.LoginRequest) (entity.LoginResponse, erro
 	}
 
 	// 5. Kembalikan Response Sukses Login Penuh
+	displayName, role, initials, _ := u.resolveProfileInfo(pengguna)
 	return entity.LoginResponse{
 		Token:                 token,
 		IDPengguna:            pengguna.IdPengguna,
 		NamaPengguna:          pengguna.NamaPengguna,
+		NamaLengkap:           displayName,
+		Email:                 pengguna.Email,
+		Jabatan:               role,
+		Role:                  role,
+		Initials:              initials,
 		RequirePasswordChange: false,
 	}, nil
 }
@@ -134,11 +147,64 @@ func (u *authUsecase) SetInitialPassword(req entity.SetInitialPasswordRequest) (
 		return entity.LoginResponse{}, errors.New("Gagal membuat sesi login setelah aktivasi")
 	}
 
+	displayName, role, initials, _ := u.resolveProfileInfo(pengguna)
 	return entity.LoginResponse{
 		Token:                 token,
 		IDPengguna:            pengguna.IdPengguna,
 		NamaPengguna:          pengguna.NamaPengguna,
+		NamaLengkap:           displayName,
+		Email:                 pengguna.Email,
+		Jabatan:               role,
+		Role:                  role,
+		Initials:              initials,
 		RequirePasswordChange: false,
+	}, nil
+}
+
+func (u *authUsecase) resolveProfileInfo(pengguna *entity.Pengguna) (displayName string, role string, initials string, foto string) {
+	displayName = pengguna.NamaLengkap
+	if displayName == "" {
+		displayName = pengguna.NamaPengguna
+	}
+	role = "Administrator"
+	foto = pengguna.FotoPengguna
+
+	if u.slotRepo != nil {
+		borrower, err := u.slotRepo.FindBorrowerBySlotID(pengguna.IdPengguna)
+		if err == nil && borrower != nil {
+			if borrower.NamaLengkap != "" {
+				displayName = borrower.NamaLengkap
+			}
+			if borrower.Jabatan != "" {
+				role = borrower.Jabatan
+			}
+			if borrower.FotoProfil != "" {
+				foto = borrower.FotoProfil
+			}
+		}
+	}
+
+	initials = utils.GenerateInitials(displayName)
+	return displayName, role, initials, foto
+}
+
+func (u *authUsecase) GetMe(ctx context.Context, idPengguna int64) (*entity.UserProfileResponse, error) {
+	pengguna, err := u.penggunaRepo.FindByID(idPengguna)
+	if err != nil {
+		return nil, errors.New("pengguna tidak ditemukan")
+	}
+
+	displayName, role, initials, foto := u.resolveProfileInfo(pengguna)
+
+	return &entity.UserProfileResponse{
+		IDPengguna:   pengguna.IdPengguna,
+		NamaPengguna: pengguna.NamaPengguna,
+		NamaLengkap:  displayName,
+		Email:        pengguna.Email,
+		Role:         role,
+		Jabatan:      role,
+		Initials:     initials,
+		Foto:         foto,
 	}, nil
 }
 

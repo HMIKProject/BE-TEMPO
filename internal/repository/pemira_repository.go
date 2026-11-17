@@ -320,7 +320,7 @@ func (r *pemiraRepository) UpdatePaslon(ctx context.Context, paslon *entity.Pasl
 }
 
 func (r *pemiraRepository) DeletePaslon(ctx context.Context, idPaslon int64) error {
-	return r.db.WithContext(ctx).Delete(&entity.Paslon{}, idPaslon).Error
+	return r.db.WithContext(ctx).Where("id_paslon = ?", idPaslon).Delete(&entity.Paslon{}).Error
 }
 
 func (r *pemiraRepository) CountSuaraByPaslon(ctx context.Context, idPaslon int64) (int64, error) {

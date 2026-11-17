@@ -358,7 +358,7 @@ func (h *PemiraHandler) UpdateCandidate(c *gin.Context) {
 func (h *PemiraHandler) DeleteCandidate(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
+	if err != nil || id <= 0 {
 		c.JSON(http.StatusBadRequest, utils.BuildFailResponse("ID paslon tidak valid", nil))
 		return
 	}
@@ -369,6 +369,25 @@ func (h *PemiraHandler) DeleteCandidate(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Pasangan calon berhasil dihapus", nil))
+}
+
+// GetCandidatesAdmin godoc
+// @Summary      Ambil Daftar Paslon untuk Admin Pemira
+// @Description  Mengambil seluruh pasangan calon pada periode aktif atau terbaru (DRAFT, TERJADWAL, BERJALAN, SELESAI)
+// @Tags         Admin - Pemira
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200 {object} utils.JSendResponse{data=[]entity.Paslon} "Daftar paslon admin berhasil diambil"
+// @Failure      500 {object} utils.JSendResponse "Gagal memuat paslon"
+// @Router       /admin/pemira/kandidat [get]
+func (h *PemiraHandler) GetCandidatesAdmin(c *gin.Context) {
+	candidates, err := h.usecase.GetAdminCandidates(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.BuildErrorResponse(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse("Daftar paslon admin berhasil diambil", candidates))
 }
 
 // GetElectionSettings godoc

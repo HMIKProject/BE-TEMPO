@@ -36,6 +36,7 @@ type PemiraUsecase interface {
 	ResetKotakSuara(ctx context.Context) error
 
 	// 4. Admin Candidate (Paslon) CRUD
+	GetAdminCandidates(ctx context.Context) ([]entity.Paslon, error)
 	CreateCandidate(ctx context.Context, req entity.CreatePaslonRequest) (*entity.Paslon, error)
 	UpdateCandidate(ctx context.Context, id int64, req entity.UpdatePaslonRequest) (*entity.Paslon, error)
 	DeleteCandidate(ctx context.Context, id int64) error
@@ -256,12 +257,32 @@ func (u *pemiraUsecase) ResendOTP(ctx context.Context, req entity.ResendOTPReque
 func (u *pemiraUsecase) GetActiveCandidates(ctx context.Context) ([]entity.Paslon, error) {
 	pemira, err := u.pemiraRepo.GetActivePemira(ctx)
 	if err != nil {
-		return nil, errors.New("tidak ada pemilihan raya yang sedang aktif saat ini")
+		pemira, err = u.pemiraRepo.GetLatestPemira(ctx)
+		if err != nil {
+			return nil, errors.New("tidak ada pemilihan raya yang sedang aktif atau tersimpan saat ini")
+		}
 	}
 
 	paslons, err := u.pemiraRepo.GetPaslonByPemiraID(ctx, pemira.IdPemira)
 	if err != nil {
 		return nil, errors.New("gagal memuat data pasangan calon")
+	}
+
+	return paslons, nil
+}
+
+func (u *pemiraUsecase) GetAdminCandidates(ctx context.Context) ([]entity.Paslon, error) {
+	pemira, err := u.pemiraRepo.GetActivePemira(ctx)
+	if err != nil {
+		pemira, err = u.pemiraRepo.GetLatestPemira(ctx)
+		if err != nil {
+			return []entity.Paslon{}, nil
+		}
+	}
+
+	paslons, err := u.pemiraRepo.GetPaslonByPemiraID(ctx, pemira.IdPemira)
+	if err != nil {
+		return nil, fmt.Errorf("gagal memuat daftar pasangan calon admin: %w", err)
 	}
 
 	return paslons, nil
