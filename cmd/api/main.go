@@ -117,7 +117,7 @@ func main() {
 	router.GET("/version", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"app":     "HMIK CoreX Backend",
-			"version": "v15-pemira-autoseed",
+			"version": "v14-pemira-autoseed",
 			"time":    time.Now().UTC().Format(time.RFC3339),
 		})
 	})
