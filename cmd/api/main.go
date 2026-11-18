@@ -56,7 +56,7 @@ func main() {
 
 	// Inisialisasi otomatis akun slot jabatan dengan password 'qwerqwer'
 	_ = seeder.SeedAllRoleAccounts(db)
-	_ = seeder.SeedSampleModul(db)
+	// _ = seeder.SeedSampleModul(db) // Ditiadakan agar modul tetap bersih untuk input manual pengurus
 
 	// 2. Inisiasi Mesin Gin
 	router := gin.Default()
@@ -93,7 +93,7 @@ func main() {
 	router.GET("/version", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"app":     "HMIK CoreX Backend",
-			"version": "v13-live-diagnostic",
+			"version": "v14-production-clean",
 			"time":    time.Now().UTC().Format(time.RFC3339),
 		})
 	})

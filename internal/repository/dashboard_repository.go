@@ -57,11 +57,6 @@ func (r *dashboardRepository) GetTotalAnggotaAktif(ctx context.Context) (*entity
 			Count(&bulanIni).Error
 	}
 
-	if total == 0 {
-		total = getAnggotaCountFromJSON()
-		bulanIni = 7
-	}
-
 	return &entity.CardDetail{
 		CardKey:             "total_anggota_aktif",
 		Judul:               "Total Anggota Aktif",
@@ -80,11 +75,6 @@ func (r *dashboardRepository) GetTotalModul(ctx context.Context) (*entity.CardDe
 		_ = r.db.WithContext(ctx).Table("modul_pembelajaran").
 			Where("dibuat_pada >= DATE_TRUNC('month', CURRENT_DATE)").
 			Count(&bulanIni).Error
-	}
-
-	if total == 0 {
-		total = 5
-		bulanIni = 2
 	}
 
 	return &entity.CardDetail{
@@ -107,11 +97,6 @@ func (r *dashboardRepository) GetTotalProgramKerja(ctx context.Context) (*entity
 			Count(&bulanIni).Error
 	}
 
-	if total == 0 {
-		total = 15
-		bulanIni = 5
-	}
-
 	return &entity.CardDetail{
 		CardKey:             "total_program_kerja",
 		Judul:               "Total Program Kerja",
@@ -124,17 +109,25 @@ func (r *dashboardRepository) GetTotalProgramKerja(ctx context.Context) (*entity
 }
 
 func (r *dashboardRepository) GetVotingAktif(ctx context.Context) (*entity.CardDetail, error) {
-	total := int64(40)
-	bulanIni := int64(0)
+	var total, bulanIni int64
+	if r.db != nil {
+		_ = r.db.WithContext(ctx).Table("pemira").Where("status = ?", "BERJALAN").Count(&total).Error
+		_ = r.db.WithContext(ctx).Table("suara").Count(&bulanIni).Error
+	}
+
+	ket := "Belum ada Voting Aktif"
+	if total > 0 {
+		ket = fmt.Sprintf("%d Suara Masuk", bulanIni)
+	}
 
 	return &entity.CardDetail{
 		CardKey:             "voting_aktif",
 		Judul:               "Voting Aktif",
 		Total:               total,
 		PertumbuhanBulanIni: bulanIni,
-		Keterangan:          "Belum ada Voting Aktif",
+		Keterangan:          ket,
 		WarnaTema:           "orange",
-		TautanAksi:          "/admin/cms-voting",
+		TautanAksi:          "/admin/pemira",
 	}, nil
 }
 
