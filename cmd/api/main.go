@@ -52,11 +52,35 @@ func main() {
 		&entity.Departemen{},
 		&entity.DivisiDepartemen{},
 		&entity.ModulPembelajaran{},
+		&entity.Pemira{},
+		&entity.Paslon{},
+		&entity.Pemilih{},
+		&entity.Suara{},
+		&entity.Kabinet{},
 	)
 
 	// Inisialisasi otomatis akun slot jabatan dengan password 'qwerqwer'
 	_ = seeder.SeedAllRoleAccounts(db)
 	// _ = seeder.SeedSampleModul(db) // Ditiadakan agar modul tetap bersih untuk input manual pengurus
+
+	// Memastikan selalu ada setidaknya satu record sesi Pemira berstatus DRAFT jika tabel kosong
+	var pemiraCount int64
+	db.Model(&entity.Pemira{}).Count(&pemiraCount)
+	if pemiraCount == 0 {
+		now := time.Now().UTC()
+		defaultPemira := entity.Pemira{
+			TahunPeriode:   "2026/2027",
+			JudulPemilihan: "Pemilihan Ketua & Wakil Ketua HMIK",
+			TanggalMulai:   now,
+			TanggalSelesai: now.Add(7 * 24 * time.Hour),
+			Status:         "DRAFT",
+		}
+		if err := db.Create(&defaultPemira).Error; err != nil {
+			log.Printf("Peringatan: Gagal auto-seed DRAFT pemira: %v", err)
+		} else {
+			log.Printf("✅ Auto-seed DRAFT Pemira berhasil dibuat dengan ID: %d", defaultPemira.IdPemira)
+		}
+	}
 
 	// 2. Inisiasi Mesin Gin
 	router := gin.Default()
@@ -93,7 +117,7 @@ func main() {
 	router.GET("/version", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"app":     "HMIK CoreX Backend",
-			"version": "v14-production-clean",
+			"version": "v15-pemira-autoseed",
 			"time":    time.Now().UTC().Format(time.RFC3339),
 		})
 	})

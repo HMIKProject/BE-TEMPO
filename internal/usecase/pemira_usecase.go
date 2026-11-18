@@ -445,7 +445,19 @@ func (u *pemiraUsecase) generateBallotJWT(nim string, idPemira int64) (string, e
 func (u *pemiraUsecase) CreateCandidate(ctx context.Context, req entity.CreatePaslonRequest) (*entity.Paslon, error) {
 	pemira, err := u.pemiraRepo.GetLatestPemira(ctx)
 	if err != nil {
-		return nil, errors.New("belum ada periode pemilihan raya yang terdaftar")
+		now := time.Now().UTC()
+		defaultPemira := &entity.Pemira{
+			TahunPeriode:   fmt.Sprintf("%d/%d", now.Year(), now.Year()+1),
+			JudulPemilihan: "Pemilihan Ketua & Wakil Ketua HMIK",
+			TanggalMulai:   now,
+			TanggalSelesai: now.Add(7 * 24 * time.Hour),
+			Status:         "DRAFT",
+		}
+		if errCreate := u.pemiraRepo.CreatePemira(ctx, defaultPemira); errCreate == nil {
+			pemira = defaultPemira
+		} else {
+			return nil, errors.New("belum ada periode pemilihan raya yang terdaftar")
+		}
 	}
 
 	paslon := entity.Paslon{
@@ -526,7 +538,19 @@ func (u *pemiraUsecase) DeleteCandidate(ctx context.Context, id int64) error {
 func (u *pemiraUsecase) GetElectionSettings(ctx context.Context) (*entity.ElectionSettingsResponse, error) {
 	pemira, err := u.pemiraRepo.GetLatestPemira(ctx)
 	if err != nil {
-		return nil, errors.New("data pengaturan pemilihan raya belum tersedia")
+		now := time.Now().UTC()
+		defaultPemira := &entity.Pemira{
+			TahunPeriode:   fmt.Sprintf("%d/%d", now.Year(), now.Year()+1),
+			JudulPemilihan: "Pemilihan Ketua & Wakil Ketua HMIK",
+			TanggalMulai:   now,
+			TanggalSelesai: now.Add(7 * 24 * time.Hour),
+			Status:         "DRAFT",
+		}
+		if errCreate := u.pemiraRepo.CreatePemira(ctx, defaultPemira); errCreate == nil {
+			pemira = defaultPemira
+		} else {
+			return nil, errors.New("data pengaturan pemilihan raya belum tersedia")
+		}
 	}
 
 	paslons, _ := u.pemiraRepo.GetPaslonByPemiraID(ctx, pemira.IdPemira)
@@ -557,9 +581,26 @@ func (u *pemiraUsecase) GetElectionSettings(ctx context.Context) (*entity.Electi
 }
 
 func (u *pemiraUsecase) UpdateElectionSchedule(ctx context.Context, req entity.UpdatePemiraScheduleRequest) error {
+	judul := strings.TrimSpace(req.JudulPemilihan)
+	if judul == "" {
+		judul = "Pemilihan Ketua & Wakil Ketua HMIK"
+	}
+
 	pemira, err := u.pemiraRepo.GetLatestPemira(ctx)
 	if err != nil {
-		return errors.New("data pemilihan raya tidak ditemukan")
+		tahunPeriode := strings.TrimSpace(req.TahunPeriode)
+		if tahunPeriode == "" {
+			now := time.Now().UTC()
+			tahunPeriode = fmt.Sprintf("%d/%d", now.Year(), now.Year()+1)
+		}
+		newPemira := &entity.Pemira{
+			TahunPeriode:   tahunPeriode,
+			JudulPemilihan: judul,
+			TanggalMulai:   req.TanggalMulai,
+			TanggalSelesai: req.TanggalSelesai,
+			Status:         "DRAFT",
+		}
+		return u.pemiraRepo.CreatePemira(ctx, newPemira)
 	}
 
 	if pemira.Status == "SELESAI" {
@@ -578,11 +619,6 @@ func (u *pemiraUsecase) UpdateElectionSchedule(ctx context.Context, req entity.U
 
 	if req.TanggalSelesai.Before(req.TanggalMulai) {
 		return errors.New("tanggal selesai tidak boleh mendahului tanggal mulai")
-	}
-
-	judul := strings.TrimSpace(req.JudulPemilihan)
-	if judul == "" {
-		judul = pemira.JudulPemilihan
 	}
 
 	return u.pemiraRepo.UpdatePemiraSchedule(ctx, pemira.IdPemira, req.TahunPeriode, judul, req.TanggalMulai, req.TanggalSelesai)
