@@ -63,6 +63,26 @@ func main() {
 	_ = seeder.SeedAllRoleAccounts(db)
 	// _ = seeder.SeedSampleModul(db) // Ditiadakan agar modul tetap bersih untuk input manual pengurus
 
+	// Memperbaiki URL file modul lama dari /uploads/... ke Cloudinary CDN jika ada
+	db.Model(&entity.ModulPembelajaran{}).
+		Where("file_url LIKE ?", "%/uploads/modul/semester_1/kalkulus_1%").
+		Update("file_url", "https://res.cloudinary.com/du9sbnbx9/image/upload/v1794654581/hmik/learning/Semester%201/Kalkulus%201/Kalkulus_1.pdf")
+	db.Model(&entity.ModulPembelajaran{}).
+		Where("file_url LIKE ?", "%/uploads/modul/semester_1/matematika_diskrit%").
+		Update("file_url", "https://res.cloudinary.com/du9sbnbx9/image/upload/v1794654588/hmik/learning/Semester%201/Matematika%20Diskrit/10-13.TeoriHimpunanElementer.pdf")
+	db.Model(&entity.ModulPembelajaran{}).
+		Where("file_url LIKE ?", "%/uploads/modul/semester_1/organisasi_komputer%").
+		Update("file_url", "https://res.cloudinary.com/du9sbnbx9/image/upload/v1794654637/hmik/learning/Semester%201/Organisasi%20Komputer/Pertemuan%201%20-%20Pengantar%20Organisasi%20Komputer.pdf")
+	db.Model(&entity.ModulPembelajaran{}).
+		Where("file_url LIKE ?", "%/uploads/modul/semester_2/dasar_pemrograman%").
+		Update("file_url", "https://res.cloudinary.com/du9sbnbx9/image/upload/v1794654662/hmik/learning/Semester%202/Dasar%20Pemrograman/UAS_DasPro_2024.pdf")
+	db.Model(&entity.ModulPembelajaran{}).
+		Where("file_url LIKE ?", "%/uploads/modul/semester_3/algoritma_dan_struktur_data%").
+		Update("file_url", "https://res.cloudinary.com/du9sbnbx9/image/upload/v1794654669/hmik/learning/Semester%203/Algoritma%20dan%20Struktur%20Data/W1_-_Array_and_Struct.pdf")
+	db.Model(&entity.ModulPembelajaran{}).
+		Where("file_url LIKE ?", "%/uploads/modul/semester_4/pbo%").
+		Update("file_url", "https://res.cloudinary.com/du9sbnbx9/image/upload/v1794654795/hmik/learning/Semester%204/PBO%20%28Pemrograman%20Berorientasi%20Objek%29/11-Polymorphism.pdf")
+
 	// Memastikan selalu ada setidaknya satu record sesi Pemira berstatus DRAFT jika tabel kosong
 	var pemiraCount int64
 	db.Model(&entity.Pemira{}).Count(&pemiraCount)

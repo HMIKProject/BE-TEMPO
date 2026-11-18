@@ -27,7 +27,7 @@ func SeedSampleModul(db *gorm.DB) error {
 			TipeFile:    "pdf",
 			UkuranFile:  "7.1 MB",
 			UkuranBytes: 7444889,
-			FileURL:     "/uploads/modul/semester_1/kalkulus_1/Kalkulus_1.pdf",
+			FileURL:     "https://res.cloudinary.com/du9sbnbx9/image/upload/v1794654581/hmik/learning/Semester%201/Kalkulus%201/Kalkulus_1.pdf",
 			DibuatOleh:  "Admin HMIK",
 		},
 		{
@@ -38,7 +38,7 @@ func SeedSampleModul(db *gorm.DB) error {
 			TipeFile:    "pdf",
 			UkuranFile:  "3.8 MB",
 			UkuranBytes: 3984588,
-			FileURL:     "/uploads/modul/semester_1/matematika_diskrit/Matematika_Diskrit.pdf",
+			FileURL:     "https://res.cloudinary.com/du9sbnbx9/image/upload/v1794654588/hmik/learning/Semester%201/Matematika%20Diskrit/10-13.TeoriHimpunanElementer.pdf",
 			DibuatOleh:  "Admin HMIK",
 		},
 		{
@@ -49,7 +49,7 @@ func SeedSampleModul(db *gorm.DB) error {
 			TipeFile:    "pptx",
 			UkuranFile:  "12.4 MB",
 			UkuranBytes: 13002342,
-			FileURL:     "/uploads/modul/semester_1/organisasi_komputer/Organisasi_Komputer.pptx",
+			FileURL:     "https://res.cloudinary.com/du9sbnbx9/image/upload/v1794654637/hmik/learning/Semester%201/Organisasi%20Komputer/Pertemuan%201%20-%20Pengantar%20Organisasi%20Komputer.pdf",
 			DibuatOleh:  "Admin HMIK",
 		},
 		{
@@ -60,7 +60,7 @@ func SeedSampleModul(db *gorm.DB) error {
 			TipeFile:    "pdf",
 			UkuranFile:  "4.5 MB",
 			UkuranBytes: 4718592,
-			FileURL:     "/uploads/modul/semester_2/dasar_pemrograman/Dasar_Pemrograman.pdf",
+			FileURL:     "https://res.cloudinary.com/du9sbnbx9/image/upload/v1794654662/hmik/learning/Semester%202/Dasar%20Pemrograman/UAS_DasPro_2024.pdf",
 			DibuatOleh:  "Admin HMIK",
 		},
 		{
@@ -71,7 +71,7 @@ func SeedSampleModul(db *gorm.DB) error {
 			TipeFile:    "pdf",
 			UkuranFile:  "3.1 MB",
 			UkuranBytes: 3250585,
-			FileURL:     "/uploads/modul/semester_3/algoritma_dan_struktur_data/Struktur_Data.pdf",
+			FileURL:     "https://res.cloudinary.com/du9sbnbx9/image/upload/v1794654669/hmik/learning/Semester%203/Algoritma%20dan%20Struktur%20Data/W1_-_Array_and_Struct.pdf",
 			DibuatOleh:  "Admin HMIK",
 		},
 		{
@@ -82,7 +82,7 @@ func SeedSampleModul(db *gorm.DB) error {
 			TipeFile:    "pdf",
 			UkuranFile:  "6.2 MB",
 			UkuranBytes: 6501171,
-			FileURL:     "/uploads/modul/semester_4/pbo/PBO_Java.pdf",
+			FileURL:     "https://res.cloudinary.com/du9sbnbx9/image/upload/v1794654795/hmik/learning/Semester%204/PBO%20%28Pemrograman%20Berorientasi%20Objek%29/11-Polymorphism.pdf",
 			DibuatOleh:  "Admin HMIK",
 		},
 	}
