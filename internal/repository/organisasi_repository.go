@@ -41,10 +41,10 @@ func (r *organisasiRepository) GetStrukturOrganisasi() (*entity.StrukturOrganisa
 	}
 
 	// 2. Ambil data Pengurus Inti BPH (Kahim, Wakahim, Sekretaris, Bendahara)
-	// BPH dicirikan dengan id_departemen IS NULL atau jabatan ketua/wakil himpunan dengan status Pengurus
+	// BPH dicirikan dengan status Pengurus dan memegang posisi inti himpunan
 	var bphAnggota []entity.Anggota
-	err = r.db.Where("status = ? AND (id_departemen IS NULL OR jabatan ILIKE ? OR jabatan ILIKE ?)",
-		"Pengurus", "%ketua himpunan%", "%wakil ketua himpunan%").
+	err = r.db.Where("status = ? AND ((id_departemen IS NULL AND (jabatan ILIKE ? OR jabatan ILIKE ?)) OR jabatan ILIKE ? OR jabatan ILIKE ?)",
+		"Pengurus", "%sekretaris%", "%bendahara%", "%ketua himpunan%", "%wakil ketua himpunan%").
 		Order("id_anggota ASC").
 		Find(&bphAnggota).Error
 	if err != nil {

@@ -57,7 +57,11 @@ func main() {
 		&entity.Pemilih{},
 		&entity.Suara{},
 		&entity.Kabinet{},
+		&entity.RiwayatJabatan{},
 	)
+
+	// Bersihkan data dummy anggota pengujian (Dankon & Anton) agar bagan organisasi bersih
+	db.Exec("DELETE FROM anggota WHERE nama_lengkap IN ('Dankon', 'Anton Chandrawansah') OR nim IN ('105224003', '105224000')")
 
 	// Inisialisasi otomatis akun slot jabatan dengan password 'qwerqwer'
 	_ = seeder.SeedAllRoleAccounts(db)
@@ -130,6 +134,14 @@ func main() {
 	// Static file serving untuk berkas unggahan lokal (uploads/modul, dll.)
 	router.Static("/uploads", "./uploads")
 
+	// Middleware Anti-Stale Cache: Cegah browser menahan data usang dari API publik & admin
+	router.Use(func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Header("Pragma", "no-cache")
+		c.Header("Expires", "0")
+		c.Next()
+	})
+
 	// 4. Mendaftarkan Seluruh Endpoint API
 	routes.SetupRoutes(router, db)
 
@@ -137,7 +149,7 @@ func main() {
 	router.GET("/version", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"app":     "HMIK CoreX Backend",
-			"version": "v14-pemira-autoseed",
+			"version": "v16-fix-riwayat-modul-cache",
 			"time":    time.Now().UTC().Format(time.RFC3339),
 		})
 	})

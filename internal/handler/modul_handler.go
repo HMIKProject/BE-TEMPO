@@ -218,11 +218,20 @@ func (h *ModulHandler) UploadFile(c *gin.Context) {
 	}
 
 	// Baca parameter semester dan mata kuliah untuk menentukan target folder
-	semester := c.DefaultPostForm("semester", "Semester 1")
-	mataKuliah := c.DefaultPostForm("mata_kuliah", "Umum")
+	semester := strings.TrimSpace(c.DefaultPostForm("semester", "Semester 1"))
+	mataKuliah := strings.TrimSpace(c.DefaultPostForm("mata_kuliah", "Umum"))
+	if semester == "" {
+		semester = "Semester 1"
+	}
+	if mataKuliah == "" {
+		mataKuliah = "Umum"
+	}
+	// Format folder Cloudinary terstandar (Title Case selaras dengan UI Admin & /learning, contoh: "hmik/learning/Semester 1/Kalkulus 1")
+	cloudFolder := fmt.Sprintf("hmik/learning/%s/%s", semester, mataKuliah)
+
+	// Format fallback direktori penyimpanan lokal (filesystem)
 	cleanSemester := strings.ReplaceAll(strings.ToLower(semester), " ", "_")
 	cleanMatkul := strings.ReplaceAll(strings.ToLower(mataKuliah), " ", "_")
-	cloudFolder := fmt.Sprintf("hmik/learning/%s/%s", cleanSemester, cleanMatkul)
 
 	var fileURL string
 	var uploadErr error
