@@ -60,6 +60,21 @@ func main() {
 		&entity.RiwayatJabatan{},
 	)
 
+	// Kembalikan ke Kondisi Murni Masa Pemilihan (Opsi 1):
+	// Lepas tautan slot akun dan bersihkan anggota uji coba pelantikan agar murni hanya sebagai Kandidat Paslon PEMIRA
+	db.Exec("UPDATE anggota SET id_pengguna = NULL WHERE nim IN ('105223042', '105223025')")
+	db.Exec("DELETE FROM anggota WHERE nim IN ('105223042', '105223025')")
+	db.Model(&entity.Pengguna{}).
+		Where("nama_pengguna IN ('hmik.kahim.01', 'hmik.wakahim.01')").
+		Updates(map[string]interface{}{
+			"kode_aktivasi":         nil,
+			"kode_aktivasi_expired": nil,
+			"is_first_login":        false,
+		})
+
+	// Nonaktifkan kabinet uji coba pelantikan agar berstatus transisi PEMIRA
+	db.Model(&entity.Kabinet{}).Where("nama_kabinet ILIKE ?", "%kan bisa besok%").Update("is_aktif", false)
+
 	// Inisialisasi otomatis akun slot jabatan dengan password 'qwerqwer'
 	_ = seeder.SeedAllRoleAccounts(db)
 	// _ = seeder.SeedSampleModul(db) // Ditiadakan agar modul tetap bersih untuk input manual pengurus
@@ -146,7 +161,7 @@ func main() {
 	router.GET("/version", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"app":     "HMIK CoreX Backend",
-			"version": "v16-fix-riwayat-modul-cache",
+			"version": "v17-pure-transition-state",
 			"time":    time.Now().UTC().Format(time.RFC3339),
 		})
 	})

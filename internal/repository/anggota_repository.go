@@ -26,12 +26,13 @@ func NewAnggotaRepository(db *gorm.DB) AnggotaRepository {
 	return &anggotaRepository{db}
 }
 
-// FindAll mengambil semua anggota beserta relasinya (Keahlian & Minat)
+// FindAll mengambil semua anggota aktif (Pengurus) beserta relasinya untuk Company Profile
 func (r *anggotaRepository) FindAll() ([]entity.Anggota, error) {
 	var anggotas []entity.Anggota
 	
 	// Menggunakan Preload untuk menarik data dari tabel relasi (Eager Loading)
 	err := r.db.
+		Where("status = ?", "Pengurus").
 		Preload("Pengguna").
 		Preload("Departemen").
 		Preload("Divisi").
