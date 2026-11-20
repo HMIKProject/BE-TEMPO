@@ -68,7 +68,7 @@ func (u *adminBIAUsecase) CreateAnggota(req entity.CreateAnggotaRequest) (*entit
 
 	status := req.Status
 	if status == "" {
-		status = "Anggota"
+		status = "Pengurus"
 	}
 
 	// 3. Jika id_pengguna disediakan, sinkronkan jabatan & struktur dari slot akun resmi
@@ -95,7 +95,7 @@ func (u *adminBIAUsecase) CreateAnggota(req entity.CreateAnggotaRequest) (*entit
 		} else if status == "Demisioner" {
 			req.Jabatan = "Demisioner"
 		} else {
-			req.Jabatan = "Anggota"
+			req.Jabatan = "Staff Pengurus"
 		}
 	}
 

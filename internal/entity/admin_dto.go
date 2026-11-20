@@ -21,7 +21,7 @@ type CreateAnggotaRequest struct {
 	ProgramStudi string `json:"program_studi" binding:"required" example:"Ilmu Komputer"`
 	Angkatan     int    `json:"angkatan" binding:"required" example:"2023"`
 	Jabatan      string `json:"jabatan" example:"Ketua Divisi Media Kreatif"`
-	Status       string `json:"status" binding:"required,oneof=Pengurus Magang Demisioner Anggota" example:"Anggota"`
+	Status       string `json:"status" binding:"required,oneof=Pengurus Magang Demisioner" example:"Pengurus"`
 	Tautan       string `json:"tautan" example:"https://www.linkedin.com/in/antondicaprio"`
 	CvUrl        string `json:"cv_url" example:"https://res.cloudinary.com/.../cv.pdf"`
 	IdDepartemen *int64 `json:"id_departemen" example:"1"`
@@ -37,7 +37,7 @@ type UpdateAnggotaRequest struct {
 	ProgramStudi string `json:"program_studi" binding:"required" example:"Ilmu Komputer"`
 	Angkatan     int    `json:"angkatan" binding:"required" example:"2023"`
 	Jabatan      string `json:"jabatan" example:"Ketua Divisi Media Kreatif"`
-	Status       string `json:"status" binding:"required,oneof=Pengurus Magang Demisioner Anggota" example:"Anggota"`
+	Status       string `json:"status" binding:"required,oneof=Pengurus Magang Demisioner" example:"Pengurus"`
 	Tautan       string `json:"tautan" example:"https://www.linkedin.com/in/antondicaprio"`
 	CvUrl        string `json:"cv_url" example:"https://res.cloudinary.com/.../cv.pdf"`
 	IdDepartemen *int64 `json:"id_departemen" example:"1"`

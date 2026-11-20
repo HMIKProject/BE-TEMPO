@@ -60,9 +60,6 @@ func main() {
 		&entity.RiwayatJabatan{},
 	)
 
-	// Bersihkan data dummy anggota pengujian (Dankon & Anton) agar bagan organisasi bersih
-	db.Exec("DELETE FROM anggota WHERE nama_lengkap IN ('Dankon', 'Anton Chandrawansah') OR nim IN ('105224003', '105224000')")
-
 	// Inisialisasi otomatis akun slot jabatan dengan password 'qwerqwer'
 	_ = seeder.SeedAllRoleAccounts(db)
 	// _ = seeder.SeedSampleModul(db) // Ditiadakan agar modul tetap bersih untuk input manual pengurus
